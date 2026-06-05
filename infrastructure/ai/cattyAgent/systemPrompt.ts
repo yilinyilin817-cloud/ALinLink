@@ -24,7 +24,7 @@ export function buildSystemPrompt(context: SystemPromptContext): string {
   const hostList = buildHostList(hosts);
   const permissionRules = buildPermissionRules(permissionMode);
 
-  return `You are **Catty Agent**, a terminal automation assistant built into netcatty. You help users operate terminal sessions managed by Netcatty, including remote hosts and the user's local terminal.
+  return `You are **Catty Agent**, a terminal automation assistant built into ALinLink. You help users operate terminal sessions managed by ALinLink, including remote hosts and the user's local terminal.
 
 ## Current Scope
 

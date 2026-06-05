@@ -1,7 +1,7 @@
 /**
  * MCP Server Bridge — TCP host in Electron main process
  *
- * Starts a local TCP server that the netcatty-mcp-server.cjs child process
+ * Starts a local TCP server that the ALinLink-mcp-server.cjs child process
  * connects to. Handles JSON-RPC calls by dispatching to real terminal sessions.
  */
 "use strict";
@@ -18,7 +18,7 @@ const { safeSend } = require("./ipcUtils.cjs");
 const { getCliDiscoveryFilePath } = require("../cli/discoveryPath.cjs");
 const sftpBridge = require("./sftpBridge.cjs");
 
-const DEBUG_MCP = process.env.NETCATTY_MCP_DEBUG === "1";
+const DEBUG_MCP = process.env.ALinLink_MCP_DEBUG === "1";
 
 function debugLog(...args) {
   if (!DEBUG_MCP) return;
@@ -85,7 +85,7 @@ function setMainWindowGetter(fn) {
  */
 // External ACP agents (for example Codex) may give up on MCP tool calls after
 // about 120 seconds; see openai/codex#6127 ("timed out awaiting tools/call
-// after 120s"). Keep the Netcatty-side approval window below that with a small
+// after 120s"). Keep the ALinLink-side approval window below that with a small
 // buffer so a stale approval cannot still be accepted after the agent has
 // already timed out and abandoned the call.
 const APPROVAL_TIMEOUT_MS = 110 * 1000; // 110 seconds
@@ -110,7 +110,7 @@ function requestApprovalFromRenderer(toolName, args, chatSessionId) {
         try {
           const win = typeof getMainWindowFn === 'function' ? getMainWindowFn() : null;
           if (win && !win.isDestroyed()) {
-            win.webContents.send('netcatty:ai:mcp:approval-cleared', { approvalIds: [approvalId] });
+            win.webContents.send('ALinLink:ai:mcp:approval-cleared', { approvalIds: [approvalId] });
           }
         } catch { /* ignore */ }
       }
@@ -123,7 +123,7 @@ function requestApprovalFromRenderer(toolName, args, chatSessionId) {
       },
       chatSessionId: chatSessionId || null,
     });
-    mainWin.webContents.send('netcatty:ai:mcp:approval-request', {
+    mainWin.webContents.send('ALinLink:ai:mcp:approval-request', {
       approvalId,
       toolName,
       args,
@@ -146,7 +146,7 @@ function notifyRendererApprovalCleared(approvalIds) {
   try {
     const win = typeof getMainWindowFn === "function" ? getMainWindowFn() : null;
     if (win && !win.isDestroyed()) {
-      win.webContents.send("netcatty:ai:mcp:approval-cleared", { approvalIds });
+      win.webContents.send("ALinLink:ai:mcp:approval-cleared", { approvalIds });
     }
   } catch {
     // Ignore renderer notification failures during approval cleanup.
@@ -304,7 +304,7 @@ function shutdownHost({ preserveScopedMetadata = false } = {}) {
 function echoCommandToSession(session, sessionId, command) {
   if (!electronModule || !session?.webContentsId || !command) return;
   const contents = electronModule.webContents?.fromId?.(session.webContentsId);
-  safeSend(contents, "netcatty:data", {
+  safeSend(contents, "ALinLink:data", {
     sessionId,
     data: `${command}\r\n`,
     syntheticEcho: true,
@@ -652,16 +652,16 @@ async function handleMessage(socket, line) {
 
 // Methods that modify remote state — blocked in observer mode
 const WRITE_METHODS = new Set([
-  "netcatty/exec",
-  "netcatty/sftp/write",
-  "netcatty/sftp/download",
-  "netcatty/sftp/upload",
-  "netcatty/sftp/mkdir",
-  "netcatty/sftp/delete",
-  "netcatty/sftp/rename",
-  "netcatty/sftp/chmod",
-  "netcatty/jobStart",
-  "netcatty/jobStop",
+  "ALinLink/exec",
+  "ALinLink/sftp/write",
+  "ALinLink/sftp/download",
+  "ALinLink/sftp/upload",
+  "ALinLink/sftp/mkdir",
+  "ALinLink/sftp/delete",
+  "ALinLink/sftp/rename",
+  "ALinLink/sftp/chmod",
+  "ALinLink/jobStart",
+  "ALinLink/jobStop",
 ]);
 
 /**
@@ -692,14 +692,14 @@ function validateSessionScope(sessionId, chatSessionId, explicitScopedIds = null
 
 async function dispatch(method, params) {
   debugLog("dispatch", { method, params, permissionMode });
-  const sessionWriteLockId = (method === "netcatty/exec" || method === "netcatty/jobStart") ? params?.sessionId : null;
+  const sessionWriteLockId = (method === "ALinLink/exec" || method === "ALinLink/jobStart") ? params?.sessionId : null;
   pruneCompletedBackgroundJobs();
 
-  // Observer mode: block all write operations *except* netcatty/jobStop,
+  // Observer mode: block all write operations *except* ALinLink/jobStop,
   // which must remain available so users can interrupt long-running jobs
   // they started before switching to observer mode (otherwise the job
   // would hold the per-session lock until it exits on its own).
-  if (permissionMode === "observer" && WRITE_METHODS.has(method) && method !== "netcatty/jobStop") {
+  if (permissionMode === "observer" && WRITE_METHODS.has(method) && method !== "ALinLink/jobStop") {
     return { ok: false, error: `Operation denied: permission mode is "observer" (read-only). Change to "confirm" or "autonomous" in Settings → AI → Safety to allow this action.` };
   }
 
@@ -710,22 +710,22 @@ async function dispatch(method, params) {
     };
   }
 
-  // netcatty/jobStop must remain callable after ACP cancel so users can stop
+  // ALinLink/jobStop must remain callable after ACP cancel so users can stop
   // a long-running terminal_start job (which intentionally survives ACP Stop)
   // even from a chat session whose write methods are otherwise blocked.
-  if (WRITE_METHODS.has(method) && method !== "netcatty/jobStop" && isChatSessionCancelled(params?.chatSessionId)) {
+  if (WRITE_METHODS.has(method) && method !== "ALinLink/jobStop" && isChatSessionCancelled(params?.chatSessionId)) {
     return { ok: false, error: "Operation cancelled: the ACP session was stopped." };
   }
 
   // Validate session scope *first* so out-of-scope callers cannot infer the
   // existence or activity of foreign sessions through busy-state error
   // messages, and so requests fail fast without blocking the write lock.
-  if (method !== "netcatty/getContext" && params?.sessionId) {
+  if (method !== "ALinLink/getContext" && params?.sessionId) {
     const scopeErr = validateSessionScope(params.sessionId, params?.chatSessionId, params?.scopedSessionIds);
     if (scopeErr) return { ok: false, error: scopeErr };
   }
 
-  if ((method === "netcatty/exec" || method === "netcatty/jobStart") && params?.sessionId) {
+  if ((method === "ALinLink/exec" || method === "ALinLink/jobStart") && params?.sessionId) {
     const busy = getSessionBusyError(params.sessionId);
     if (busy) return busy;
   }
@@ -743,10 +743,10 @@ async function dispatch(method, params) {
 
   try {
     // Confirm mode: request user approval for write operations.
-    // netcatty/jobStop bypasses approval — it's a stop/cancel action that
+    // ALinLink/jobStop bypasses approval — it's a stop/cancel action that
     // must remain available even if the renderer is unavailable; otherwise
     // a runaway terminal_start job could not be interrupted at all.
-    if (permissionMode === "confirm" && WRITE_METHODS.has(method) && method !== "netcatty/jobStop") {
+    if (permissionMode === "confirm" && WRITE_METHODS.has(method) && method !== "ALinLink/jobStop") {
       const { chatSessionId, ...toolArgs } = params || {};
       const approved = await requestApprovalFromRenderer(method, toolArgs, chatSessionId);
       if (!approved) {
@@ -754,41 +754,41 @@ async function dispatch(method, params) {
       }
     }
     switch (method) {
-      case "netcatty/getContext":
+      case "ALinLink/getContext":
         return handleGetContext(params);
-      case "netcatty/getStatus":
+      case "ALinLink/getStatus":
         return handleGetStatus();
-      case "netcatty/exec":
+      case "ALinLink/exec":
         return handleExec(params);
-      case "netcatty/sftp/list":
+      case "ALinLink/sftp/list":
         return handleSftpList(params);
-      case "netcatty/sftp/read":
+      case "ALinLink/sftp/read":
         return handleSftpRead(params);
-      case "netcatty/sftp/write":
+      case "ALinLink/sftp/write":
         return handleSftpWrite(params);
-      case "netcatty/sftp/download":
+      case "ALinLink/sftp/download":
         return handleSftpDownload(params);
-      case "netcatty/sftp/upload":
+      case "ALinLink/sftp/upload":
         return handleSftpUpload(params);
-      case "netcatty/sftp/mkdir":
+      case "ALinLink/sftp/mkdir":
         return handleSftpMkdir(params);
-      case "netcatty/sftp/delete":
+      case "ALinLink/sftp/delete":
         return handleSftpDelete(params);
-      case "netcatty/sftp/rename":
+      case "ALinLink/sftp/rename":
         return handleSftpRename(params);
-      case "netcatty/sftp/stat":
+      case "ALinLink/sftp/stat":
         return handleSftpStat(params);
-      case "netcatty/sftp/chmod":
+      case "ALinLink/sftp/chmod":
         return handleSftpChmod(params);
-      case "netcatty/sftp/home":
+      case "ALinLink/sftp/home":
         return handleSftpHome(params);
-      case "netcatty/setCancelled":
+      case "ALinLink/setCancelled":
         return handleSetCancelled(params);
-      case "netcatty/jobStart":
+      case "ALinLink/jobStart":
         return handleJobStart(params);
-      case "netcatty/jobPoll":
+      case "ALinLink/jobPoll":
         return handleJobPoll(params);
-      case "netcatty/jobStop":
+      case "ALinLink/jobStop":
         return handleJobStop(params);
       default:
         throw new Error(`Unknown method: ${method}`);
@@ -823,7 +823,7 @@ function handleGetContext(params) {
   // it as "no access" rather than falling back to all sessions.
   if (hasScopedContext && (!resolvedScopedIds || resolvedScopedIds.length === 0)) {
     return {
-      environment: "netcatty-terminal",
+      environment: "ALinLink-terminal",
       description: "No hosts are available in the current scope.",
       hosts: [],
       hostCount: 0,
@@ -854,10 +854,10 @@ function handleGetContext(params) {
   }
 
   return {
-    environment: "netcatty-terminal",
-    description: "You are operating inside Netcatty, a multi-session terminal manager. " +
+    environment: "ALinLink-terminal",
+    description: "You are operating inside ALinLink, a multi-session terminal manager. " +
       "The available sessions may be remote hosts, local terminals, Mosh-backed shells, or serial port connections (network devices, embedded systems). " +
-      "Use the provided tools to execute commands through the sessions exposed by Netcatty. " +
+      "Use the provided tools to execute commands through the sessions exposed by ALinLink. " +
       "Serial sessions (protocol: serial, shellType: raw) do not run a standard shell — commands are sent as-is. " +
       "Network device sessions (deviceType: network) use vendor CLIs (Huawei VRP, Cisco IOS, etc.) — commands are sent as-is without shell wrapping, and exit codes are unavailable. " +
       "Always prefer these tools over suggesting the user to do things manually.",
@@ -869,7 +869,7 @@ function handleGetContext(params) {
 function handleGetStatus() {
   return {
     ok: true,
-    environment: "netcatty-terminal",
+    environment: "ALinLink-terminal",
     permissionMode,
     approvalTimeoutMs: APPROVAL_TIMEOUT_MS,
     commandTimeoutMs,

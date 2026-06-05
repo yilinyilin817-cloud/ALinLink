@@ -353,8 +353,8 @@ function buildCompactContext(
   if (!durableUserLines.length && !durableAssistantLines.length && !summaryLines.length) return [];
 
   const contentLines = [
-    "[Compact prior Netcatty UI context]",
-    "The external ACP agent may already have its own persisted session context. Use this compact Netcatty UI context only as fallback/background, and prefer the current user request when there is any conflict.",
+    "[Compact prior ALinLink UI context]",
+    "The external ACP agent may already have its own persisted session context. Use this compact ALinLink UI context only as fallback/background, and prefer the current user request when there is any conflict.",
   ];
   if (durableUserLines.length) {
     contentLines.push("Earlier user requests that may still apply:");

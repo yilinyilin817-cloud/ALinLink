@@ -4,11 +4,11 @@ const { moshExtraResources } = require('./scripts/mosh-extra-resources.cjs');
  * @type {import('electron-builder').Configuration}
  */
 module.exports = {
-    appId: 'com.netcatty.app',
-    productName: 'Netcatty',
+    appId: 'com.ALinLink.app',
+    productName: 'ALinLink',
     artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
     // Give the macOS build a unique Mach-O LC_UUID before signing, so macOS
-    // Local Network privacy treats Netcatty distinctly from every other
+    // Local Network privacy treats ALinLink distinctly from every other
     // Electron app (which all share Electron's prebuilt LC_UUID) — see #1040
     // and scripts/afterPackMacUuid.cjs. No-op on Windows/Linux.
     afterPack: './scripts/afterPackMacUuid.cjs',
@@ -44,7 +44,7 @@ module.exports = {
         'public/**/*',
         'node_modules/**/*',
         // @anthropic-ai/claude-agent-sdk@0.3.x bundles the native Claude Code
-        // CLI (~211MB per arch) as optional sibling packages. Netcatty is
+        // CLI (~211MB per arch) as optional sibling packages. ALinLink is
         // designed around the user's own Claude Code install — the wrapper
         // honors `CLAUDE_CODE_EXECUTABLE` (set by useAgentDiscovery.ts) and
         // only falls back to the bundled binary if that env var is empty.
@@ -94,9 +94,9 @@ module.exports = {
         entitlements: 'electron/entitlements.mac.plist',
         entitlementsInherit: 'electron/entitlements.mac.plist',
         extendInfo: {
-            NSCameraUsageDescription: 'Netcatty may use the camera for video calls',
-            NSMicrophoneUsageDescription: 'Netcatty may use the microphone for audio',
-            NSLocalNetworkUsageDescription: 'Netcatty needs local network access for SSH connections'
+            NSCameraUsageDescription: 'ALinLink may use the camera for video calls',
+            NSMicrophoneUsageDescription: 'ALinLink may use the microphone for audio',
+            NSLocalNetworkUsageDescription: 'ALinLink needs local network access for SSH connections'
         },
         extraResources: moshExtraResources('darwin')
     },
@@ -137,7 +137,7 @@ module.exports = {
         allowToChangeInstallationDirectory: true,
         createDesktopShortcut: true,
         createStartMenuShortcut: true,
-        shortcutName: 'Netcatty'
+        shortcutName: 'ALinLink'
     },
     linux: {
         // Linux desktop icons render full-bleed like Windows — use the
@@ -157,7 +157,7 @@ module.exports = {
         {
             provider: 'github',
             owner: 'binaricat',
-            repo: 'Netcatty',
+            repo: 'ALinLink',
             releaseType: 'release'
         }
     ]

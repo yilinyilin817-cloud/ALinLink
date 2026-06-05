@@ -181,7 +181,7 @@ function getTrayPanelUrl() {
   if (devServerUrl) {
     return `${devServerUrl.replace(/\/$/, "")}/#/tray`;
   }
-  return "app://netcatty/index.html#/tray";
+  return "app://ALinLink/index.html#/tray";
 }
 
 function ensureTrayPanelWindow() {
@@ -229,7 +229,7 @@ function ensureTrayPanelWindow() {
 
   trayPanelWindow.webContents.on("did-finish-load", () => {
     try {
-      trayPanelWindow?.webContents?.send("netcatty:trayPanel:setMenuData", trayMenuData);
+      trayPanelWindow?.webContents?.send("ALinLink:trayPanel:setMenuData", trayMenuData);
     } catch {
       // ignore
     }
@@ -259,7 +259,7 @@ function showTrayPanel() {
   win.focus();
 
   try {
-    win.webContents?.send("netcatty:trayPanel:setMenuData", trayMenuData);
+    win.webContents?.send("ALinLink:trayPanel:setMenuData", trayMenuData);
   } catch {
     // ignore
   }
@@ -268,7 +268,7 @@ function showTrayPanel() {
   trayPanelRefreshTimer = setInterval(() => {
     try {
       if (!trayPanelWindow || trayPanelWindow.isDestroyed() || !trayPanelWindow.isVisible()) return;
-      trayPanelWindow.webContents?.send("netcatty:trayPanel:refresh");
+      trayPanelWindow.webContents?.send("ALinLink:trayPanel:refresh");
     } catch {
       // ignore
     }
@@ -618,7 +618,7 @@ function createTray() {
     }
 
     tray = new Tray(trayIcon || nativeImage.createEmpty());
-    tray.setToolTip("Netcatty");
+    tray.setToolTip("ALinLink");
 
     // Build and set initial context menu
     updateTrayMenu();
@@ -674,7 +674,7 @@ function buildTrayMenuTemplate() {
             win.show();
             win.focus();
             // Notify renderer to focus this session
-            win.webContents?.send("netcatty:tray:focusSession", session.id);
+            win.webContents?.send("ALinLink:tray:focusSession", session.id);
           }
         },
       });
@@ -710,7 +710,7 @@ function buildTrayMenuTemplate() {
         click: () => {
           const win = getMainWindow();
           if (win) {
-            win.webContents?.send("netcatty:tray:togglePortForward", rule.id, !isActive);
+            win.webContents?.send("ALinLink:tray:togglePortForward", rule.id, !isActive);
           }
         },
       });
@@ -827,70 +827,70 @@ function handleWindowClose(event, win) {
  */
 function registerHandlers(ipcMain) {
   // Register global toggle hotkey
-  ipcMain.handle("netcatty:globalHotkey:register", async (_event, { hotkey }) => {
+  ipcMain.handle("ALinLink:globalHotkey:register", async (_event, { hotkey }) => {
     return registerGlobalHotkey(hotkey);
   });
 
   // Unregister global toggle hotkey
-  ipcMain.handle("netcatty:globalHotkey:unregister", async () => {
+  ipcMain.handle("ALinLink:globalHotkey:unregister", async () => {
     unregisterGlobalHotkey();
     return { success: true };
   });
 
   // Get current hotkey status
-  ipcMain.handle("netcatty:globalHotkey:status", async () => {
+  ipcMain.handle("ALinLink:globalHotkey:status", async () => {
     return getHotkeyStatus();
   });
 
   // Set close-to-tray behavior
-  ipcMain.handle("netcatty:tray:setCloseToTray", async (_event, { enabled }) => {
+  ipcMain.handle("ALinLink:tray:setCloseToTray", async (_event, { enabled }) => {
     return setCloseToTray(enabled);
   });
 
   // Get close-to-tray status
-  ipcMain.handle("netcatty:tray:isCloseToTray", async () => {
+  ipcMain.handle("ALinLink:tray:isCloseToTray", async () => {
     return { enabled: closeToTray };
   });
 
   // Update tray menu data
-  ipcMain.handle("netcatty:tray:updateMenuData", async (_event, data) => {
+  ipcMain.handle("ALinLink:tray:updateMenuData", async (_event, data) => {
     setTrayMenuData(data);
     return { success: true };
   });
 
-  ipcMain.handle("netcatty:trayPanel:hide", async () => {
+  ipcMain.handle("ALinLink:trayPanel:hide", async () => {
     hideTrayPanel();
     return { success: true };
   });
 
-  ipcMain.handle("netcatty:trayPanel:openMainWindow", async () => {
+  ipcMain.handle("ALinLink:trayPanel:openMainWindow", async () => {
     openMainWindow();
     return { success: true };
   });
 
-  ipcMain.handle("netcatty:trayPanel:jumpToSession", async (_event, sessionId) => {
+  ipcMain.handle("ALinLink:trayPanel:jumpToSession", async (_event, sessionId) => {
     openMainWindow();
     try {
       const win = getMainWindow();
-      win?.webContents?.send("netcatty:trayPanel:jumpToSession", sessionId);
+      win?.webContents?.send("ALinLink:trayPanel:jumpToSession", sessionId);
     } catch {
       // ignore
     }
     return { success: true };
   });
 
-  ipcMain.handle("netcatty:trayPanel:connectToHost", async (_event, hostId) => {
+  ipcMain.handle("ALinLink:trayPanel:connectToHost", async (_event, hostId) => {
     openMainWindow();
     try {
       const win = getMainWindow();
-      win?.webContents?.send("netcatty:trayPanel:connectToHost", hostId);
+      win?.webContents?.send("ALinLink:trayPanel:connectToHost", hostId);
     } catch {
       // ignore
     }
     return { success: true };
   });
 
-  ipcMain.handle("netcatty:trayPanel:quitApp", async () => {
+  ipcMain.handle("ALinLink:trayPanel:quitApp", async () => {
     const { app } = electronModule;
     closeToTray = false;
     app.quit();

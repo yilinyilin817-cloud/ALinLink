@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import type { MutableRefObject } from "react";
-import { netcattyBridge } from "../../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../../infrastructure/services/ALinLinkBridge";
 import type { Host, Identity, SftpConnection, SftpFileEntry, SftpFilenameEncoding, SSHKey } from "../../../domain/models";
 import type { SftpPane } from "./types";
 import { useSftpDirectoryListing } from "./useSftpDirectoryListing";
@@ -132,7 +132,7 @@ export const useSftpConnections = ({
             // have already removed during the await.
             sftpSessionsRef.current.delete(currentPane.connection.id);
             try {
-              await netcattyBridge.get()?.closeSftp(oldSftpId);
+              await ALinLinkBridge.get()?.closeSftp(oldSftpId);
             } catch {
               // Ignore errors when closing stale SFTP sessions
             }
@@ -141,7 +141,7 @@ export const useSftpConnections = ({
       }
 
       if (host === "local") {
-        let homeDir = await netcattyBridge.get()?.getHomeDir?.();
+        let homeDir = await ALinLinkBridge.get()?.getHomeDir?.();
         if (!homeDir) {
           const isWindows = navigator.platform.toLowerCase().includes("win");
           homeDir = isWindows ? "C:\\Users\\damao" : "/Users/damao";
@@ -226,7 +226,7 @@ export const useSftpConnections = ({
         // Subscribe to SFTP connection progress events for auth logging
         const sftpSessionId = `sftp-${connectionId}`;
         let unsubSftpProgress: (() => void) | undefined;
-        const bridge = netcattyBridge.get();
+        const bridge = ALinLinkBridge.get();
         if (bridge?.onSftpConnectionProgress) {
           unsubSftpProgress = bridge.onSftpConnectionProgress((sid, label, status, detail) => {
             if (sid !== sftpSessionId) return;
@@ -329,7 +329,7 @@ export const useSftpConnections = ({
 
           if (!sharedHostCache) {
             // Detect home directory: SSH exec `echo ~` → SFTP realpath('.') → hardcoded fallback
-            const bridge = netcattyBridge.get();
+            const bridge = ALinLinkBridge.get();
             let detected = false;
 
             if (bridge?.getSftpHomeDir) {
@@ -560,7 +560,7 @@ export const useSftpConnections = ({
         const sftpId = sftpSessionsRef.current.get(pane.connection.id);
         if (sftpId) {
           try {
-            await netcattyBridge.get()?.closeSftp(sftpId);
+            await ALinLinkBridge.get()?.closeSftp(sftpId);
           } catch {
             // Ignore errors when closing SFTP session during disconnect
           }

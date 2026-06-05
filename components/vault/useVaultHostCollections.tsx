@@ -157,11 +157,13 @@ export function useVaultHostCollections({
         );
       }
       filtered = [...filtered].sort((a, b) => {
+        const labelA = a.label ?? a.name ?? a.hostname ?? "";
+        const labelB = b.label ?? b.name ?? b.hostname ?? "";
         switch (sortMode) {
           case "az":
-            return a.label.localeCompare(b.label);
+            return labelA.localeCompare(labelB);
           case "za":
-            return b.label.localeCompare(a.label);
+            return labelB.localeCompare(labelA);
           case "newest":
             return (b.createdAt || 0) - (a.createdAt || 0);
           case "oldest":
@@ -170,7 +172,7 @@ export function useVaultHostCollections({
             const groupA = a.group || "";
             const groupB = b.group || "";
             const groupCmp = groupA.localeCompare(groupB);
-            return groupCmp !== 0 ? groupCmp : a.label.localeCompare(b.label);
+            return groupCmp !== 0 ? groupCmp : labelA.localeCompare(labelB);
           }
           default:
             return 0;
@@ -199,7 +201,7 @@ export function useVaultHostCollections({
           selectedTags.some((t) => h.tags?.includes(t)),
         );
       }
-      return filtered.sort((a, b) => a.label.localeCompare(b.label));
+      return filtered.sort((a, b) => (a.label ?? a.name ?? a.hostname ?? "").localeCompare(b.label ?? b.name ?? b.hostname ?? ""));
     }, [hosts, selectedGroupPath, search, selectedTags]);
   
   // Recently connected hosts for root-level display
@@ -256,11 +258,13 @@ export function useVaultHostCollections({
         );
       }
       filtered = [...filtered].sort((a, b) => {
+        const labelA = a.label ?? a.name ?? a.hostname ?? "";
+        const labelB = b.label ?? b.name ?? b.hostname ?? "";
         switch (sortMode) {
           case "az":
-            return a.label.localeCompare(b.label);
+            return labelA.localeCompare(labelB);
           case "za":
-            return b.label.localeCompare(a.label);
+            return labelB.localeCompare(labelA);
           case "newest":
             return (b.createdAt || 0) - (a.createdAt || 0);
           case "oldest":
@@ -269,7 +273,7 @@ export function useVaultHostCollections({
             const groupA = a.group || "";
             const groupB = b.group || "";
             const groupCmp = groupA.localeCompare(groupB);
-            return groupCmp !== 0 ? groupCmp : a.label.localeCompare(b.label);
+            return groupCmp !== 0 ? groupCmp : labelA.localeCompare(labelB);
           }
           default:
             return 0;

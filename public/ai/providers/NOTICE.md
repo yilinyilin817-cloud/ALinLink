@@ -3,10 +3,10 @@
 Files in this directory are bundled as static assets for the AI provider
 configuration UI.
 
-## Originally authored for netcatty
+## Originally authored for ALinLink
 
 - `anthropic.svg`, `openai.svg`, `google.svg`, `ollama.svg`, `openrouter.svg`,
-  `custom.svg` — netcatty.
+  `custom.svg` — ALinLink.
 
 ## From [lobehub/lobe-icons](https://github.com/lobehub/lobe-icons) (MIT)
 

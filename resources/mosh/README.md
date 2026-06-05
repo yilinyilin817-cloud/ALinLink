@@ -1,7 +1,7 @@
 # Bundled `mosh-client`
 
 This directory holds the network-protocol-only `mosh-client` binary
-bundled with the Netcatty installer. Netcatty drives the `ssh` +
+bundled with the ALinLink installer. ALinLink drives the `ssh` +
 `mosh-server` bootstrap itself and then launches this bundled client
 directly (see `electron/bridges/moshHandshake.cjs` and
 `electron/bridges/terminalBridge.cjs`).
@@ -27,7 +27,7 @@ directly (see `electron/bridges/moshHandshake.cjs` and
    renders remote output on Windows.
 
 2. When manually dispatched with `release_tag`, that workflow publishes
-   the binaries to the dedicated `binaricat/Netcatty-mosh-bin`
+   the binaries to the dedicated `binaricat/ALinLink-mosh-bin`
    repository. The release gets a tag like `mosh-bin-1.4.0-1`, with
    `SHA256SUMS` attached.
 
@@ -44,7 +44,7 @@ directly (see `electron/bridges/moshHandshake.cjs` and
 
    Local dev uses the same binary path: `npm run dev` runs
    `npm run fetch:mosh:dev` first, which downloads the host platform's
-   bundled `mosh-client` into this gitignored directory. Netcatty does
+   bundled `mosh-client` into this gitignored directory. ALinLink does
    not fall back to a system-installed `mosh` or `mosh-client`; if the
    bundled binary is missing, Mosh startup fails loudly instead of using
    whatever happens to be installed on the developer machine.
@@ -59,7 +59,7 @@ The directory is otherwise empty (binaries are gitignored).
 
 - Mosh itself is licensed under **GPL-3.0**
   (https://github.com/mobile-shell/mosh).
-- Netcatty is **GPL-3.0**, so redistribution as part of the installer
+- ALinLink is **GPL-3.0**, so redistribution as part of the installer
   is permitted.
 - The default Windows x64 binary is the FluentTerminal-pinned
   standalone `mosh-client.exe` from
@@ -95,7 +95,7 @@ For macOS the build needs an Xcode toolchain; see
   to a freshly-spawned `mosh-client` PTY when `MOSH CONNECT` is
   detected. Keystrokes that arrive after the swap go to mosh-client
   because `writeToSession` reads `session.proc` lazily.
-- Mosh startup requires Netcatty's bundled `mosh-client` and a usable
+- Mosh startup requires ALinLink's bundled `mosh-client` and a usable
   `ssh` client for the remote bootstrap. System-installed `mosh` /
   `mosh-client` binaries are intentionally ignored.
 - Windows x64 currently ships the FluentTerminal-pinned standalone

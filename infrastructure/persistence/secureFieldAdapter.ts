@@ -11,13 +11,13 @@
 
 import type { GroupConfig, Host, Identity, ProxyProfile, SSHKey } from "../../domain/models";
 import type { ProviderConnection, S3Config, WebDAVConfig } from "../../domain/sync";
-import { netcattyBridge } from "../services/netcattyBridge";
+import { ALinLinkBridge } from "../services/ALinLinkBridge";
 
 // ---------------------------------------------------------------------------
 // Primitive helpers
 // ---------------------------------------------------------------------------
 
-const bridge = () => netcattyBridge.get();
+const bridge = () => ALinLinkBridge.get();
 
 export async function encryptField(value: string | undefined): Promise<string | undefined> {
   if (!value) return value;

@@ -1,11 +1,20 @@
 import {
+  BookOpen,
+  Columns,
   Folder,
   FolderLock,
   LayoutGrid,
+  MonitorSpeaker,
+  Network,
+  Palette,
   Plus,
   Search,
+  Send,
+  Settings,
+  SplitSquareHorizontal,
   Terminal,
   TerminalSquare,
+  Zap,
 } from "lucide-react";
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "../application/i18n/I18nProvider";
@@ -18,6 +27,33 @@ type QuickSwitcherItem = {
   id: string;
   data?: Host | TerminalSession | Workspace;
 };
+
+// Command Palette action definitions
+interface PaletteAction {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  category: string;
+  shortcut?: string;
+  keywords: string[];
+}
+
+const PALETTE_ACTIONS: PaletteAction[] = [
+  { id: "open-settings", label: "Open Settings", icon: <Settings size={16} />, category: "App", keywords: ["settings", "preferences", "config"] },
+  { id: "toggle-theme", label: "Toggle Theme", icon: <Palette size={16} />, category: "App", keywords: ["theme", "dark", "light", "appearance"] },
+  { id: "open-sftp", label: "Open SFTP", icon: <Folder size={16} />, category: "Navigation", keywords: ["sftp", "file", "browser", "files"] },
+  { id: "open-hosts", label: "Open Hosts Vault", icon: <FolderLock size={16} />, category: "Navigation", keywords: ["hosts", "vault", "connections"] },
+  { id: "port-forwarding", label: "Open Port Forwarding", icon: <Network size={16} />, category: "Navigation", keywords: ["port", "forwarding", "tunnel", "network"] },
+  { id: "snippets", label: "Open Snippets", icon: <Zap size={16} />, category: "Navigation", keywords: ["snippets", "scripts", "commands", "macros"] },
+  { id: "new-workspace", label: "New Workspace", icon: <Plus size={16} />, category: "Workspace", keywords: ["workspace", "new", "create"] },
+  { id: "split-horizontal", label: "Split Horizontal", icon: <SplitSquareHorizontal size={16} />, category: "Terminal", keywords: ["split", "horizontal", "pane"] },
+  { id: "split-vertical", label: "Split Vertical", icon: <Columns size={16} />, category: "Terminal", keywords: ["split", "vertical", "pane"] },
+  { id: "broadcast", label: "Toggle Broadcast Mode", icon: <Send size={16} />, category: "Terminal", keywords: ["broadcast", "multi", "send", "all"] },
+  { id: "batch-command", label: "Batch Command Execution", icon: <MonitorSpeaker size={16} />, category: "Tools", keywords: ["batch", "command", "multi-host", "execute"] },
+  { id: "session-recording", label: "Session Recording", icon: <BookOpen size={16} />, category: "Tools", keywords: ["record", "recording", "session", "replay"] },
+  { id: "tunnel-viz", label: "Tunnel Visualization", icon: <Network size={16} />, category: "Tools", keywords: ["tunnel", "visualization", "topology", "port forwarding"] },
+  { id: "host-dashboard", label: "Host Health Dashboard", icon: <MonitorSpeaker size={16} />, category: "Tools", keywords: ["monitor", "health", "dashboard", "stats", "cpu", "memory"] },
+];
 import { DistroAvatar } from "./DistroAvatar";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
@@ -72,6 +108,8 @@ interface QuickSwitcherProps {
   onCreateWorkspace?: () => void;
   keyBindings?: KeyBinding[];
   showSftpTab: boolean;
+  /** Callback for Command Palette action execution */
+  onExecuteAction?: (actionId: string) => void;
 }
 
 const QuickSwitcherInner: React.FC<QuickSwitcherProps> = ({
@@ -88,9 +126,22 @@ const QuickSwitcherInner: React.FC<QuickSwitcherProps> = ({
   onCreateWorkspace,
   keyBindings,
   showSftpTab,
+  onExecuteAction,
 }) => {
   const { t } = useI18n();
   const discoveredShells = useDiscoveredShells();
+
+  // Filter actions by search query
+  const filteredActions = useMemo(() => {
+    if (!query.trim()) return PALETTE_ACTIONS;
+    const q = query.toLowerCase();
+    return PALETTE_ACTIONS.filter(
+      (a) =>
+        a.label.toLowerCase().includes(q) ||
+        a.category.toLowerCase().includes(q) ||
+        a.keywords.some((k) => k.includes(q))
+    );
+  }, [query]);
 
   const filteredShells = useMemo(() => {
     const list = !query.trim()
@@ -159,6 +210,10 @@ const QuickSwitcherInner: React.FC<QuickSwitcherProps> = ({
     const items: QuickSwitcherItem[] = [];
 
     if (showCategorized) {
+      // Actions (Command Palette)
+      filteredActions.forEach((action) =>
+        items.push({ type: "action", id: action.id }),
+      );
       // Hosts
       results.forEach((host) =>
         items.push({ type: "host", id: host.id, data: host }),
@@ -198,7 +253,7 @@ const QuickSwitcherInner: React.FC<QuickSwitcherProps> = ({
     });
 
     return { flatItems: items, itemIndexMap: indexMap };
-  }, [showCategorized, results, orphanSessions, workspaces, filteredShells, showSftpTab]);
+  }, [showCategorized, results, orphanSessions, workspaces, filteredShells, showSftpTab, filteredActions]);
 
   // O(1) index lookup
   const getItemIndex = useCallback((type: string, id: string) => {
@@ -232,8 +287,8 @@ const QuickSwitcherInner: React.FC<QuickSwitcherProps> = ({
         onClose();
         break;
       case "action":
-        if (item.id === "local-terminal" && onCreateLocalTerminal) {
-          onCreateLocalTerminal();
+        if (onExecuteAction) {
+          onExecuteAction(item.id);
           onClose();
         }
         break;
@@ -304,6 +359,42 @@ const QuickSwitcherInner: React.FC<QuickSwitcherProps> = ({
                 </button>
               )}
             </div>
+
+            {/* Actions section (Command Palette) */}
+            {filteredActions.length > 0 && (
+              <div>
+                <div className="px-4 py-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Actions
+                  </span>
+                </div>
+                {filteredActions.map((action) => {
+                  const idx = getItemIndex("action", action.id);
+                  const isSelected = idx === selectedIndex;
+                  return (
+                    <div
+                      key={action.id}
+                      className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${
+                        isSelected ? "bg-primary/15" : "hover:bg-muted/50"
+                      }`}
+                      onClick={() => {
+                        if (onExecuteAction) {
+                          onExecuteAction(action.id);
+                          onClose();
+                        }
+                      }}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                    >
+                      <div className="h-6 w-6 rounded flex items-center justify-center text-muted-foreground">
+                        {action.icon}
+                      </div>
+                      <span className="text-sm font-medium flex-1">{action.label}</span>
+                      <span className="text-[11px] text-muted-foreground">{action.category}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Hosts section */}
             {results.length > 0 && (

@@ -131,16 +131,16 @@ export default [
         "error",
         {
           object: "window",
-          property: "netcatty",
+          property: "ALinLink",
           message:
-            "Do not access window.netcatty directly; use netcattyBridge or an application/state backend hook.",
+            "Do not access window.ALinLink directly; use ALinLinkBridge or an application/state backend hook.",
         },
       ],
       "no-restricted-globals": ["error", "localStorage", "sessionStorage"],
     },
   },
   {
-    files: ["infrastructure/services/netcattyBridge.ts"],
+    files: ["infrastructure/services/ALinLinkBridge.ts"],
     rules: {
       "no-restricted-properties": "off",
     },

@@ -1,11 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { ArrowUpCircle, Bug, Check, Github, Loader2, MessageCircle, Newspaper, RefreshCcw } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { ArrowUpCircle, Check, Download, FileUp, Loader2, Newspaper, RefreshCcw, Trash2, Wrench } from "lucide-react";
 import AppLogo from "./AppLogo";
 import { Button } from "./ui/button";
 import { cn } from "../lib/utils";
 import { useApplicationBackend } from "../application/state/useApplicationBackend";
 import type { UpdateState, UseUpdateCheckResult } from "../application/state/useUpdateCheck";
 import { useI18n } from "../application/i18n/I18nProvider";
+import { useVaultState } from "../application/state/useVaultState";
+import { importVaultHostsFromText } from "../domain/vaultImport";
 import { SettingsTabContent } from "./settings/settings-ui";
 import { toast } from "./ui/toast";
 
@@ -15,31 +17,7 @@ type AppInfo = {
   platform?: string;
 };
 
-const REPO_URL = "https://github.com/binaricat/Netcatty";
-
-const buildIssueUrl = (appInfo: AppInfo) => {
-  const title = "Bug: ";
-  const bodyLines = [
-    "## Describe the problem",
-    "",
-    "## Steps to reproduce",
-    "1.",
-    "",
-    "## Expected behavior",
-    "",
-    "## Actual behavior",
-    "",
-    "## Environment",
-    `- App: ${appInfo.name} ${appInfo.version}`,
-    `- Platform: ${appInfo.platform || "unknown"}`,
-    `- UA: ${typeof navigator !== "undefined" ? navigator.userAgent : "unknown"}`,
-  ];
-  const params = new URLSearchParams({
-    title,
-    body: bodyLines.join("\n"),
-  });
-  return `${REPO_URL}/issues/new?${params.toString()}`;
-};
+const REPO_URL = "https://github.com/binaricat/ALinLink";
 
 const ActionRow: React.FC<{
   icon: React.ReactNode;
@@ -74,9 +52,11 @@ interface SettingsApplicationTabProps {
 
 export default function SettingsApplicationTab({ updateState, checkNow, openReleasePage, installUpdate, startDownload, isUpdateDemoMode }: SettingsApplicationTabProps) {
   const { t } = useI18n();
-  const { openExternal, getApplicationInfo } = useApplicationBackend();
-  const [appInfo, setAppInfo] = useState<AppInfo>({ name: "Netcatty", version: "" });
+  const { openExternal, getApplicationInfo, clearAppCache } = useApplicationBackend();
+  const { exportData, importData, hosts } = useVaultState();
+  const [appInfo, setAppInfo] = useState<AppInfo>({ name: "ALinLink", version: "" });
   const [lastCheckResult, setLastCheckResult] = useState<'none' | 'available' | 'upToDate'>('none');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -141,9 +121,64 @@ export default function SettingsApplicationTab({ updateState, checkNow, openRele
     setTimeout(() => setLastCheckResult('none'), 3000);
   };
 
-  const issueUrl = useMemo(() => buildIssueUrl(appInfo), [appInfo]);
   const releasesUrl = `${REPO_URL}/releases`;
-  const discussionsUrl = `${REPO_URL}/discussions`;
+
+  const handleExportVault = () => {
+    try {
+      const data = exportData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ALinLink-vault-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(t("settings.application.exportSuccess"), t("settings.application.exportTitle"));
+    } catch (err) {
+      console.error("导出失败:", err);
+      toast.error(t("settings.application.exportFailed"), t("settings.application.exportTitle"));
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const result = importVaultHostsFromText("ssh_config", text, hosts);
+      if (result.hosts.length > 0) {
+        await importData({ hosts: [...hosts, ...result.hosts] });
+        toast.success(
+          t("settings.application.importSuccess", { count: result.hosts.length }),
+          t("settings.application.importTitle")
+        );
+      } else {
+        toast.warning(t("settings.application.importNoHosts"), t("settings.application.importTitle"));
+      }
+    } catch (err) {
+      console.error("导入失败:", err);
+      toast.error(t("settings.application.importFailed"), t("settings.application.importTitle"));
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleClearCache = () => {
+    try {
+      const count = clearAppCache();
+      if (count > 0) {
+        toast.success(t("settings.application.clearCacheSuccess"), t("settings.application.clearCacheTitle"));
+      } else {
+        toast.info(t("settings.application.clearCacheSuccess"), t("settings.application.clearCacheTitle"));
+      }
+    } catch (err) {
+      console.error("清理缓存失败:", err);
+      toast.error(t("settings.application.clearCacheFailed"), t("settings.application.clearCacheTitle"));
+    }
+  };
 
   return (
     <SettingsTabContent value="application">
@@ -152,13 +187,13 @@ export default function SettingsApplicationTab({ updateState, checkNow, openRele
           <div className="flex items-center gap-4">
             <AppLogo className="w-16 h-16" />
             <div>
-              {/* Match the Vault sidebar wordmark so the Netcatty brand
+              {/* Match the Vault sidebar wordmark so the ALinLink brand
                   reads consistently across surfaces — same italic heavy
                   cut, just scaled up for the Settings hero area and
-                  using the branded mixed-case "Netcatty" instead of
+                  using the branded mixed-case "ALinLink" instead of
                   the lowercase electron app name. */}
               <div className="text-3xl font-black italic tracking-tight leading-none text-foreground">
-                Netcatty
+                ALinLink
               </div>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-muted-foreground">
@@ -214,28 +249,46 @@ export default function SettingsApplicationTab({ updateState, checkNow, openRele
         <div className="flex-1">
           <div className="space-y-2">
             <ActionRow
-              icon={<Bug size={18} />}
-              title={t("settings.application.reportProblem")}
-              subtitle={t("settings.application.reportProblem.subtitle")}
-              onClick={() => void handleOpenExternal(issueUrl)}
-            />
-            <ActionRow
-              icon={<MessageCircle size={18} />}
-              title={t("settings.application.community")}
-              subtitle={t("settings.application.community.subtitle")}
-              onClick={() => void handleOpenExternal(discussionsUrl)}
-            />
-            <ActionRow
-              icon={<Github size={18} />}
-              title="GitHub"
-              subtitle={t("settings.application.github.subtitle")}
-              onClick={() => void handleOpenExternal(REPO_URL)}
-            />
-            <ActionRow
               icon={<Newspaper size={18} />}
               title={t("settings.application.whatsNew")}
               subtitle={t("settings.application.whatsNew.subtitle")}
               onClick={() => void handleOpenExternal(releasesUrl)}
+            />
+          </div>
+
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Wrench size={16} className="text-muted-foreground" />
+              <h3 className="text-sm font-semibold text-foreground">
+                {t("settings.application.toolbox")}
+              </h3>
+            </div>
+            <div className="space-y-2">
+              <ActionRow
+                icon={<Download size={18} />}
+                title={t("settings.application.exportVault")}
+                subtitle={t("settings.application.exportVaultSubtitle")}
+                onClick={handleExportVault}
+              />
+              <ActionRow
+                icon={<FileUp size={18} />}
+                title={t("settings.application.importSshConfig")}
+                subtitle={t("settings.application.importSshConfigSubtitle")}
+                onClick={handleImportClick}
+              />
+              <ActionRow
+                icon={<Trash2 size={18} />}
+                title={t("settings.application.clearCache")}
+                subtitle={t("settings.application.clearCacheSubtitle")}
+                onClick={handleClearCache}
+              />
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".config,.*"
+              className="hidden"
+              onChange={handleFileChange}
             />
           </div>
         </div>

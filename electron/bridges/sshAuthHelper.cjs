@@ -135,7 +135,7 @@ function notifyPassphraseAuthFailed(sender, keyPath, resolvedPath, keyIds) {
     if (Array.isArray(keyIds) && keyIds.length > 0) {
       payload.keyIds = keyIds;
     }
-    sender?.send?.("netcatty:passphrase-auth-failed", payload);
+    sender?.send?.("ALinLink:passphrase-auth-failed", payload);
   } catch {
     // Sender may have gone away while authentication was in progress.
   }
@@ -489,7 +489,7 @@ async function getAvailableAgentSocket() {
  * @param {string} [options.privateKey] - Explicitly configured private key
  * @param {string} [options.password] - Password for authentication
 * @param {string} [options.passphrase] - Passphrase for encrypted private key
- * @param {Object} [options.agent] - SSH agent (NetcattyAgent or socket path)
+ * @param {Object} [options.agent] - SSH agent (ALinLinkAgent or socket path)
  * @param {string} options.username - SSH username
  * @param {string} [options.logPrefix] - Log prefix for debugging
  * @returns {{ authHandler: Function|Array, privateKey: string|null, agent: string|Object|null, usedDefaultKeys: boolean }}
@@ -897,7 +897,7 @@ function createKeyboardInteractiveHandler(options) {
     console.log(`${logPrefix} Showing modal for ${promptsData.length} prompts`);
     try { onPromptShown?.(); } catch (err) { console.warn(`${logPrefix} onPromptShown callback threw`, err); }
 
-    safeSend(sender, "netcatty:keyboard-interactive", {
+    safeSend(sender, "ALinLink:keyboard-interactive", {
       requestId,
       sessionId,
       name: name || hostname,

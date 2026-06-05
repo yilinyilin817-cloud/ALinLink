@@ -9,7 +9,7 @@ import {
   setLocalVaultBackupMaxCount,
   trimLocalVaultBackups,
 } from '../localVaultBackups';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 
 export function useLocalVaultBackups() {
   const [backups, setBackups] = useState<LocalVaultBackupPreview[]>([]);
@@ -57,7 +57,7 @@ export function useLocalVaultBackups() {
   // the user manually navigated away and back, silently under-reporting
   // the most recent recovery points.
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     const subscribe = bridge?.onVaultBackupsChanged;
     if (typeof subscribe !== 'function') return undefined;
     const unsubscribe = subscribe(() => {

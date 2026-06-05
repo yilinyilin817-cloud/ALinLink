@@ -50,7 +50,7 @@ test("buildAcpHistoryMessages compacts older ACP context and keeps only recent r
   const result = buildAcpHistoryMessages(messages);
 
   assert.equal(result[0].role, "user");
-  assert.match(result[0].content, /Compact prior Netcatty UI context/);
+  assert.match(result[0].content, /Compact prior ALinLink UI context/);
   assert.match(result[0].content, /最小改动/);
   assert.match(result[0].content, /pwsh\.exe/);
   assert.match(result[0].content, /PR #738/);
@@ -572,7 +572,7 @@ test("buildAcpHistoryMessages does not duplicate recent raw turns into the compa
 
   const result = buildAcpHistoryMessages(messages);
 
-  const compact = result.find((m) => m.content.includes("[Compact prior Netcatty UI context]"));
+  const compact = result.find((m) => m.content.includes("[Compact prior ALinLink UI context]"));
   assert.ok(compact, "expected a compact context message");
 
   // Both markers belong to messages inside the raw window — they must
@@ -581,7 +581,7 @@ test("buildAcpHistoryMessages does not duplicate recent raw turns into the compa
   assert.doesNotMatch(compact.content, /RAW_TOOL_MARKER/);
 
   // Raw section still carries them verbatim.
-  const raw = result.filter((m) => !m.content.includes("[Compact prior Netcatty UI context]"));
+  const raw = result.filter((m) => !m.content.includes("[Compact prior ALinLink UI context]"));
   const rawFlat = raw.map((m) => m.content).join("\n");
   assert.match(rawFlat, /IMPORTANT_RAW_MARKER/);
   assert.match(rawFlat, /RAW_TOOL_MARKER/);

@@ -6,7 +6,7 @@ import {
   STORAGE_KEY_TOGGLE_WINDOW_HOTKEY,
 } from '../../infrastructure/config/storageKeys';
 import { localStorageAdapter } from '../../infrastructure/persistence/localStorageAdapter';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 
 interface UseSystemSettingsEffectsParams {
   toggleWindowHotkey: string;
@@ -32,7 +32,7 @@ export function useSystemSettingsEffects({
   // Persist and sync toggle window hotkey setting
   useEffect(() => {
     // Register/unregister the global hotkey in main process (needed on mount)
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.registerGlobalHotkey) {
       if (toggleWindowHotkey && globalHotkeyEnabled) {
         setHotkeyRegistrationError(null);
@@ -77,7 +77,7 @@ export function useSystemSettingsEffects({
   // Persist and sync close to tray setting
   useEffect(() => {
     // Update main process tray behavior (needed on mount)
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.setCloseToTray) {
       bridge.setCloseToTray(closeToTray).catch((err) => {
         console.warn('[SystemTray] Failed to set close-to-tray:', err);
@@ -93,7 +93,7 @@ export function useSystemSettingsEffects({
   // This reconciles localStorage (renderer) with auto-update-pref.json (main)
   // in case localStorage was cleared or is stale.
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     void bridge?.getAutoUpdate?.().then((result) => {
       if (result && typeof result.enabled === 'boolean') {
         setAutoUpdateEnabled((prev) => {
@@ -113,7 +113,7 @@ export function useSystemSettingsEffects({
     if (!persistMountedRef.current) return;
     notifySettingsChanged(STORAGE_KEY_AUTO_UPDATE_ENABLED, autoUpdateEnabled);
     // Notify main process on user-initiated changes
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     bridge?.setAutoUpdate?.(autoUpdateEnabled).catch((err: unknown) => {
       console.warn('[AutoUpdate] Failed to set auto-update:', err);
     });

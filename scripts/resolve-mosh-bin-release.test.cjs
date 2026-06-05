@@ -14,7 +14,7 @@ const {
 } = require("./resolve-mosh-bin-release.cjs");
 
 function makeTmp(t) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-resolve-mosh-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-resolve-mosh-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
@@ -26,10 +26,10 @@ test("validateReleaseTag accepts only mosh binary release tags", () => {
 });
 
 test("parseRepository falls back to the dedicated mosh binary repository", () => {
-  assert.deepEqual(parseRepository({}), { owner: "binaricat", repo: "Netcatty-mosh-bin" });
+  assert.deepEqual(parseRepository({}), { owner: "binaricat", repo: "ALinLink-mosh-bin" });
   assert.deepEqual(parseRepository({ GITHUB_REPOSITORY: "owner/project" }), {
     owner: "owner",
-    repo: "Netcatty-mosh-bin",
+    repo: "ALinLink-mosh-bin",
   });
   assert.deepEqual(
     parseRepository({ GITHUB_REPOSITORY: "owner/project", MOSH_BIN_OWNER: "bin", MOSH_BIN_REPO: "binaries" }),

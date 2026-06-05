@@ -11,20 +11,20 @@ export type TerminalBackendApi = {
   localAvailable: () => boolean;
   serialAvailable: () => boolean;
   execAvailable: () => boolean;
-  startSSHSession: (options: NetcattySSHOptions) => Promise<string>;
+  startSSHSession: (options: ALinLinkSSHOptions) => Promise<string>;
   startTelnetSession: (
-    options: Parameters<NonNullable<NetcattyBridge["startTelnetSession"]>>[0],
+    options: Parameters<NonNullable<ALinLinkBridge["startTelnetSession"]>>[0],
   ) => Promise<string>;
   startMoshSession: (
-    options: Parameters<NonNullable<NetcattyBridge["startMoshSession"]>>[0],
+    options: Parameters<NonNullable<ALinLinkBridge["startMoshSession"]>>[0],
   ) => Promise<string>;
   startLocalSession: (
-    options: Parameters<NonNullable<NetcattyBridge["startLocalSession"]>>[0],
+    options: Parameters<NonNullable<ALinLinkBridge["startLocalSession"]>>[0],
   ) => Promise<string>;
   startSerialSession: (
-    options: Parameters<NonNullable<NetcattyBridge["startSerialSession"]>>[0],
+    options: Parameters<NonNullable<ALinLinkBridge["startSerialSession"]>>[0],
   ) => Promise<string>;
-  execCommand: (options: Parameters<NetcattyBridge["execCommand"]>[0]) => Promise<{
+  execCommand: (options: Parameters<ALinLinkBridge["execCommand"]>[0]) => Promise<{
     stdout?: string;
     stderr?: string;
   }>;

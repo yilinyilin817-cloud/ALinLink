@@ -33,7 +33,7 @@ import {
   STORAGE_KEY_UI_THEME_LIGHT,
   STORAGE_KEY_WORKSPACE_FOCUS_STYLE,
 } from '../../infrastructure/config/storageKeys';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 import { isValidUiFontId, migrateIncomingTerminalFontId } from './settingsStateDefaults';
 
 interface UseSettingsIpcSyncParams {
@@ -93,7 +93,7 @@ export function useSettingsIpcSync({
 }: UseSettingsIpcSyncParams) {
   // Listen for settings changes from other windows via IPC
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onSettingsChanged) return;
     const unsubscribe = bridge.onSettingsChanged((payload) => {
       const { key, value } = payload;

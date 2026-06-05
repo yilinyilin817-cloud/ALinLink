@@ -1,9 +1,9 @@
 import { useCallback } from "react";
-import { netcattyBridge } from "../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../infrastructure/services/ALinLinkBridge";
 
 export const useClipboardBackend = () => {
   const readClipboardText = useCallback(async (): Promise<string> => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.readClipboardText) throw new Error("clipboard bridge unavailable");
 
     const text = await bridge.readClipboardText();

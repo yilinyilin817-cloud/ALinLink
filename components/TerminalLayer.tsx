@@ -309,7 +309,7 @@ const TerminalLayerInner: React.FC<TerminalLayerProps> = ({
     STORAGE_KEY_SIDE_PANEL_WIDTH, 420, { min: 280, max: 800 },
   );
   const [sidePanelPosition, setSidePanelPosition] = useStoredString<'left' | 'right'>(
-    'netcatty_side_panel_position',
+    'ALinLink_side_panel_position',
     'left',
     (v): v is 'left' | 'right' => v === 'left' || v === 'right',
   );

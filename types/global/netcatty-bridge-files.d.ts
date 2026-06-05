@@ -1,7 +1,7 @@
 import type { SftpFilenameEncoding } from "../../types";
 
 declare global {
-  interface NetcattyBridge {
+  interface ALinLinkBridge {
     // File opener helpers (for "Open With" feature)
     selectApplication?(): Promise<{ path: string; name: string } | null>;
     openWithApplication?(filePath: string, appPath: string): Promise<boolean>;

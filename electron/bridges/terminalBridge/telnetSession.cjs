@@ -28,11 +28,11 @@ function createTelnetSessionApi(ctx) {
           },
           onComplete() {
             const contents = electronModule.webContents.fromId(event.sender.id);
-            contents?.send("netcatty:telnet:auto-login-complete", { sessionId });
+            contents?.send("ALinLink:telnet:auto-login-complete", { sessionId });
           },
           onUserInput() {
             const contents = electronModule.webContents.fromId(event.sender.id);
-            contents?.send("netcatty:telnet:auto-login-cancelled", { sessionId });
+            contents?.send("ALinLink:telnet:auto-login-cancelled", { sessionId });
           },
         });
     
@@ -153,7 +153,7 @@ function createTelnetSessionApi(ctx) {
         const telnetWebContentsId = event.sender.id;
         const { bufferData: bufferTelnetData, flush: flushTelnet } = createPtyOutputBuffer((data) => {
           const contents = electronModule.webContents.fromId(telnetWebContentsId);
-          contents?.send("netcatty:data", { sessionId, data });
+          contents?.send("ALinLink:data", { sessionId, data });
         });
     
         const telnetZmodemSentry = createZmodemSentry({
@@ -224,7 +224,7 @@ function createTelnetSessionApi(ctx) {
             if (session) {
               session.zmodemSentry?.cancel();
               const contents = electronModule.webContents.fromId(session.webContentsId);
-              contents?.send("netcatty:exit", { sessionId, exitCode: 1, error: err.message, reason: "error" });
+              contents?.send("ALinLink:exit", { sessionId, exitCode: 1, error: err.message, reason: "error" });
             }
             ptyProcessTree.unregisterPid(sessionId);
             sessions.delete(sessionId);
@@ -241,7 +241,7 @@ function createTelnetSessionApi(ctx) {
           if (session) {
             session.zmodemSentry?.cancel();
             const contents = electronModule.webContents.fromId(session.webContentsId);
-            contents?.send("netcatty:exit", { sessionId, exitCode: hadError ? 1 : 0, reason: hadError ? "error" : "closed" });
+            contents?.send("ALinLink:exit", { sessionId, exitCode: hadError ? 1 : 0, reason: hadError ? "error" : "closed" });
           }
           ptyProcessTree.unregisterPid(sessionId);
           sessions.delete(sessionId);

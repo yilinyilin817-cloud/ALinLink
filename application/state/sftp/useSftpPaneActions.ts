@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from "react";
 import type { Host, SftpFileEntry, SftpFilenameEncoding } from "../../../domain/models";
-import { netcattyBridge } from "../../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../../infrastructure/services/ALinLinkBridge";
 import { logger } from "../../../lib/logger";
 import { SftpPane } from "./types";
 import { getFileName, getParentPath, isNavigableDirectory, isWindowsRoot, joinPath } from "./utils";
@@ -542,14 +542,14 @@ export const useSftpPaneActions = ({
 
       try {
         if (pane.connection.isLocal) {
-          await netcattyBridge.get()?.mkdirLocal?.(fullPath);
+          await ALinLinkBridge.get()?.mkdirLocal?.(fullPath);
         } else {
           const sftpId = sftpSessionsRef.current.get(pane.connection.id);
           if (!sftpId) {
             handleSessionError(side, new Error("SFTP session not found"));
             return;
           }
-          await netcattyBridge.get()?.mkdirSftp(sftpId, fullPath, pane.filenameEncoding);
+          await ALinLinkBridge.get()?.mkdirSftp(sftpId, fullPath, pane.filenameEncoding);
         }
         if (pane.connection.currentPath === path) {
           await refresh(side);
@@ -583,7 +583,7 @@ export const useSftpPaneActions = ({
 
       try {
         if (pane.connection.isLocal) {
-          const bridge = netcattyBridge.get();
+          const bridge = ALinLinkBridge.get();
           if (bridge?.writeLocalFile) {
             const emptyBuffer = new ArrayBuffer(0);
             await bridge.writeLocalFile(fullPath, emptyBuffer);
@@ -596,7 +596,7 @@ export const useSftpPaneActions = ({
             handleSessionError(side, new Error("SFTP session not found"));
             return;
           }
-          const bridge = netcattyBridge.get();
+          const bridge = ALinLinkBridge.get();
           if (bridge?.writeSftpBinary) {
             const emptyBuffer = new ArrayBuffer(0);
             await bridge.writeSftpBinary(sftpId, fullPath, emptyBuffer, pane.filenameEncoding);
@@ -639,14 +639,14 @@ export const useSftpPaneActions = ({
           const fullPath = joinPath(pane.connection.currentPath, name);
 
           if (pane.connection.isLocal) {
-            await netcattyBridge.get()?.deleteLocalFile?.(fullPath);
+            await ALinLinkBridge.get()?.deleteLocalFile?.(fullPath);
           } else {
             const sftpId = sftpSessionsRef.current.get(pane.connection.id);
             if (!sftpId) {
               handleSessionError(side, new Error("SFTP session not found"));
               return;
             }
-            await netcattyBridge.get()?.deleteSftp?.(sftpId, fullPath, pane.filenameEncoding);
+            await ALinLinkBridge.get()?.deleteSftp?.(sftpId, fullPath, pane.filenameEncoding);
           }
         }
         await refresh(side);
@@ -673,9 +673,9 @@ export const useSftpPaneActions = ({
       if (!pane?.connection) {
         throw new Error("Source pane is no longer available");
       }
-      const bridge = netcattyBridge.get();
+      const bridge = ALinLinkBridge.get();
       if (!bridge) {
-        throw new Error("Netcatty bridge not available");
+        throw new Error("ALinLink bridge not available");
       }
 
       try {
@@ -753,14 +753,14 @@ export const useSftpPaneActions = ({
 
       try {
         if (pane.connection.isLocal) {
-          await netcattyBridge.get()?.renameLocalFile?.(oldPath, newPath);
+          await ALinLinkBridge.get()?.renameLocalFile?.(oldPath, newPath);
         } else {
           const sftpId = sftpSessionsRef.current.get(pane.connection.id);
           if (!sftpId) {
             handleSessionError(side, new Error("SFTP session not found"));
             return;
           }
-          await netcattyBridge.get()?.renameSftp?.(sftpId, oldPath, newPath, pane.filenameEncoding);
+          await ALinLinkBridge.get()?.renameSftp?.(sftpId, oldPath, newPath, pane.filenameEncoding);
         }
         await refresh(side);
       } catch (err) {
@@ -786,14 +786,14 @@ export const useSftpPaneActions = ({
 
       try {
         if (pane.connection.isLocal) {
-          await netcattyBridge.get()?.renameLocalFile?.(oldPath, newPath);
+          await ALinLinkBridge.get()?.renameLocalFile?.(oldPath, newPath);
         } else {
           const sftpId = sftpSessionsRef.current.get(pane.connection.id);
           if (!sftpId) {
             handleSessionError(side, new Error("SFTP session not found"));
             return;
           }
-          await netcattyBridge.get()?.renameSftp?.(sftpId, oldPath, newPath, pane.filenameEncoding);
+          await ALinLinkBridge.get()?.renameSftp?.(sftpId, oldPath, newPath, pane.filenameEncoding);
         }
         if (pane.connection.currentPath === parentPath) {
           await refresh(side);
@@ -840,7 +840,7 @@ export const useSftpPaneActions = ({
 
       try {
         if (pane.connection.isLocal) {
-          const renameLocalFile = netcattyBridge.get()?.renameLocalFile;
+          const renameLocalFile = ALinLinkBridge.get()?.renameLocalFile;
           if (!renameLocalFile) {
             throw new Error("Local rename unavailable");
           }
@@ -854,7 +854,7 @@ export const useSftpPaneActions = ({
             handleSessionError(side, new Error("SFTP session not found"));
             return;
           }
-          const renameSftp = netcattyBridge.get()?.renameSftp;
+          const renameSftp = ALinLinkBridge.get()?.renameSftp;
           if (!renameSftp) {
             throw new Error("SFTP rename unavailable");
           }
@@ -920,13 +920,13 @@ export const useSftpPaneActions = ({
       }
 
       const sftpId = sftpSessionsRef.current.get(pane.connection.id);
-      if (!sftpId || !netcattyBridge.get()?.chmodSftp) {
+      if (!sftpId || !ALinLinkBridge.get()?.chmodSftp) {
         handleSessionError(side, new Error("SFTP session not found"));
         return;
       }
 
       try {
-        await netcattyBridge.get()!.chmodSftp!(sftpId, filePath, mode, pane.filenameEncoding);
+        await ALinLinkBridge.get()!.chmodSftp!(sftpId, filePath, mode, pane.filenameEncoding);
         await refresh(side);
       } catch (err) {
         if (isSessionError(err)) {

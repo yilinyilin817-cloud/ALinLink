@@ -46,6 +46,7 @@ function createBridgeRegistrar(context) {
     getAiBridge,
     getWindowManager,
     getVaultBackupBridge,
+    networkScanBridge,
     isPathInside,
   } = context;
 
@@ -174,9 +175,10 @@ function createBridgeRegistrar(context) {
     aiBridge.registerHandlers(ipcMain);
     crashLogBridge.registerHandlers(ipcMain);
     vaultBackupBridge.registerHandlers(ipcMain, electronModule);
+    networkScanBridge.registerHandlers(ipcMain);
   
     // ZMODEM cancel handler
-    ipcMain.on("netcatty:zmodem:cancel", (_event, payload) => {
+    ipcMain.on("ALinLink:zmodem:cancel", (_event, payload) => {
       const session = sessions.get(payload.sessionId);
       if (session?.zmodemSentry) {
         session.zmodemSentry.cancel();
@@ -184,7 +186,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Fig autocomplete spec loader — uses dynamic import() since @withfig/autocomplete is ESM
-    ipcMain.handle("netcatty:figspec:list", async () => {
+    ipcMain.handle("ALinLink:figspec:list", async () => {
       try {
         const fs = require("fs");
         const mod = await import("@withfig/autocomplete");
@@ -204,7 +206,7 @@ function createBridgeRegistrar(context) {
         return [];
       }
     });
-    ipcMain.handle("netcatty:figspec:load", async (_event, commandName) => {
+    ipcMain.handle("ALinLink:figspec:load", async (_event, commandName) => {
       try {
         // Sanitize: reject absolute paths, path traversal, and non-spec characters
         if (!commandName || commandName.startsWith("/") || commandName.startsWith("\\") ||
@@ -235,7 +237,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Local directory listing for autocomplete (local terminal sessions)
-    ipcMain.handle("netcatty:local:listdir", async (_event, payload) => {
+    ipcMain.handle("ALinLink:local:listdir", async (_event, payload) => {
       try {
         const {
           path: dirPath,
@@ -281,7 +283,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Settings window handler
-    ipcMain.handle("netcatty:settings:open", async (event) => {
+    ipcMain.handle("ALinLink:settings:open", async (event) => {
       try {
         await getWindowManager().openSettingsWindow(electronModule, {
           preload,
@@ -300,7 +302,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Cloud sync master password (stored in-memory + persisted via safeStorage)
-    ipcMain.handle("netcatty:cloudSync:session:setPassword", async (_event, password) => {
+    ipcMain.handle("ALinLink:cloudSync:session:setPassword", async (_event, password) => {
       cloudSyncSessionPassword = typeof password === "string" && password.length ? password : null;
       if (cloudSyncSessionPassword) {
         persistCloudSyncPassword(cloudSyncSessionPassword);
@@ -310,14 +312,14 @@ function createBridgeRegistrar(context) {
       return true;
     });
   
-    ipcMain.handle("netcatty:cloudSync:session:getPassword", async () => {
+    ipcMain.handle("ALinLink:cloudSync:session:getPassword", async () => {
       if (cloudSyncSessionPassword) return cloudSyncSessionPassword;
       const persisted = readPersistedCloudSyncPassword();
       cloudSyncSessionPassword = persisted;
       return persisted;
     });
   
-    ipcMain.handle("netcatty:cloudSync:session:clearPassword", async () => {
+    ipcMain.handle("ALinLink:cloudSync:session:clearPassword", async () => {
       cloudSyncSessionPassword = null;
       clearPersistedCloudSyncPassword();
       return true;
@@ -328,12 +330,12 @@ function createBridgeRegistrar(context) {
     // no default browser configured — error 0x483). Rejects only in the rare
     // case where both the system browser AND the fallback window fail, so
     // existing callers that rely on rejection semantics still abort cleanly.
-    ipcMain.handle("netcatty:openExternal", async (_event, url) => {
+    ipcMain.handle("ALinLink:openExternal", async (_event, url) => {
       const { shell } = electronModule;
       await getWindowManager().tryOpenExternalWithFallback(shell, url);
     });
   
-    ipcMain.handle("netcatty:openPath", async (_event, targetPath) => {
+    ipcMain.handle("ALinLink:openPath", async (_event, targetPath) => {
       if (typeof targetPath !== "string" || targetPath.trim() === "") {
         return { success: false, error: "Invalid path" };
       }
@@ -351,7 +353,7 @@ function createBridgeRegistrar(context) {
     });
   
     // App information for About/Application screens
-    ipcMain.handle("netcatty:app:getInfo", async () => {
+    ipcMain.handle("ALinLink:app:getInfo", async () => {
       return {
         name: app.getName(),
         version: app.getVersion(),
@@ -360,7 +362,7 @@ function createBridgeRegistrar(context) {
     });
   
     // PTY child process list for busy-check before close
-    ipcMain.handle("netcatty:pty:childProcesses", async (_event, sessionId) => {
+    ipcMain.handle("ALinLink:pty:childProcesses", async (_event, sessionId) => {
       if (typeof sessionId !== "string") return [];
       return ptyProcessTree.getChildProcesses(sessionId);
     });
@@ -369,7 +371,7 @@ function createBridgeRegistrar(context) {
     // Returns true only if the user explicitly clicks "Close". ESC/dialog-dismiss
     // resolves as cancelId (0) → false, which is the safe default (do not close).
     ipcMain.handle(
-      "netcatty:dialog:confirmCloseBusy",
+      "ALinLink:dialog:confirmCloseBusy",
       async (event, payload) => {
         const command = typeof payload?.command === "string" ? payload.command : "unknown";
         const title = typeof payload?.title === "string" ? payload.title : "Confirm close";
@@ -394,7 +396,7 @@ function createBridgeRegistrar(context) {
     );
   
     // Clipboard helpers for renderer fallback paths (e.g. Monaco paste in Electron)
-    ipcMain.handle("netcatty:clipboard:readText", async () => {
+    ipcMain.handle("ALinLink:clipboard:readText", async () => {
       try {
         return clipboard?.readText?.() || "";
       } catch {
@@ -403,7 +405,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Select an application from system file picker
-    ipcMain.handle("netcatty:selectApplication", async () => {
+    ipcMain.handle("ALinLink:selectApplication", async () => {
       const { dialog } = electronModule;
       
       let filters = [];
@@ -439,7 +441,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Open a file with a specific application
-    ipcMain.handle("netcatty:openWithApplication", async (_event, { filePath, appPath }) => {
+    ipcMain.handle("ALinLink:openWithApplication", async (_event, { filePath, appPath }) => {
       const { spawn: cpSpawn } = require("node:child_process");
       
       console.log(`[Main] Opening file with application:`);
@@ -512,7 +514,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Show save file dialog and return selected path
-    ipcMain.handle("netcatty:showSaveDialog", async (_event, { defaultPath, filters }) => {
+    ipcMain.handle("ALinLink:showSaveDialog", async (_event, { defaultPath, filters }) => {
       const { dialog } = electronModule;
   
       const result = await dialog.showSaveDialog({
@@ -528,7 +530,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Select a file and return the selected path
-    ipcMain.handle("netcatty:selectFile", async (_event, { title, defaultPath, filters }) => {
+    ipcMain.handle("ALinLink:selectFile", async (_event, { title, defaultPath, filters }) => {
       const { dialog } = electronModule;
   
       const result = await dialog.showOpenDialog({
@@ -546,7 +548,7 @@ function createBridgeRegistrar(context) {
     });
   
     // Select a directory and return the selected path
-    ipcMain.handle("netcatty:selectDirectory", async (_event, { title, defaultPath }) => {
+    ipcMain.handle("ALinLink:selectDirectory", async (_event, { title, defaultPath }) => {
       const { dialog } = electronModule;
   
       const result = await dialog.showOpenDialog({
@@ -563,14 +565,14 @@ function createBridgeRegistrar(context) {
     });
   
     // Download SFTP file to temp and return local path
-    ipcMain.handle("netcatty:sftp:downloadToTemp", async (_event, { sftpId, remotePath, fileName, encoding }) => {
+    ipcMain.handle("ALinLink:sftp:downloadToTemp", async (_event, { sftpId, remotePath, fileName, encoding }) => {
       console.log(`[Main] Downloading SFTP file to temp:`);
       console.log(`[Main]   SFTP ID: ${sftpId}`);
       console.log(`[Main]   Remote path: ${remotePath}`);
       console.log(`[Main]   File name: ${fileName}`);
       
       const client = require("./bridges/sftpBridge.cjs");
-      // Use tempDirBridge for dedicated Netcatty temp directory
+      // Use tempDirBridge for dedicated ALinLink temp directory
       const localPath = await getTempDirBridge().getTempFilePath(fileName);
       
       console.log(`[Main]   Local temp path: ${localPath}`);
@@ -605,11 +607,11 @@ function createBridgeRegistrar(context) {
     });
   
     // Download SFTP file to temp with progress reporting via transfer events.
-    // Progress/complete/cancelled events are delivered via the netcatty:transfer:*
+    // Progress/complete/cancelled events are delivered via the ALinLink:transfer:*
     // channels (handled by transferBridge.startTransfer), so the IPC return value
     // only carries the resolved temp path. Cancellation is NOT an error here —
     // the UI already transitions the task to "cancelled" via the dedicated event.
-    ipcMain.handle("netcatty:sftp:downloadToTempWithProgress", async (event, { sftpId, remotePath, fileName, encoding, transferId }) => {
+    ipcMain.handle("ALinLink:sftp:downloadToTempWithProgress", async (event, { sftpId, remotePath, fileName, encoding, transferId }) => {
       const localPath = await getTempDirBridge().getTempFilePath(fileName);
       const cleanupPartialDownload = async () => {
         try {
@@ -648,13 +650,13 @@ function createBridgeRegistrar(context) {
     });
   
     // Delete a temp file (for cleanup when editors close)
-    ipcMain.handle("netcatty:deleteTempFile", async (_event, { filePath }) => {
+    ipcMain.handle("ALinLink:deleteTempFile", async (_event, { filePath }) => {
       try {
-        // Only allow deleting files in Netcatty temp directory for security
-        const netcattyTempDir = path.resolve(getTempDirBridge().getTempDir());
+        // Only allow deleting files in ALinLink temp directory for security
+        const ALinLinkTempDir = path.resolve(getTempDirBridge().getTempDir());
         const resolvedPath = path.resolve(String(filePath || ""));
-        if (!isPathInside(netcattyTempDir, resolvedPath)) {
-          console.warn(`[Main] Refused to delete file outside Netcatty temp dir: ${filePath}`);
+        if (!isPathInside(ALinLinkTempDir, resolvedPath)) {
+          console.warn(`[Main] Refused to delete file outside ALinLink temp dir: ${filePath}`);
           return { success: false };
         }
         

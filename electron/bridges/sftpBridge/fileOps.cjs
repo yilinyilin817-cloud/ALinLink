@@ -290,7 +290,7 @@ function createFileOpsApi(ctx) {
                 }
               } else {
                 const contents = electronModule.webContents.fromId(event.sender.id);
-                contents?.send("netcatty:upload:progress", {
+                contents?.send("ALinLink:upload:progress", {
                   transferId,
                   transferred: transferredBytes,
                   totalBytes,
@@ -323,7 +323,7 @@ function createFileOpsApi(ctx) {
           }
         } else {
           const contents = electronModule.webContents.fromId(event.sender.id);
-          contents?.send("netcatty:upload:complete", { transferId });
+          contents?.send("ALinLink:upload:complete", { transferId });
         }
     
         return { success: true, transferId };
@@ -333,7 +333,7 @@ function createFileOpsApi(ctx) {
         const uploadState = activeSftpUploads.get(transferId);
         if (uploadState?.cancelled || err.message === "Upload cancelled") {
           const contents = electronModule.webContents.fromId(event.sender.id);
-          contents?.send("netcatty:upload:cancelled", { transferId });
+          contents?.send("ALinLink:upload:cancelled", { transferId });
           return { success: false, transferId, cancelled: true };
         }
     
@@ -346,7 +346,7 @@ function createFileOpsApi(ctx) {
           }
         } else {
           const contents = electronModule.webContents.fromId(event.sender.id);
-          contents?.send("netcatty:upload:error", { transferId, error: err.message });
+          contents?.send("ALinLink:upload:error", { transferId, error: err.message });
         }
         throw err;
       } finally {
@@ -462,7 +462,7 @@ function createFileOpsApi(ctx) {
       const encoding = resolveEncodingForRequest(payload.sftpId, payload.encoding);
       const shouldUseFastDirectoryDelete = (
         encoding === "utf-8" &&
-        !client.__netcattySessionBacked &&
+        !client.__ALinLinkSessionBacked &&
         !signal &&
         !(Number.isFinite(payload?.timeoutMs) && payload.timeoutMs > 0)
       );
@@ -503,7 +503,7 @@ function createFileOpsApi(ctx) {
               }
             }
           }
-          if (client.__netcattySessionBacked) {
+          if (client.__ALinLinkSessionBacked) {
             await client.rmdir(encodedPath, true, { signal });
           } else {
             const normalizedPath = await normalizeRemotePathString(client, payload.path);
@@ -512,7 +512,7 @@ function createFileOpsApi(ctx) {
             throwIfAborted(signal);
           }
         } else {
-          if (client.__netcattySessionBacked) {
+          if (client.__ALinLinkSessionBacked) {
             await client.delete(encodedPath, { signal });
           } else {
             throwIfAborted(signal);

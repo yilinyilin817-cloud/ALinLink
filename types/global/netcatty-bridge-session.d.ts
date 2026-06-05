@@ -1,8 +1,8 @@
 
 declare global {
-  interface NetcattyBridge {
-    getWindowsPtyInfo?(): NetcattyWindowsPtyInfo | null;
-    startSSHSession(options: NetcattySSHOptions): Promise<string>;
+  interface ALinLinkBridge {
+    getWindowsPtyInfo?(): ALinLinkWindowsPtyInfo | null;
+    startSSHSession(options: ALinLinkSSHOptions): Promise<string>;
     startTelnetSession?(options: {
       sessionId?: string;
       hostname: string;

@@ -345,7 +345,7 @@ echo $3 >> "$FILE"`);
       const result = await generateKeyPair({
         type: keyType,
         bits: keySize,
-        comment: `${draftKey.label.trim()}@netcatty`,
+        comment: `${draftKey.label.trim()}@ALinLink`,
       });
       if (!result) {
         throw new Error(

@@ -147,7 +147,7 @@ test("listWindowsHiddenBasenames invokes attrib.exe with /d so hidden directorie
 });
 
 test("collectLocalTreeEntries preserves empty directories in selected folders", async () => {
-  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), "netcatty-upload-tree-"));
+  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), "ALinLink-upload-tree-"));
   const selected = path.join(root, "project");
   await fs.promises.mkdir(path.join(selected, "empty"), { recursive: true });
   await fs.promises.mkdir(path.join(selected, "src"), { recursive: true });

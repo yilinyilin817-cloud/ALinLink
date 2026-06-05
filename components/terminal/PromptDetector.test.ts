@@ -389,12 +389,12 @@ test("aligns themed prompt decorations when command echo lags", () => {
     { lineText: "➜  ~ git ", promptText: "➜  ~ " },
     { lineText: "➜  ~ git st", promptText: "➜  ~ " },
     {
-      lineText: "➜  netcatty git:(main) ✗ git ",
-      promptText: "➜  netcatty git:(main) ✗ ",
+      lineText: "➜  ALinLink git:(main) ✗ git ",
+      promptText: "➜  ALinLink git:(main) ✗ ",
     },
     {
-      lineText: "➜  netcatty git:(main) ✗ git st",
-      promptText: "➜  netcatty git:(main) ✗ ",
+      lineText: "➜  ALinLink git:(main) ✗ git st",
+      promptText: "➜  ALinLink git:(main) ✗ ",
     },
   ];
 
@@ -421,17 +421,17 @@ test("trims single-space themed prompt decorations out of the detected input", (
   const cases = [
     { lineText: "➜ ~/repo do", typedInput: "do", promptText: "➜ ~/repo " },
     {
-      lineText: "➜  netcatty git:(main) ✗ ls",
+      lineText: "➜  ALinLink git:(main) ✗ ls",
       typedInput: "ls",
-      promptText: "➜  netcatty git:(main) ✗ ",
+      promptText: "➜  ALinLink git:(main) ✗ ",
     },
     {
-      lineText: "➜  netcatty git:(main) ✗ + ls",
+      lineText: "➜  ALinLink git:(main) ✗ + ls",
       typedInput: "ls",
-      promptText: "➜  netcatty git:(main) ✗ + ",
+      promptText: "➜  ALinLink git:(main) ✗ + ",
     },
-    { lineText: "➜  netcatty ✗ $ ls", typedInput: "ls", promptText: "➜  netcatty ✗ $ " },
-    { lineText: "➜  netcatty $ ls", typedInput: "ls", promptText: "➜  netcatty $ " },
+    { lineText: "➜  ALinLink ✗ $ ls", typedInput: "ls", promptText: "➜  ALinLink ✗ $ " },
+    { lineText: "➜  ALinLink $ ls", typedInput: "ls", promptText: "➜  ALinLink $ " },
   ];
 
   for (const { lineText, typedInput, promptText } of cases) {

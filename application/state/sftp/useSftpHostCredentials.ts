@@ -22,7 +22,7 @@ export const buildSftpHostCredentials = ({
   keys,
   identities,
   terminalSettings,
-}: UseSftpHostCredentialsParams & { host: Host }): NetcattySSHOptions => {
+}: UseSftpHostCredentialsParams & { host: Host }): ALinLinkSSHOptions => {
   const globalKeepalive = terminalSettings ?? FALLBACK_KEEPALIVE;
   if (host.proxyProfileId && !host.proxyConfig) {
     throw new Error(`Saved proxy for host "${host.label || host.hostname}" is missing. Open host settings and select a valid proxy.`);
@@ -40,7 +40,7 @@ export const buildSftpHostCredentials = ({
       password: sanitizeCredentialValue(host.proxyConfig.password),
     }
     : undefined;
-  let jumpHosts: NetcattyJumpHost[] | undefined;
+  let jumpHosts: ALinLinkJumpHost[] | undefined;
   if (host.hostChain?.hostIds && host.hostChain.hostIds.length > 0) {
     jumpHosts = host.hostChain.hostIds.map((hostId) => {
       const jumpHost = hosts.find((candidate) => candidate.id === hostId);
@@ -179,6 +179,6 @@ export const useSftpHostCredentials = ({
   terminalSettings,
 }: UseSftpHostCredentialsParams) =>
   useCallback(
-    (host: Host): NetcattySSHOptions => buildSftpHostCredentials({ host, hosts, keys, identities, terminalSettings }),
+    (host: Host): ALinLinkSSHOptions => buildSftpHostCredentials({ host, hosts, keys, identities, terminalSettings }),
     [hosts, identities, keys, terminalSettings],
   );

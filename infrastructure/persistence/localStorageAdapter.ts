@@ -7,7 +7,7 @@ const safeParse = <T>(value: string | null): T | null => {
   }
 };
 
-export const LOCAL_STORAGE_ADAPTER_CHANGED_EVENT = 'netcatty:local-storage-adapter-changed';
+export const LOCAL_STORAGE_ADAPTER_CHANGED_EVENT = 'ALinLink:local-storage-adapter-changed';
 
 const pendingChangedKeys = new Set<string>();
 let emitChangedKeysTimer: ReturnType<typeof setTimeout> | null = null;
@@ -102,5 +102,13 @@ export const localStorageAdapter = {
   remove(key: string) {
     localStorage.removeItem(key);
     emitLocalStorageAdapterChanged(key);
+  },
+  keys(): string[] {
+    const result: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) result.push(key);
+    }
+    return result;
   },
 };

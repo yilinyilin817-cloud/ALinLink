@@ -1,9 +1,9 @@
 import type { RemoteFile, SftpFilenameEncoding } from "../../types";
 
 declare global {
-  interface NetcattyBridge {
+  interface ALinLinkBridge {
     // SFTP operations
-    openSftp(options: NetcattySSHOptions): Promise<string>;
+    openSftp(options: ALinLinkSSHOptions): Promise<string>;
     listSftp(sftpId: string, path: string, encoding?: SftpFilenameEncoding): Promise<RemoteFile[]>;
     readSftp(sftpId: string, path: string, encoding?: SftpFilenameEncoding): Promise<string>;
     readSftpBinary?(sftpId: string, path: string, encoding?: SftpFilenameEncoding): Promise<ArrayBuffer>;
@@ -98,7 +98,27 @@ declare global {
     }>>;
     getHomeDir?(): Promise<string>;
     listDrives?(): Promise<string[]>;
-    getSystemInfo?(): Promise<{ username: string; hostname: string }>;
+    getSystemInfo?(): Promise<{
+      username: string;
+      hostname: string;
+      platform?: string;
+      arch?: string;
+      osType?: string;
+      osRelease?: string;
+      osVersion?: string;
+      kernel?: string;
+      uptime?: string;
+      uptimeSeconds?: number;
+      cpuCores?: number;
+      cpuModel?: string;
+      cpuUsage?: number;
+      totalMemory?: number;
+      freeMemory?: number;
+      usedMemory?: number;
+      memoryUsagePercent?: number;
+      loadAvg?: number[];
+      networkInterfaces?: Array<{ name: string; ip: string; mac: string; netmask?: string }>;
+    }>;
   }
 }
 

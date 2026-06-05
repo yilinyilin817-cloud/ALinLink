@@ -160,7 +160,7 @@ test("follow-theme resolver: dark + auto follows the active dark UI preset", () 
       terminalThemeLightId: TERMINAL_THEME_AUTO,
       lightUiThemeId: "snow",
       darkUiThemeId: "midnight",
-      fallbackThemeId: "netcatty-dark",
+      fallbackThemeId: "ALinLink-dark",
     }),
     "ui-midnight",
   );
@@ -174,7 +174,7 @@ test("follow-theme resolver: light + auto follows the active light UI preset", (
       terminalThemeLightId: TERMINAL_THEME_AUTO,
       lightUiThemeId: "snow",
       darkUiThemeId: "midnight",
-      fallbackThemeId: "netcatty-dark",
+      fallbackThemeId: "ALinLink-dark",
     }),
     "ui-snow",
   );
@@ -188,7 +188,7 @@ test("follow-theme resolver: explicit dark override wins over auto-matching", ()
       terminalThemeLightId: TERMINAL_THEME_AUTO,
       lightUiThemeId: "snow",
       darkUiThemeId: "midnight",
-      fallbackThemeId: "netcatty-dark",
+      fallbackThemeId: "ALinLink-dark",
     }),
     "dracula",
   );
@@ -202,7 +202,7 @@ test("follow-theme resolver: explicit light override wins over auto-matching", (
       terminalThemeLightId: "solarized-light",
       lightUiThemeId: "snow",
       darkUiThemeId: "midnight",
-      fallbackThemeId: "netcatty-dark",
+      fallbackThemeId: "ALinLink-dark",
     }),
     "solarized-light",
   );
@@ -216,8 +216,8 @@ test("follow-theme resolver: auto with no UI match falls back to fallbackThemeId
       terminalThemeLightId: TERMINAL_THEME_AUTO,
       lightUiThemeId: "no-such-ui-theme",
       darkUiThemeId: "no-such-ui-theme",
-      fallbackThemeId: "netcatty-dark",
+      fallbackThemeId: "ALinLink-dark",
     }),
-    "netcatty-dark",
+    "ALinLink-dark",
   );
 });

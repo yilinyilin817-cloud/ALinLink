@@ -1,7 +1,7 @@
 import { CustomKeyBindings } from './models';
 
-const SYNC_VERSION_FIELD = '__netcattySyncVersion';
-const SYNC_ORIGIN_FIELD = '__netcattySyncOrigin';
+const SYNC_VERSION_FIELD = '__ALinLinkSyncVersion';
+const SYNC_ORIGIN_FIELD = '__ALinLinkSyncOrigin';
 
 export interface CustomKeyBindingsStorageRecord {
   bindings: CustomKeyBindings;

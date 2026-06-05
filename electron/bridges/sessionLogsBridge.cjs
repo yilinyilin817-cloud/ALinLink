@@ -255,10 +255,10 @@ async function openSessionLogsDir(event, payload) {
  * Register IPC handlers for session logs operations
  */
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:sessionLogs:export", exportSessionLog);
-  ipcMain.handle("netcatty:sessionLogs:selectDir", selectSessionLogsDir);
-  ipcMain.handle("netcatty:sessionLogs:autoSave", autoSaveSessionLog);
-  ipcMain.handle("netcatty:sessionLogs:openDir", openSessionLogsDir);
+  ipcMain.handle("ALinLink:sessionLogs:export", exportSessionLog);
+  ipcMain.handle("ALinLink:sessionLogs:selectDir", selectSessionLogsDir);
+  ipcMain.handle("ALinLink:sessionLogs:autoSave", autoSaveSessionLog);
+  ipcMain.handle("ALinLink:sessionLogs:openDir", openSessionLogsDir);
 }
 
 module.exports = {

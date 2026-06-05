@@ -11,7 +11,7 @@ export interface ExternalAgentCallbacks {
 }
 
 /**
- * Bridge interface matching the agent-related methods from window.netcatty
+ * Bridge interface matching the agent-related methods from window.ALinLink
  */
 interface AgentBridge {
   aiSpawnAgent(

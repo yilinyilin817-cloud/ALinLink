@@ -23,7 +23,7 @@ const createSender = () => {
 // 5-minute TTL timer doesn't keep the test process alive.
 const drainPendingRequests = (sent) => {
   for (const event of sent) {
-    if (event.channel !== "netcatty:keyboard-interactive") continue;
+    if (event.channel !== "ALinLink:keyboard-interactive") continue;
     const requestId = event.payload?.requestId;
     if (requestId) {
       keyboardInteractiveHandler.handleResponse(null, { requestId, cancelled: true });
@@ -170,7 +170,7 @@ test("createKeyboardInteractiveHandler falls back to the modal on the retry afte
   assert.deepEqual(promptEvents, ["prompt-shown"]);
   assert.deepEqual(finishCalls, [{ first: ["wrong-password"] }]);
   assert.equal(sent.length, 1);
-  assert.equal(sent[0].channel, "netcatty:keyboard-interactive");
+  assert.equal(sent[0].channel, "ALinLink:keyboard-interactive");
 
   drainPendingRequests(sent);
 });
@@ -241,7 +241,7 @@ test("createKeyboardInteractiveHandler shows the modal for OTP-style hidden prom
 
   assert.deepEqual(autoFillEvents, []);
   assert.equal(sent.length, 1, "modal IPC should fire instead of auto-fill");
-  assert.equal(sent[0].channel, "netcatty:keyboard-interactive");
+  assert.equal(sent[0].channel, "ALinLink:keyboard-interactive");
 
   drainPendingRequests(sent);
 });

@@ -94,7 +94,7 @@ function getRequests() {
  * Register IPC handler for keyboard-interactive responses
  */
 function registerHandler(ipcMain) {
-  ipcMain.handle("netcatty:keyboard-interactive:respond", handleResponse);
+  ipcMain.handle("ALinLink:keyboard-interactive:respond", handleResponse);
 }
 
 module.exports = {

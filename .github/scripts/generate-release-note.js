@@ -38,7 +38,7 @@ function getVersion() {
 }
 
 const version = getVersion();
-const repo = process.env.GITHUB_REPOSITORY || 'binaricat/netcatty';
+const repo = process.env.GITHUB_REPOSITORY || 'binaricat/ALinLink';
 // For tag releases, use the tag; for workflow_dispatch, create a tag from version
 const tag = (process.env.GITHUB_REF_NAME && /^v\d+\.\d+\.\d+/.test(process.env.GITHUB_REF_NAME))
   ? process.env.GITHUB_REF_NAME
@@ -52,24 +52,24 @@ const baseUrl = `https://github.com/${repo}/releases/download/${tag}`;
 // - rpm: x64 -> x86_64, arm64 -> aarch64
 const files = {
   mac: {
-    arm64: `Netcatty-${version}-mac-arm64.dmg`,
-    x64: `Netcatty-${version}-mac-x64.dmg`
+    arm64: `ALinLink-${version}-mac-arm64.dmg`,
+    x64: `ALinLink-${version}-mac-x64.dmg`
   },
   win: {
-    x64: `Netcatty-${version}-win-x64.exe`
+    x64: `ALinLink-${version}-win-x64.exe`
   },
   linux: {
     appimage: {
-      x64: `Netcatty-${version}-linux-x86_64.AppImage`,
-      arm64: `Netcatty-${version}-linux-arm64.AppImage`
+      x64: `ALinLink-${version}-linux-x86_64.AppImage`,
+      arm64: `ALinLink-${version}-linux-arm64.AppImage`
     },
     deb: {
-      x64: `Netcatty-${version}-linux-amd64.deb`,
-      arm64: `Netcatty-${version}-linux-arm64.deb`
+      x64: `ALinLink-${version}-linux-amd64.deb`,
+      arm64: `ALinLink-${version}-linux-arm64.deb`
     },
     rpm: {
-      x64: `Netcatty-${version}-linux-x86_64.rpm`,
-      arm64: `Netcatty-${version}-linux-aarch64.rpm`
+      x64: `ALinLink-${version}-linux-x86_64.rpm`,
+      arm64: `ALinLink-${version}-linux-aarch64.rpm`
     }
   }
 };

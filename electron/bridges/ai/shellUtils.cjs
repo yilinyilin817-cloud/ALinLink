@@ -399,7 +399,7 @@ function resolveClaudeAcpBinaryPath(shellEnv, electronModule) {
   }
 
   // Packaged build (or dev fallback): run the npm-bundled JS via process.execPath.
-  // In packaged Electron `process.execPath` is the app binary (e.g. Netcatty.exe);
+  // In packaged Electron `process.execPath` is the app binary (e.g. ALinLink.exe);
   // setting `ELECTRON_RUN_AS_NODE=1` makes it behave as the embedded Node so we
   // don't depend on the user having `node` installed.  When `process.execPath`
   // is already a real `node` (e.g. during tests), no env var is needed.
@@ -460,7 +460,7 @@ function serializeStreamChunk(chunk) {
       let realToolName = isAcpWrapper ? (acpInput?.toolName || chunk.toolName) : chunk.toolName;
       const realArgs = isAcpWrapper ? (acpInput?.args || chunk.args || chunk.input) : (chunk.input ?? chunk.args);
       const realToolCallId = isAcpWrapper ? (acpInput?.toolCallId || chunk.toolCallId) : chunk.toolCallId;
-      // Simplify MCP tool names: "mcp__netcatty-remote-hosts__get_environment" → "get_environment"
+      // Simplify MCP tool names: "mcp__ALinLink-remote-hosts__get_environment" → "get_environment"
       if (realToolName && realToolName.includes("__")) {
         realToolName = realToolName.split("__").pop();
       }

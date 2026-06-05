@@ -34,7 +34,7 @@ import { selectDraftForAgentSwitch } from '../application/state/aiDraftState';
 import type { CodexIntegrationStatus } from './settings/tabs/ai/types';
 import {
   useAIChatStreaming,
-  getNetcattyBridge,
+  getALinLinkBridge,
   type DefaultTargetSessionHint,
 } from './ai/hooks/useAIChatStreaming';
 import { buildAcpHistoryMessagesForBridge } from './ai/acpHistory';
@@ -197,7 +197,7 @@ const AIChatSidePanelInner: React.FC<AIChatSidePanelProps> = ({
   }, [terminalSessions, scopeType, scopeTargetId]);
 
   useEffect(() => {
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     if (bridge?.aiMcpUpdateSessions) {
       void bridge.aiMcpUpdateSessions(terminalSessions, activeSessionId ?? undefined);
     }
@@ -316,7 +316,7 @@ const AIChatSidePanelInner: React.FC<AIChatSidePanelProps> = ({
       }));
     };
 
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     if (!bridge?.aiUserSkillsGetStatus) {
       applyUserSkillsStatus(null);
       return;
@@ -338,14 +338,14 @@ const AIChatSidePanelInner: React.FC<AIChatSidePanelProps> = ({
   }, [isVisible, scopeKey, toolIntegrationMode, updateScopeDraft]);
 
   useEffect(() => {
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     if (bridge?.aiSyncProviders && providers.length > 0) {
       void bridge.aiSyncProviders(providers);
     }
   }, [providers]);
 
   useEffect(() => {
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     if (bridge?.aiSyncWebSearch) {
       void bridge.aiSyncWebSearch(webSearchConfig?.apiHost || null, webSearchConfig?.apiKey || null);
     }
@@ -457,7 +457,7 @@ const AIChatSidePanelInner: React.FC<AIChatSidePanelProps> = ({
       setCodexConfigModel(null);
       return;
     }
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     if (!bridge?.aiCodexGetIntegration) return;
     let cancelled = false;
     void Promise.resolve(
@@ -483,7 +483,7 @@ const AIChatSidePanelInner: React.FC<AIChatSidePanelProps> = ({
     if (!currentAgentConfig?.acpCommand) return;
     if (!isCopilotExternalAgent && !isClaudeManagedAgent && !isCodexManagedAgent) return;
 
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     if (!bridge?.aiAcpListModels) return;
 
     let cancelled = false;
@@ -809,7 +809,7 @@ const AIChatSidePanelInner: React.FC<AIChatSidePanelProps> = ({
       executionStatus: msg.executionStatus === 'running' ? 'cancelled' : msg.executionStatus,
     }));
     clearAllPendingApprovals(activeSessionId);
-    const bridge = getNetcattyBridge();
+    const bridge = getALinLinkBridge();
     bridge?.aiCattyCancelExec?.(activeSessionId);
     bridge?.aiAcpCancel?.('', activeSessionId);
   }, [activeSessionId, setStreamingForScope, updateLastMessage, abortControllersRef]);

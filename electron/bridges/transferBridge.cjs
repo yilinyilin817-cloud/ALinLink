@@ -302,7 +302,7 @@ async function uploadFile(localPath, remotePath, client, fileSize, transfer, sen
   if (!sftp) throw new Error("SFTP client not ready");
 
   // Prefer fastPut on an isolated SFTP channel so cancellation can abort just this transfer.
-  if (!client.__netcattySudoMode) {
+  if (!client.__ALinLinkSudoMode) {
     let fastSftp = null;
     try {
       fastSftp = await openIsolatedSftpChannel(client);
@@ -410,7 +410,7 @@ async function downloadFile(remotePath, localPath, client, fileSize, transfer, s
   if (!sftp) throw new Error("SFTP client not ready");
 
   // Prefer fastGet on an isolated SFTP channel so cancellation can abort just this transfer.
-  if (!client.__netcattySudoMode) {
+  if (!client.__ALinLinkSudoMode) {
       const fastSftp = await acquireIsolatedDownloadChannel(client, transfer);
 
     if (fastSftp && typeof fastSftp.fastGet === "function") {
@@ -582,7 +582,7 @@ async function startTransfer(event, payload, onProgress) {
     ) {
       lastProgressSentTime = now;
       lastProgressSentBytes = transferred;
-      sender.send("netcatty:transfer:progress", { transferId, transferred, speed, totalBytes: total });
+      sender.send("ALinLink:transfer:progress", { transferId, transferred, speed, totalBytes: total });
     }
   };
 
@@ -625,13 +625,13 @@ async function startTransfer(event, payload, onProgress) {
   };
 
   const sendComplete = () => {
-    sender.send("netcatty:transfer:complete", { transferId });
+    sender.send("ALinLink:transfer:complete", { transferId });
     cleanupTransfer();
   };
 
   const sendError = (error) => {
     cleanupTransfer();
-    sender.send("netcatty:transfer:error", { transferId, error: error.message || String(error) });
+    sender.send("ALinLink:transfer:error", { transferId, error: error.message || String(error) });
   };
 
   try {
@@ -756,7 +756,7 @@ async function startTransfer(event, payload, onProgress) {
       }
 
       if (!sameHostDone) {
-        const tempPath = path.join(os.tmpdir(), `netcatty-transfer-${transferId}`);
+        const tempPath = path.join(os.tmpdir(), `ALinLink-transfer-${transferId}`);
 
         const sourceClient = sftpClients.get(sourceSftpId);
         const targetClient = sftpClients.get(targetSftpId);
@@ -797,7 +797,7 @@ async function startTransfer(event, payload, onProgress) {
   } catch (err) {
     if (err.message === 'Transfer cancelled') {
       cleanupTransfer();
-      sender.send("netcatty:transfer:cancelled", { transferId });
+      sender.send("ALinLink:transfer:cancelled", { transferId });
     } else {
       sendError(err);
     }
@@ -896,9 +896,9 @@ async function sameHostCopyDirectory(event, payload) {
  * Register IPC handlers for transfer operations
  */
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:transfer:start", startTransfer);
-  ipcMain.handle("netcatty:transfer:cancel", cancelTransfer);
-  ipcMain.handle("netcatty:transfer:same-host-copy-dir", sameHostCopyDirectory);
+  ipcMain.handle("ALinLink:transfer:start", startTransfer);
+  ipcMain.handle("ALinLink:transfer:cancel", cancelTransfer);
+  ipcMain.handle("ALinLink:transfer:same-host-copy-dir", sameHostCopyDirectory);
 }
 
 module.exports = {

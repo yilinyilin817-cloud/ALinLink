@@ -2,7 +2,7 @@
  * Terminal Toolbar
  * Displays high-frequency terminal actions and close button in the terminal status bar.
  */
-import { Check, ChevronRight, FolderInput, Languages, MoreVertical, X, Zap, Palette, Search, TextCursorInput } from 'lucide-react';
+import { Check, ChevronRight, FolderInput, Languages, MoreVertical, X, Zap, Palette, Search, TextCursorInput, Wrench } from 'lucide-react';
 import React, { useState } from 'react';
 import { useI18n } from '../../application/i18n/I18nProvider';
 import { Host } from '../../types';
@@ -18,6 +18,7 @@ export interface TerminalToolbarProps {
     onOpenSFTP: () => void;
     onOpenScripts: () => void;
     onOpenTheme: () => void;
+    onOpenOpsTools?: () => void;
     onUpdateHost?: (host: Host) => void;
     showClose?: boolean;
     onClose?: () => void;
@@ -38,6 +39,7 @@ export const TerminalToolbar: React.FC<TerminalToolbarProps> = ({
     onOpenSFTP,
     onOpenScripts,
     onOpenTheme,
+    onOpenOpsTools,
     onUpdateHost,
     showClose,
     onClose,
@@ -191,6 +193,14 @@ export const TerminalToolbar: React.FC<TerminalToolbarProps> = ({
                             <span className="flex-1 text-left truncate">{t("terminal.toolbar.terminalSettings")}</span>
                         </button>
                     </PopoverClose>
+                    {onOpenOpsTools && (
+                        <PopoverClose asChild>
+                            <button type="button" className={menuItemClass} onClick={onOpenOpsTools}>
+                                <Wrench size={12} className="shrink-0" />
+                                <span className="flex-1 text-left truncate">运维工具</span>
+                            </button>
+                        </PopoverClose>
+                    )}
                     {encodingSwitchSupported && onSetTerminalEncoding && (
                         <Popover open={encodingSubmenuOpen} onOpenChange={setEncodingSubmenuOpen}>
                             <PopoverTrigger asChild>

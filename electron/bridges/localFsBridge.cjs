@@ -303,12 +303,87 @@ async function getHomeDir() {
 }
 
 /**
- * Get system info (username and hostname)
+ * Get system info (username, hostname, CPU, memory, etc.)
  */
 async function getSystemInfo() {
+  const cpus = os.cpus();
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const loadAvg = os.loadavg();
+  const platform = os.platform();
+  const release = os.release();
+
+  // 计算 CPU 使用率（需要两次采样）
+  // 使用上一次采样的信息
+  let cpuUsage = 0;
+  if (cpus && cpus.length > 0) {
+    const totalTimes = cpus.reduce(
+      (acc, cpu) => {
+        const t = cpu.times;
+        acc.idle += t.idle;
+        acc.total += t.user + t.nice + t.sys + t.idle + t.irq;
+        return acc;
+      },
+      { idle: 0, total: 0 }
+    );
+    // 这里只是初始值，实际使用率需要两次采样后计算
+    cpuUsage = totalTimes.total > 0
+      ? parseFloat(((1 - totalTimes.idle / totalTimes.total) * 100).toFixed(1))
+      : 0;
+  }
+
+  // 获取 CPU 型号
+  const cpuModel = cpus && cpus.length > 0 ? cpus[0].model : 'Unknown';
+  // 去掉型号字符串中多余的空格
+  const cpuModelClean = cpuModel.replace(/\s+/g, ' ').trim();
+
+  // 获取网络接口信息
+  const networkInterfaces = os.networkInterfaces();
+  const networkList = [];
+  for (const [name, addrs] of Object.entries(networkInterfaces)) {
+    if (!addrs) continue;
+    for (const addr of addrs) {
+      if (addr.family === 'IPv4' && !addr.internal) {
+        networkList.push({
+          name,
+          ip: addr.address,
+          mac: addr.mac,
+          netmask: addr.netmask
+        });
+      }
+    }
+  }
+
+  // 获取运行时间
+  const uptimeSeconds = os.uptime();
+  const days = Math.floor(uptimeSeconds / 86400);
+  const hours = Math.floor((uptimeSeconds % 86400) / 3600);
+  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+  const seconds = Math.floor(uptimeSeconds % 60);
+  const uptimeStr = `${days} 天 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
   return {
     username: os.userInfo().username,
     hostname: os.hostname(),
+    platform,
+    arch: os.arch(),
+    osType: os.type(),
+    osRelease: release,
+    osVersion: typeof os.version === 'function' ? os.version() : release,
+    kernel: release,
+    uptime: uptimeStr,
+    uptimeSeconds,
+    cpuCores: cpus ? cpus.length : 0,
+    cpuModel: cpuModelClean,
+    cpuUsage,
+    totalMemory: Math.round(totalMem / (1024 * 1024)), // MB
+    freeMemory: Math.round(freeMem / (1024 * 1024)),
+    usedMemory: Math.round((totalMem - freeMem) / (1024 * 1024)),
+    memoryUsagePercent: totalMem > 0
+      ? parseFloat((((totalMem - freeMem) / totalMem) * 100).toFixed(1))
+      : 0,
+    loadAvg,
+    networkInterfaces: networkList
   };
 }
 
@@ -364,18 +439,18 @@ async function listDrives() {
  * Register IPC handlers for local filesystem operations
  */
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:local:list", listLocalDir);
-  ipcMain.handle("netcatty:local:read", readLocalFile);
-  ipcMain.handle("netcatty:local:write", writeLocalFile);
-  ipcMain.handle("netcatty:local:delete", deleteLocalFile);
-  ipcMain.handle("netcatty:local:rename", renameLocalFile);
-  ipcMain.handle("netcatty:local:mkdir", mkdirLocal);
-  ipcMain.handle("netcatty:local:stat", statLocal);
-  ipcMain.handle("netcatty:local:tree", listLocalTree);
-  ipcMain.handle("netcatty:local:homedir", getHomeDir);
-  ipcMain.handle("netcatty:local:drives", listDrives);
-  ipcMain.handle("netcatty:system:info", getSystemInfo);
-  ipcMain.handle("netcatty:known-hosts:read", readKnownHosts);
+  ipcMain.handle("ALinLink:local:list", listLocalDir);
+  ipcMain.handle("ALinLink:local:read", readLocalFile);
+  ipcMain.handle("ALinLink:local:write", writeLocalFile);
+  ipcMain.handle("ALinLink:local:delete", deleteLocalFile);
+  ipcMain.handle("ALinLink:local:rename", renameLocalFile);
+  ipcMain.handle("ALinLink:local:mkdir", mkdirLocal);
+  ipcMain.handle("ALinLink:local:stat", statLocal);
+  ipcMain.handle("ALinLink:local:tree", listLocalTree);
+  ipcMain.handle("ALinLink:local:homedir", getHomeDir);
+  ipcMain.handle("ALinLink:local:drives", listDrives);
+  ipcMain.handle("ALinLink:system:info", getSystemInfo);
+  ipcMain.handle("ALinLink:known-hosts:read", readKnownHosts);
 }
 
 module.exports = {

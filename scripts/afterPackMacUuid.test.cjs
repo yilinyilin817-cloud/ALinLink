@@ -60,14 +60,14 @@ function buildFatMachO(slices) {
 }
 
 test("deriveUuid is deterministic and 16 bytes", () => {
-  const a = deriveUuid("com.netcatty.app");
-  const b = deriveUuid("com.netcatty.app");
+  const a = deriveUuid("com.ALinLink.app");
+  const b = deriveUuid("com.ALinLink.app");
   assert.equal(a.length, 16);
   assert.ok(a.equals(b));
 });
 
 test("deriveUuid differs per appId and sets version/variant bits", () => {
-  const a = deriveUuid("com.netcatty.app");
+  const a = deriveUuid("com.ALinLink.app");
   const b = deriveUuid("com.example.other");
   assert.ok(!a.equals(b));
   assert.equal(a[6] & 0xf0, 0x50); // version 5
@@ -77,7 +77,7 @@ test("deriveUuid differs per appId and sets version/variant bits", () => {
 test("patchMachOBuffer rewrites LC_UUID in a thin Mach-O and leaves the rest intact", () => {
   const original = Buffer.alloc(16, 0x11);
   const buf = buildThinMachO(original);
-  const uuid = deriveUuid("com.netcatty.app");
+  const uuid = deriveUuid("com.ALinLink.app");
 
   const { patched, oldUuids } = patchMachOBuffer(buf, uuid);
 
@@ -95,7 +95,7 @@ test("patchMachOBuffer patches every slice of a fat binary", () => {
   const slice1 = buildThinMachO(Buffer.alloc(16, 0x22));
   const slice2 = buildThinMachO(Buffer.alloc(16, 0x33));
   const fat = buildFatMachO([slice1, slice2]);
-  const uuid = deriveUuid("com.netcatty.app");
+  const uuid = deriveUuid("com.ALinLink.app");
 
   const { patched } = patchMachOBuffer(fat, uuid);
 
@@ -112,6 +112,6 @@ test("patchMachOBuffer reports zero when there is no LC_UUID", () => {
   cmd.writeUInt32LE(16, 4);
   const buf = Buffer.concat([header, cmd]);
 
-  const { patched } = patchMachOBuffer(buf, deriveUuid("com.netcatty.app"));
+  const { patched } = patchMachOBuffer(buf, deriveUuid("com.ALinLink.app"));
   assert.equal(patched, 0);
 });

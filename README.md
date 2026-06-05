@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="public/icon.png" alt="Netcatty" width="128" height="128">
+  <img src="public/icon.png" alt="ALinLink" width="128" height="128">
 </p>
 
-<h1 align="center">Netcatty</h1>
+<h1 align="center">ALinLink</h1>
 
 <p align="center">
   <strong>🔥 AI-Powered SSH Client, SFTP Browser & Terminal Manager 🚀</strong><br/>
-  <a href="https://netcatty.app"><strong>netcatty.app</strong></a>
+  <a href="https://alinlink.app"><strong>alinlink.app</strong></a>
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/binaricat/Netcatty/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/binaricat/Netcatty?style=for-the-badge&logo=github&label=Release"></a>
+  <a href="https://github.com/binaricat/ALinLink/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/binaricat/ALinLink?style=for-the-badge&logo=github&label=Release"></a>
   &nbsp;
   <a href="#"><img alt="Platform" src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=for-the-badge&logo=electron"></a>
   &nbsp;
@@ -23,8 +23,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/binaricat/Netcatty/releases/latest">
-    <img src="https://img.shields.io/github/v/release/binaricat/Netcatty?style=for-the-badge&logo=github&label=Download%20Latest&color=success" alt="Download Latest Release">
+  <a href="https://github.com/binaricat/ALinLink/releases/latest">
+    <img src="https://img.shields.io/github/v/release/binaricat/ALinLink?style=for-the-badge&logo=github&label=Download%20Latest&color=success" alt="Download Latest Release">
   </a>
 </p>
 
@@ -40,7 +40,7 @@
 
 ---
 
-<img width="2868" height="1784" alt="netcatty SSH (Window) 2026-04-23 11:19 PM" src="https://github.com/user-attachments/assets/d6df734f-9ebc-452a-8b7d-e8a0fdc9463a" />
+<img width="2868" height="1784" alt="ALinLink SSH (Window) 2026-04-23 11:19 PM" src="https://github.com/user-attachments/assets/d6df734f-9ebc-452a-8b7d-e8a0fdc9463a" />
 
 
 ---
@@ -88,8 +88,8 @@ https://github.com/user-attachments/assets/52fd30b8-9f02-43d4-a3b2-142691e8e3ec
 # Contents <!-- omit in toc -->
 
 - [🔥 Catty Agent — AI Partner](#catty-agent)
-- [What is Netcatty](#what-is-netcatty)
-- [Why Netcatty](#why-netcatty)
+- [What is ALinLink](#what-is-alinlink)
+- [Why ALinLink](#why-alinlink)
 - [Features](#features)
 - [Demos](#demos)
 - [Screenshots](#screenshots)
@@ -107,23 +107,23 @@ https://github.com/user-attachments/assets/52fd30b8-9f02-43d4-a3b2-142691e8e3ec
 
 ---
 
-<a name="what-is-netcatty"></a>
-# What is Netcatty
+<a name="what-is-alinlink"></a>
+# What is ALinLink
 
-**Netcatty** is a modern SSH client and terminal manager for macOS, Windows, and Linux, designed for developers, sysadmins, and DevOps engineers who need to manage multiple remote servers efficiently.
+**ALinLink** is a modern SSH client and terminal manager for macOS, Windows, and Linux, designed for developers, sysadmins, and DevOps engineers who need to manage multiple remote servers efficiently.
 
-- **Netcatty is** an alternative to PuTTY, Termius, SecureCRT, and macOS Terminal.app for SSH connections
-- **Netcatty is** a powerful SFTP client with dual-pane file browser
-- **Netcatty is** a terminal workspace with split panes, tabs, and session management
-- **Netcatty supports** SSH, local terminal, Telnet, Mosh, and Serial connections (when available)
-- **Netcatty is not** a shell replacement — it connects to shells via SSH/Telnet/Mosh or local/serial sessions
+- **ALinLink is** an alternative to PuTTY, Termius, SecureCRT, and macOS Terminal.app for SSH connections
+- **ALinLink is** a powerful SFTP client with dual-pane file browser
+- **ALinLink is** a terminal workspace with split panes, tabs, and session management
+- **ALinLink supports** SSH, local terminal, Telnet, Mosh, and Serial connections (when available)
+- **ALinLink is not** a shell replacement — it connects to shells via SSH/Telnet/Mosh or local/serial sessions
 
 ---
 
-<a name="why-netcatty"></a>
-# Why Netcatty
+<a name="why-alinlink"></a>
+# Why ALinLink
 
-If you regularly work with a fleet of servers, Netcatty is built for speed and flow:
+If you regularly work with a fleet of servers, ALinLink is built for speed and flow:
 
 - **Workspace-first** — split panes + tabs + session restore for “always-on” workflows
 - **Vault organization** — grid/list/tree views with fast search and drag-friendly workflows
@@ -198,7 +198,7 @@ https://github.com/user-attachments/assets/e1e26f7a-3489-41cc-975e-8dccba56ea85
 
 
 ### Custom themes
-Make Netcatty yours: customize themes and UI appearance.
+Make ALinLink yours: customize themes and UI appearance.
 
 
 
@@ -259,7 +259,7 @@ Split panes help you monitor multiple servers/services at the same time (deploy 
 <a name="supported-distros"></a>
 # Supported Distros
 
-Netcatty automatically detects and displays OS icons for connected hosts:
+ALinLink automatically detects and displays OS icons for connected hosts:
 
 <p align="center">
   <img src="public/distro/ubuntu.svg" width="48" alt="Ubuntu" title="Ubuntu">
@@ -282,7 +282,7 @@ Netcatty automatically detects and displays OS icons for connected hosts:
 
 ### Download
 
-Download the latest release for your platform from [GitHub Releases](https://github.com/binaricat/Netcatty/releases/latest).
+Download the latest release for your platform from [GitHub Releases](https://github.com/binaricat/ALinLink/releases/latest).
 
 | OS | Support |
 | :--- | :--- |
@@ -290,7 +290,7 @@ Download the latest release for your platform from [GitHub Releases](https://git
 | **Windows** | x64 / arm64 |
 | **Linux** | x64 / arm64 |
 
-Or browse all releases at [GitHub Releases](https://github.com/binaricat/Netcatty/releases).
+Or browse all releases at [GitHub Releases](https://github.com/binaricat/ALinLink/releases).
 
 > **macOS Users:** Current releases are expected to be code-signed and notarized. If Gatekeeper still warns, make sure you downloaded the latest official build from GitHub Releases.
 
@@ -302,8 +302,8 @@ Or browse all releases at [GitHub Releases](https://github.com/binaricat/Netcatt
 
 ```bash
 # Clone the repository
-git clone https://github.com/binaricat/Netcatty.git
-cd Netcatty
+git clone https://github.com/binaricat/ALinLink.git
+cd ALinLink
 
 # Install dependencies
 npm install
@@ -387,8 +387,8 @@ See [agents.md](agents.md) for architecture overview and coding conventions.
 
 Thanks to all the people who contribute!
 
-<a href="https://github.com/binaricat/Netcatty/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=binaricat/Netcatty" />
+<a href="https://github.com/binaricat/ALinLink/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=binaricat/ALinLink" />
 </a>
 
 ---
@@ -403,11 +403,11 @@ This project is licensed under the **GPL-3.0 License** - see the [LICENSE](LICEN
 <a name="star-history"></a>
 # Star History
 
-<a href="https://star-history.com/#binaricat/Netcatty&Date">
+<a href="https://star-history.com/#binaricat/ALinLink&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=binaricat/Netcatty&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=binaricat/Netcatty&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=binaricat/Netcatty&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=binaricat/ALinLink&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=binaricat/ALinLink&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=binaricat/ALinLink&type=Date" />
  </picture>
 </a>
 

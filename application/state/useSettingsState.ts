@@ -58,7 +58,7 @@ import { getUiThemeById } from '../../infrastructure/config/uiThemes';
 import { DEFAULT_UI_FONT_ID } from '../../infrastructure/config/uiFonts';
 import { uiFontStore, useUIFontsLoaded } from './uiFontStore';
 import { localStorageAdapter } from '../../infrastructure/persistence/localStorageAdapter';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 import {
   DEFAULT_ACCENT_MODE,
   DEFAULT_CUSTOM_ACCENT,
@@ -358,7 +358,7 @@ export const useSettingsState = () => {
   // Helper to notify other windows about settings changes via IPC
   const notifySettingsChanged = useCallback((key: string, value: unknown) => {
     try {
-      netcattyBridge.get()?.notifySettingsChanged?.({ key, value });
+      ALinLinkBridge.get()?.notifySettingsChanged?.({ key, value });
     } catch {
       // ignore - bridge may not be available
     }
@@ -412,8 +412,10 @@ export const useSettingsState = () => {
     setCustomAccent(nextAccent);
 
     const effective = nextTheme === 'system' ? getSystemPreference() : nextTheme;
-    const tokens = getUiThemeById(effective, effective === 'dark' ? nextDarkId : nextLightId).tokens;
+    const activeUiThemeId = effective === 'dark' ? nextDarkId : nextLightId;
+    const tokens = getUiThemeById(effective, activeUiThemeId).tokens;
     applyThemeTokens(nextTheme, effective, tokens, nextAccentMode, nextAccent);
+    document.documentElement.setAttribute('data-active-ui-theme', activeUiThemeId);
   }, [theme, lightUiThemeId, darkUiThemeId, accentMode, customAccent]);
 
   const syncCustomCssFromStorage = useCallback(() => {
@@ -501,8 +503,11 @@ export const useSettingsState = () => {
   }, [applyIncomingCustomKeyBindings, syncAppearanceFromStorage, syncCustomCssFromStorage, setTerminalSettings]);
 
   useLayoutEffect(() => {
-    const tokens = getUiThemeById(resolvedTheme, resolvedTheme === 'dark' ? darkUiThemeId : lightUiThemeId).tokens;
+    const activeUiThemeId = resolvedTheme === 'dark' ? darkUiThemeId : lightUiThemeId;
+    const tokens = getUiThemeById(resolvedTheme, activeUiThemeId).tokens;
     applyThemeTokens(theme, resolvedTheme, tokens, accentMode, customAccent);
+    // Expose the active UI theme ID as a data attribute for CSS and component targeting
+    document.documentElement.setAttribute('data-active-ui-theme', activeUiThemeId);
     localStorageAdapter.writeString(STORAGE_KEY_THEME, theme);
     localStorageAdapter.writeString(STORAGE_KEY_UI_THEME_LIGHT, lightUiThemeId);
     localStorageAdapter.writeString(STORAGE_KEY_UI_THEME_DARK, darkUiThemeId);
@@ -529,7 +534,7 @@ export const useSettingsState = () => {
   useLayoutEffect(() => {
     localStorageAdapter.writeString(STORAGE_KEY_UI_LANGUAGE, uiLanguage);
     document.documentElement.lang = uiLanguage;
-    netcattyBridge.get()?.setLanguage?.(uiLanguage);
+    ALinLinkBridge.get()?.setLanguage?.(uiLanguage);
     // Fix 1: Skip IPC broadcast on initial mount
     if (persistMountedRef.current) {
       notifySettingsChanged(STORAGE_KEY_UI_LANGUAGE, uiLanguage);
@@ -577,7 +582,7 @@ export const useSettingsState = () => {
   });
 
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onLanguageChanged) return;
     const unsubscribe = bridge.onLanguageChanged((language) => {
       if (typeof language !== 'string' || !language.length) return;
@@ -718,10 +723,10 @@ export const useSettingsState = () => {
   // Apply and persist custom CSS
   useEffect(() => {
     // Always apply CSS to document (needed on mount)
-    let styleEl = document.getElementById('netcatty-custom-css') as HTMLStyleElement | null;
+    let styleEl = document.getElementById('ALinLink-custom-css') as HTMLStyleElement | null;
     if (!styleEl) {
       styleEl = document.createElement('style');
-      styleEl.id = 'netcatty-custom-css';
+      styleEl.id = 'ALinLink-custom-css';
       document.head.appendChild(styleEl);
     }
     styleEl.textContent = customCSS;
@@ -876,8 +881,10 @@ export const useSettingsState = () => {
 
   /** Re-apply the current UI theme tokens (used to restore after immersive mode override). */
   const reapplyCurrentTheme = useCallback(() => {
-    const tokens = getUiThemeById(resolvedTheme, resolvedTheme === 'dark' ? darkUiThemeId : lightUiThemeId).tokens;
+    const activeUiThemeId = resolvedTheme === 'dark' ? darkUiThemeId : lightUiThemeId;
+    const tokens = getUiThemeById(resolvedTheme, activeUiThemeId).tokens;
     applyThemeTokens(theme, resolvedTheme, tokens, accentMode, customAccent);
+    document.documentElement.setAttribute('data-active-ui-theme', activeUiThemeId);
   }, [theme, resolvedTheme, lightUiThemeId, darkUiThemeId, accentMode, customAccent]);
 
   return {

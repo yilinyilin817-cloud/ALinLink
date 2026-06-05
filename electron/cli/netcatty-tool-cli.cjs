@@ -3,44 +3,44 @@
 
 const path = require("node:path");
 
-const { connectClient, createError } = require("./netcattyRpcClient.cjs");
+const { connectClient, createError } = require("./ALinLinkRpcClient.cjs");
 
 function printHelp() {
   process.stdout.write(
-    "Netcatty Tool CLI\n\n" +
+    "ALinLink Tool CLI\n\n" +
     "Usage:\n" +
-    "  netcatty-tool-cli status [--json]\n" +
-    "  netcatty-tool-cli env --chat-session <id> [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli session --session <id> --chat-session <id> [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli exec --session <id> --chat-session <id> [--json] [--] <shell-ready-command>\n" +
-    "  netcatty-tool-cli job-start --session <id> --chat-session <id> [--json] [--] <shell-ready-command>\n" +
-    "  netcatty-tool-cli job-poll --job <id> --chat-session <id> [--offset <n>] [--json]\n" +
-    "  netcatty-tool-cli job-stop --job <id> --chat-session <id> [--json]\n" +
-    "  netcatty-tool-cli sftp list --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp read --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp write --session <id> --remote-path <remote-path> --content <text> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp download --session <id> --remote-path <remote-path> --local-path <local-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp upload --session <id> --local-path <local-path> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp mkdir --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp delete --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp rename --session <id> --old-remote-path <remote-path> --new-remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp stat --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp chmod --session <id> --remote-path <remote-path> --mode <octal> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli sftp home --session <id> --chat-session <id> [--json] [--scope-session <session-id> ...]\n" +
-    "  netcatty-tool-cli cancel --chat-session <id> [--json]\n" +
-    "  netcatty-tool-cli resume --chat-session <id> [--json]\n" +
-    "  netcatty-tool-cli help\n\n" +
+    "  ALinLink-tool-cli status [--json]\n" +
+    "  ALinLink-tool-cli env --chat-session <id> [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli session --session <id> --chat-session <id> [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli exec --session <id> --chat-session <id> [--json] [--] <shell-ready-command>\n" +
+    "  ALinLink-tool-cli job-start --session <id> --chat-session <id> [--json] [--] <shell-ready-command>\n" +
+    "  ALinLink-tool-cli job-poll --job <id> --chat-session <id> [--offset <n>] [--json]\n" +
+    "  ALinLink-tool-cli job-stop --job <id> --chat-session <id> [--json]\n" +
+    "  ALinLink-tool-cli sftp list --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp read --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp write --session <id> --remote-path <remote-path> --content <text> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp download --session <id> --remote-path <remote-path> --local-path <local-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp upload --session <id> --local-path <local-path> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp mkdir --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp delete --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp rename --session <id> --old-remote-path <remote-path> --new-remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp stat --session <id> --remote-path <remote-path> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp chmod --session <id> --remote-path <remote-path> --mode <octal> --chat-session <id> [--encoding <enc>] [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli sftp home --session <id> --chat-session <id> [--json] [--scope-session <session-id> ...]\n" +
+    "  ALinLink-tool-cli cancel --chat-session <id> [--json]\n" +
+    "  ALinLink-tool-cli resume --chat-session <id> [--json]\n" +
+    "  ALinLink-tool-cli help\n\n" +
     "Examples:\n" +
-    "  netcatty-tool-cli status --json\n" +
-    "  netcatty-tool-cli env --chat-session ai_123 --json\n" +
-    "  netcatty-tool-cli session --session sess_123 --json --chat-session ai_123\n" +
-    "  netcatty-tool-cli exec --session sess_123 --chat-session ai_123 --json -- \"pwd\"\n" +
-    "  netcatty-tool-cli job-start --session sess_123 --chat-session ai_123 --json -- \"npm run dev\"\n" +
-    "  netcatty-tool-cli job-poll --job job_123 --chat-session ai_123 --offset 0 --json\n" +
-    "  netcatty-tool-cli sftp list --session sess_123 --remote-path /etc --chat-session ai_123 --json\n" +
-    "  netcatty-tool-cli sftp download --session sess_123 --remote-path /etc/hosts --local-path ./hosts.txt --chat-session ai_123 --json\n\n" +
+    "  ALinLink-tool-cli status --json\n" +
+    "  ALinLink-tool-cli env --chat-session ai_123 --json\n" +
+    "  ALinLink-tool-cli session --session sess_123 --json --chat-session ai_123\n" +
+    "  ALinLink-tool-cli exec --session sess_123 --chat-session ai_123 --json -- \"pwd\"\n" +
+    "  ALinLink-tool-cli job-start --session sess_123 --chat-session ai_123 --json -- \"npm run dev\"\n" +
+    "  ALinLink-tool-cli job-poll --job job_123 --chat-session ai_123 --offset 0 --json\n" +
+    "  ALinLink-tool-cli sftp list --session sess_123 --remote-path /etc --chat-session ai_123 --json\n" +
+    "  ALinLink-tool-cli sftp download --session sess_123 --remote-path /etc/hosts --local-path ./hosts.txt --chat-session ai_123 --json\n\n" +
     "Notes:\n" +
-    "  - Start the Netcatty desktop app before using this CLI.\n" +
+    "  - Start the ALinLink desktop app before using this CLI.\n" +
     "  - This CLI is intended as an internal Skills + CLI transport, not a general customer-facing shell tool.\n" +
     "  - `env` and `session` always require --chat-session <id>.\n" +
     "  - `exec` always requires both --session <id> and --chat-session <id>.\n" +
@@ -166,7 +166,7 @@ function parseArgs(argv) {
 
 function formatEnvText(ctx) {
   const header = [
-    `Environment: ${ctx.environment || "netcatty-terminal"}`,
+    `Environment: ${ctx.environment || "ALinLink-terminal"}`,
     `Hosts: ${ctx.hostCount || 0}`,
   ];
   if (!Array.isArray(ctx.hosts) || ctx.hosts.length === 0) {
@@ -236,7 +236,7 @@ function findHostOrThrow(ctx, sessionId) {
 }
 
 async function resolveTargetHost(client, opts) {
-  const ctx = await client.call("netcatty/getContext", buildScopeParams(opts));
+  const ctx = await client.call("ALinLink/getContext", buildScopeParams(opts));
   if (opts.sessionId) {
     return findHostOrThrow(ctx, opts.sessionId);
   }
@@ -291,7 +291,7 @@ function formatSessionText(host) {
 
 function formatStatusText(status) {
   const lines = [
-    "Netcatty Tool Status",
+    "ALinLink Tool Status",
     `Permission Mode: ${status.permissionMode || "unknown"}`,
     `Command Timeout (ms): ${status.commandTimeoutMs ?? "unknown"}`,
     `Max Iterations: ${status.maxIterations ?? "unknown"}`,
@@ -355,7 +355,7 @@ async function run() {
     client = await connectClient();
 
     if (command === "status") {
-      const result = await client.call("netcatty/getStatus", {});
+      const result = await client.call("ALinLink/getStatus", {});
       const output = opts.json ? JSON.stringify(result, null, 2) : formatStatusText(result);
       process.stdout.write(`${output}${opts.json ? "\n" : ""}`);
       return;
@@ -366,7 +366,7 @@ async function run() {
         throw createError("INVALID_ARGUMENT", "Missing required --chat-session <id> for env.");
       }
       const params = buildScopeParams(opts);
-      const result = await client.call("netcatty/getContext", params);
+      const result = await client.call("ALinLink/getContext", params);
       const output = opts.json ? JSON.stringify({ ok: true, ...result }, null, 2) : formatEnvText(result);
       process.stdout.write(`${output}${opts.json ? "\n" : ""}`);
       return;
@@ -394,7 +394,7 @@ async function run() {
         command: shellCommand,
         chatSessionId: opts.chatSessionId,
       };
-      const result = await client.call("netcatty/exec", rpcParams);
+      const result = await client.call("ALinLink/exec", rpcParams);
       if (result.ok === false) {
         const err = createError(result.code || "EXEC_FAILED", result.error || "Command failed");
         err.details = result;
@@ -414,7 +414,7 @@ async function run() {
       }
       const shellCommand = getSingleCommandOrThrow(opts, "job-start");
       const host = await resolveTargetHost(client, opts);
-      const result = await client.call("netcatty/jobStart", {
+      const result = await client.call("ALinLink/jobStart", {
         sessionId: host.sessionId,
         command: shellCommand,
         chatSessionId: opts.chatSessionId,
@@ -436,7 +436,7 @@ async function run() {
         throw createError("INVALID_ARGUMENT", "Missing required --job <id> for job-poll.");
       }
       const offset = Number.isFinite(opts.offset) && opts.offset >= 0 ? opts.offset : 0;
-      const result = await client.call("netcatty/jobPoll", {
+      const result = await client.call("ALinLink/jobPoll", {
         jobId: opts.jobId,
         offset,
         chatSessionId: opts.chatSessionId,
@@ -458,7 +458,7 @@ async function run() {
       if (!opts.jobId) {
         throw createError("INVALID_ARGUMENT", "Missing required --job <id> for job-stop.");
       }
-      const result = await client.call("netcatty/jobStop", {
+      const result = await client.call("ALinLink/jobStop", {
         jobId: opts.jobId,
         chatSessionId: opts.chatSessionId,
         ...buildScopeParams(opts),
@@ -506,7 +506,7 @@ async function run() {
       if (subcommand === "list") {
         if (!opts.remotePath) throw createError("INVALID_ARGUMENT", "Missing required --remote-path <remote-path> for sftp list.");
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/list", buildSftpParams()),
+          await client.call("ALinLink/sftp/list", buildSftpParams()),
           "SFTP_LIST_FAILED",
           "Failed to list remote directory",
         );
@@ -519,7 +519,7 @@ async function run() {
       if (subcommand === "read") {
         if (!opts.remotePath) throw createError("INVALID_ARGUMENT", "Missing required --remote-path <remote-path> for sftp read.");
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/read", buildSftpParams()),
+          await client.call("ALinLink/sftp/read", buildSftpParams()),
           "SFTP_READ_FAILED",
           "Failed to read remote file",
         );
@@ -533,7 +533,7 @@ async function run() {
         if (!opts.remotePath) throw createError("INVALID_ARGUMENT", "Missing required --remote-path <remote-path> for sftp write.");
         if (opts.content == null) throw createError("INVALID_ARGUMENT", "Missing required --content <text> for sftp write.");
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/write", buildSftpParams()),
+          await client.call("ALinLink/sftp/write", buildSftpParams()),
           "SFTP_WRITE_FAILED",
           "Failed to write remote file",
         );
@@ -548,7 +548,7 @@ async function run() {
           throw createError("INVALID_ARGUMENT", "Missing required --remote-path and --local-path for sftp download.");
         }
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/download", buildSftpParams()),
+          await client.call("ALinLink/sftp/download", buildSftpParams()),
           "SFTP_DOWNLOAD_FAILED",
           "Failed to download remote file",
         );
@@ -563,7 +563,7 @@ async function run() {
           throw createError("INVALID_ARGUMENT", "Missing required --local-path and --remote-path for sftp upload.");
         }
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/upload", buildSftpParams()),
+          await client.call("ALinLink/sftp/upload", buildSftpParams()),
           "SFTP_UPLOAD_FAILED",
           "Failed to upload local file",
         );
@@ -576,7 +576,7 @@ async function run() {
       if (subcommand === "mkdir") {
         if (!opts.remotePath) throw createError("INVALID_ARGUMENT", "Missing required --remote-path <remote-path> for sftp mkdir.");
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/mkdir", buildSftpParams()),
+          await client.call("ALinLink/sftp/mkdir", buildSftpParams()),
           "SFTP_MKDIR_FAILED",
           "Failed to create remote directory",
         );
@@ -589,7 +589,7 @@ async function run() {
       if (subcommand === "delete") {
         if (!opts.remotePath) throw createError("INVALID_ARGUMENT", "Missing required --remote-path <remote-path> for sftp delete.");
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/delete", buildSftpParams()),
+          await client.call("ALinLink/sftp/delete", buildSftpParams()),
           "SFTP_DELETE_FAILED",
           "Failed to delete remote path",
         );
@@ -604,7 +604,7 @@ async function run() {
           throw createError("INVALID_ARGUMENT", "Missing required --old-remote-path and --new-remote-path for sftp rename.");
         }
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/rename", buildSftpParams()),
+          await client.call("ALinLink/sftp/rename", buildSftpParams()),
           "SFTP_RENAME_FAILED",
           "Failed to rename remote path",
         );
@@ -617,7 +617,7 @@ async function run() {
       if (subcommand === "stat") {
         if (!opts.remotePath) throw createError("INVALID_ARGUMENT", "Missing required --remote-path <remote-path> for sftp stat.");
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/stat", buildSftpParams()),
+          await client.call("ALinLink/sftp/stat", buildSftpParams()),
           "SFTP_STAT_FAILED",
           "Failed to stat remote path",
         );
@@ -632,7 +632,7 @@ async function run() {
           throw createError("INVALID_ARGUMENT", "Missing required --remote-path and --mode for sftp chmod.");
         }
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/chmod", buildSftpParams()),
+          await client.call("ALinLink/sftp/chmod", buildSftpParams()),
           "SFTP_CHMOD_FAILED",
           "Failed to chmod remote path",
         );
@@ -644,7 +644,7 @@ async function run() {
 
       if (subcommand === "home") {
         const result = ensureBridgeCallOk(
-          await client.call("netcatty/sftp/home", buildSftpParams()),
+          await client.call("ALinLink/sftp/home", buildSftpParams()),
           "SFTP_HOME_FAILED",
           "Failed to resolve remote home directory",
         );
@@ -660,7 +660,7 @@ async function run() {
         throw createError("INVALID_ARGUMENT", `Missing required --chat-session <id> for ${command}.`);
       }
       const cancelled = command === "cancel";
-      const result = await client.call("netcatty/setCancelled", {
+      const result = await client.call("ALinLink/setCancelled", {
         chatSessionId: opts.chatSessionId,
         cancelled,
       });

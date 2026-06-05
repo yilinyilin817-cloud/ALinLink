@@ -30,7 +30,7 @@ import {
 } from "../../../domain/terminalAppearance";
 import { logger } from "../../../lib/logger";
 import { isMacPlatform } from "../../../lib/utils";
-import { netcattyBridge } from "../../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../../infrastructure/services/ALinLinkBridge";
 import {
   clearTerminalViewport,
   isEraseViewportSequence,
@@ -209,7 +209,7 @@ export const createXTermRuntime = (ctx: CreateXTermRuntimeContext): XTermRuntime
 
   const settings = ctx.terminalSettingsRef.current;
   const rendererType = settings?.rendererType ?? "auto";
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   const isLocalTerminalHost = ctx.host.protocol === "local";
   const windowsPty =
     platform === "win32" && isLocalTerminalHost
@@ -917,7 +917,7 @@ export const createXTermRuntime = (ctx: CreateXTermRuntimeContext): XTermRuntime
         // Use Electron bridge as primary, fall back to navigator.clipboard
         const readClipboard = async (): Promise<string> => {
           try {
-            const bridge = netcattyBridge.get();
+            const bridge = ALinLinkBridge.get();
             if (bridge?.readClipboardText) return await bridge.readClipboardText();
           } catch { /* fall through to navigator.clipboard */ }
           return navigator.clipboard.readText();

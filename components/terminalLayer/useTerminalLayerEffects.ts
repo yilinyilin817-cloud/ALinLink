@@ -192,8 +192,8 @@ export function useTerminalLayerEffects(ctx: TerminalLayerEffectsContext) {
     // handler so a second click on an already-open AI panel closes it.
     useEffect(() => {
       const handler = () => handleToggleAiFromTopBar();
-      window.addEventListener('netcatty:toggle-ai-panel', handler);
-      return () => window.removeEventListener('netcatty:toggle-ai-panel', handler);
+      window.addEventListener('ALinLink:toggle-ai-panel', handler);
+      return () => window.removeEventListener('ALinLink:toggle-ai-panel', handler);
     }, [handleToggleAiFromTopBar]);
   
   useEffect(() => {

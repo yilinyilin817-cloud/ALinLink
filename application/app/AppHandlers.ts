@@ -187,9 +187,9 @@ export function handleEscapeKeyDownImpl(getCtx: AppContextGetter, e: KeyboardEve
 }
 
 export function handleKeyboardInteractiveSubmitImpl(getCtx: AppContextGetter, requestId: string, responses: string[], savePassword?: string) {
-  const { hosts, keyboardInteractiveQueue, netcattyBridge, sessions, setKeyboardInteractiveQueue, updateHosts } = getCtx();
+  const { hosts, keyboardInteractiveQueue, ALinLinkBridge, sessions, setKeyboardInteractiveQueue, updateHosts } = getCtx();
 {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.respondKeyboardInteractive) {
       void bridge.respondKeyboardInteractive(requestId, responses, false);
     }
@@ -214,9 +214,9 @@ export function handleKeyboardInteractiveSubmitImpl(getCtx: AppContextGetter, re
 }
 
 export function handleKeyboardInteractiveCancelImpl(getCtx: AppContextGetter, requestId: string) {
-  const { netcattyBridge, setKeyboardInteractiveQueue } = getCtx();
+  const { ALinLinkBridge, setKeyboardInteractiveQueue } = getCtx();
 {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.respondKeyboardInteractive) {
       void bridge.respondKeyboardInteractive(requestId, [], true);
     }
@@ -226,9 +226,9 @@ export function handleKeyboardInteractiveCancelImpl(getCtx: AppContextGetter, re
 }
 
 export async function handlePassphraseSubmitImpl(getCtx: AppContextGetter, requestId: string, passphrase: string, remember: boolean) {
-  const { keysRef, netcattyBridge, passphraseQueue, rememberKeyPassphrase, setPassphraseQueue, updateKeys } = getCtx();
+  const { keysRef, ALinLinkBridge, passphraseQueue, rememberKeyPassphrase, setPassphraseQueue, updateKeys } = getCtx();
 {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     const request = passphraseQueue.find((r: PassphraseRequest) => r.requestId === requestId);
 
     // Save passphrase if requested
@@ -258,9 +258,9 @@ export async function handlePassphraseSubmitImpl(getCtx: AppContextGetter, reque
 }
 
 export function handlePassphraseCancelImpl(getCtx: AppContextGetter, requestId: string) {
-  const { netcattyBridge, setPassphraseQueue } = getCtx();
+  const { ALinLinkBridge, setPassphraseQueue } = getCtx();
 {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.respondPassphrase) {
       // Cancel = stop the entire passphrase flow
       void bridge.respondPassphrase(requestId, '', true);
@@ -270,9 +270,9 @@ export function handlePassphraseCancelImpl(getCtx: AppContextGetter, requestId: 
 }
 
 export function handlePassphraseSkipImpl(getCtx: AppContextGetter, requestId: string) {
-  const { netcattyBridge, setPassphraseQueue } = getCtx();
+  const { ALinLinkBridge, setPassphraseQueue } = getCtx();
 {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.respondPassphraseSkip) {
       // Skip = skip this key but continue asking for others
       void bridge.respondPassphraseSkip(requestId);
@@ -320,9 +320,9 @@ export function copySessionWithCurrentShellImpl(getCtx: AppContextGetter, sessio
 }
 
 export async function confirmIfBusyLocalTerminalImpl(getCtx: AppContextGetter, sessionIds: string[]) {
-  const { netcattyBridge, sessions, t } = getCtx();
+  const { ALinLinkBridge, sessions, t } = getCtx();
 {
-      const bridge = netcattyBridge.get();
+      const bridge = ALinLinkBridge.get();
       const localIds = sessionIds.filter((id) => {
         const s = sessions.find((x) => x.id === id);
         return s?.protocol === 'local';

@@ -1,9 +1,9 @@
 import { useCallback } from "react";
-import { netcattyBridge } from "../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../infrastructure/services/ALinLinkBridge";
 
 export const useKeychainBackend = () => {
   const generateKeyPair = useCallback(async (options: { type: "RSA" | "ECDSA" | "ED25519"; bits?: number; comment?: string }) => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     return bridge?.generateKeyPair?.(options);
   }, []);
 
@@ -25,7 +25,7 @@ export const useKeychainBackend = () => {
     skipEcdsaHostKey?: boolean;
     algorithmOverrides?: import("../../domain/models").HostAlgorithmOverrides;
   }) => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.execCommand) throw new Error("execCommand unavailable");
     return bridge.execCommand(options);
   }, []);

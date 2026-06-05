@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { DiscoveredAgent, ExternalAgentConfig } from '../../infrastructure/ai/types';
 
-interface NetcattyBridge {
+interface ALinLinkBridge {
   aiDiscoverAgents(): Promise<DiscoveredAgent[]>;
 }
 
-function getBridge(): NetcattyBridge | undefined {
-  return (window as unknown as { netcatty?: NetcattyBridge }).netcatty;
+function getBridge(): ALinLinkBridge | undefined {
+  return (window as unknown as { ALinLink?: ALinLinkBridge }).ALinLink;
 }
 
 export function useAgentDiscovery(

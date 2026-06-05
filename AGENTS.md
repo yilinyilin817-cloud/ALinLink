@@ -31,7 +31,7 @@ This project is wired around three layers: domain (pure logic), application stat
 ## Data & Storage
 - Persisted keys: see `storageKeys.ts`. Use `localStorageAdapter` for all reads/writes.
 - Seed data: `config/defaultData.ts`; terminal themes: `config/terminalThemes.ts`.
-- **Temporary files**: All temporary files (e.g., SFTP downloaded files for external editing) must be written to Netcatty's dedicated temp directory via `tempDirBridge.getTempFilePath(fileName)`. Do not write directly to `os.tmpdir()`. This ensures proper cleanup and user visibility in Settings > System.
+- **Temporary files**: All temporary files (e.g., SFTP downloaded files for external editing) must be written to ALinLink's dedicated temp directory via `tempDirBridge.getTempFilePath(fileName)`. Do not write directly to `os.tmpdir()`. This ensures proper cleanup and user visibility in Settings > System.
 
 ## Testing & Safety
 - Favor unit tests for domain helpers (e.g., `workspace.ts`, `host.ts`) and hook-level tests for application state.
@@ -45,9 +45,9 @@ This project is wired around three layers: domain (pure logic), application stat
 - Maintain ASCII-only unless required by existing file content.
 
 ## Review Boundaries
-- Treat `electron/cli/*`, `netcatty-tool-cli`, the CLI discovery file, and the local TCP bridge as internal Netcatty integration surfaces unless a task explicitly says otherwise.
-- Do not review those surfaces as public APIs by default, and do not assume they must support third-party callers, manual launches, or non-Netcatty agents.
-- On supported first-party paths, assume Netcatty's own launcher provides required integration environment such as `NETCATTY_TOOL_CLI_DISCOVERY_FILE`.
+- Treat `electron/cli/*`, `ALinLink-tool-cli`, the CLI discovery file, and the local TCP bridge as internal ALinLink integration surfaces unless a task explicitly says otherwise.
+- Do not review those surfaces as public APIs by default, and do not assume they must support third-party callers, manual launches, or non-ALinLink agents.
+- On supported first-party paths, assume ALinLink's own launcher provides required integration environment such as `ALinLink_TOOL_CLI_DISCOVERY_FILE`.
 - If a review concern depends on external exposure, third-party compatibility, or public API stability, call it out as out of scope unless the task explicitly includes that contract.
 
 ---

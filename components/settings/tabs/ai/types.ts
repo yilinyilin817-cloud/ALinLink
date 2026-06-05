@@ -95,7 +95,7 @@ export interface FetchBridge {
   aiAllowlistAddHost?: (baseURL: string) => Promise<{ ok: boolean }>;
 }
 
-export interface NetcattyAiBridge {
+export interface ALinLinkAiBridge {
   aiCodexGetIntegration?: (options?: { refreshShellEnv?: boolean }) => Promise<CodexIntegrationStatus>;
   aiCodexStartLogin?: () => Promise<{ ok: boolean; session?: CodexLoginSession; error?: string }>;
   aiCodexGetLoginSession?: (sessionId: string) => Promise<{ ok: boolean; session?: CodexLoginSession; error?: string }>;
@@ -136,18 +136,18 @@ export const AGENT_DEFAULTS: Record<string, Omit<ExternalAgentConfig, "id" | "co
 // Bridge helpers
 // ---------------------------------------------------------------------------
 
-export function getBridge(): NetcattyAiBridge | undefined {
-  return (window as unknown as { netcatty?: NetcattyAiBridge }).netcatty;
+export function getBridge(): ALinLinkAiBridge | undefined {
+  return (window as unknown as { ALinLink?: ALinLinkAiBridge }).ALinLink;
 }
 
 export function getFetchBridge(): FetchBridge | undefined {
-  return (window as unknown as { netcatty?: FetchBridge }).netcatty;
+  return (window as unknown as { ALinLink?: FetchBridge }).ALinLink;
 }
 
 export function normalizeCodexBridgeError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
-  if (message.includes("No handler registered for 'netcatty:ai:codex:")) {
-    return "Codex main-process handlers are not loaded yet. Fully restart Netcatty, or restart the Electron dev process, then try again.";
+  if (message.includes("No handler registered for 'ALinLink:ai:codex:")) {
+    return "Codex main-process handlers are not loaded yet. Fully restart ALinLink, or restart the Electron dev process, then try again.";
   }
   return message;
 }

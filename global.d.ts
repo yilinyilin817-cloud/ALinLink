@@ -1,9 +1,9 @@
-/// <reference path="./types/global/netcatty-bridge-session.d.ts" />
-/// <reference path="./types/global/netcatty-bridge-sftp.d.ts" />
-/// <reference path="./types/global/netcatty-bridge-sync.d.ts" />
-/// <reference path="./types/global/netcatty-bridge-files.d.ts" />
-/// <reference path="./types/global/netcatty-bridge-ai.d.ts" />
-/// <reference path="./types/global/netcatty-bridge-app.d.ts" />
+/// <reference path="./types/global/ALinLink-bridge-session.d.ts" />
+/// <reference path="./types/global/ALinLink-bridge-sftp.d.ts" />
+/// <reference path="./types/global/ALinLink-bridge-sync.d.ts" />
+/// <reference path="./types/global/ALinLink-bridge-files.d.ts" />
+/// <reference path="./types/global/ALinLink-bridge-ai.d.ts" />
+/// <reference path="./types/global/ALinLink-bridge-app.d.ts" />
 declare module "*.cjs" {
   const value: Record<string, unknown>;
   export = value;
@@ -17,7 +17,7 @@ declare module 'react' {
 
 declare global {
   // Proxy configuration for SSH connections
-  interface NetcattyProxyConfig {
+  interface ALinLinkProxyConfig {
     type: 'http' | 'socks5';
     host: string;
     port: number;
@@ -36,7 +36,7 @@ declare global {
   }
 
   // Jump host configuration for SSH tunneling
-  interface NetcattyJumpHost {
+  interface ALinLinkJumpHost {
     hostname: string;
     port: number;
     username: string;
@@ -48,7 +48,7 @@ declare global {
     keyId?: string;
     keySource?: 'generated' | 'imported' | 'reference';
     label?: string; // Display label for UI
-    proxy?: NetcattyProxyConfig;
+    proxy?: ALinLinkProxyConfig;
     identityFilePaths?: string[];
     // Resolved keepalive for THIS hop (caller has already applied host
     // override / global fallback). interval in seconds, 0 = disabled.
@@ -65,7 +65,7 @@ declare global {
 
   // Host key information for verification
   // Reserved for future host key verification UI feature
-  interface _NetcattyHostKeyInfo {
+  interface _ALinLinkHostKeyInfo {
     hostname: string;
     port: number;
     keyType: string;
@@ -73,7 +73,7 @@ declare global {
     publicKey?: string;
   }
 
-  interface NetcattySSHOptions {
+  interface ALinLinkSSHOptions {
     sessionId?: string;
     hostLabel?: string;
     hostname: string;
@@ -99,9 +99,9 @@ declare global {
     // Environment variables to set in the remote shell
     env?: Record<string, string>;
     // Proxy configuration
-    proxy?: NetcattyProxyConfig;
+    proxy?: ALinLinkProxyConfig;
     // Jump hosts (bastion chain)
-    jumpHosts?: NetcattyJumpHost[];
+    jumpHosts?: ALinLinkJumpHost[];
     // SSH-level keepalive interval in seconds (0 = disabled)
     keepaliveInterval?: number;
     // Unanswered keepalives before ssh2 declares the connection dead
@@ -162,8 +162,8 @@ declare global {
     certificate?: string;
     keyId?: string;
     passphrase?: string;
-    proxy?: NetcattyProxyConfig;
-    jumpHosts?: NetcattyJumpHost[];
+    proxy?: ALinLinkProxyConfig;
+    jumpHosts?: ALinLinkJumpHost[];
     identityFilePaths?: string[];
     legacyAlgorithms?: boolean;
     skipEcdsaHostKey?: boolean;
@@ -188,17 +188,17 @@ declare global {
     error?: string;
   }
 
-  interface NetcattyWindowsPtyInfo {
+  interface ALinLinkWindowsPtyInfo {
     backend: 'conpty' | 'winpty';
     buildNumber?: number;
   }
 
   type PortForwardStatusCallback = (status: 'inactive' | 'connecting' | 'active' | 'error', error?: string) => void;
 
-  interface NetcattyBridge {}
+  interface ALinLinkBridge {}
 
   interface Window {
-    netcatty?: NetcattyBridge;
+    ALinLink?: ALinLinkBridge;
   }
 
 }

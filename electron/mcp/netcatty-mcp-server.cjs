@@ -1,9 +1,9 @@
 /**
- * Netcatty MCP Server (stdio transport)
+ * ALinLink MCP Server (stdio transport)
  *
  * Spawned by codex-acp (or other ACP agents) as a child process.
- * Communicates with the Netcatty main process via TCP (JSON-RPC over newline-delimited JSON).
- * Exposes Netcatty terminal tools so ACP agents can operate on scoped sessions.
+ * Communicates with the ALinLink main process via TCP (JSON-RPC over newline-delimited JSON).
+ * Exposes ALinLink terminal tools so ACP agents can operate on scoped sessions.
  */
 "use strict";
 
@@ -12,11 +12,11 @@ const { McpServer } = require("@modelcontextprotocol/sdk/server/mcp.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { z } = require("zod");
 
-const DEBUG_MCP = process.env.NETCATTY_MCP_DEBUG === "1";
+const DEBUG_MCP = process.env.ALinLink_MCP_DEBUG === "1";
 
 function debugLog(...args) {
   if (!DEBUG_MCP) return;
-  process.stderr.write(`[netcatty-mcp:debug] ${args.map(arg => {
+  process.stderr.write(`[ALinLink-mcp:debug] ${args.map(arg => {
     if (typeof arg === "string") return arg;
     try {
       return JSON.stringify(arg);
@@ -26,33 +26,33 @@ function debugLog(...args) {
   }).join(" ")}\n`);
 }
 
-// ── TCP Bridge to Netcatty main process ──
+// ── TCP Bridge to ALinLink main process ──
 
-const NETCATTY_MCP_PORT = parseInt(process.env.NETCATTY_MCP_PORT, 10);
-if (!NETCATTY_MCP_PORT) {
-  process.stderr.write("[netcatty-mcp] NETCATTY_MCP_PORT not set\n");
+const ALinLink_MCP_PORT = parseInt(process.env.ALinLink_MCP_PORT, 10);
+if (!ALinLink_MCP_PORT) {
+  process.stderr.write("[ALinLink-mcp] ALinLink_MCP_PORT not set\n");
   process.exit(1);
 }
 
 // Auth token for TCP bridge authentication
-const NETCATTY_MCP_TOKEN = process.env.NETCATTY_MCP_TOKEN || "";
-if (!NETCATTY_MCP_TOKEN) {
-  process.stderr.write("[netcatty-mcp] NETCATTY_MCP_TOKEN not set\n");
+const ALinLink_MCP_TOKEN = process.env.ALinLink_MCP_TOKEN || "";
+if (!ALinLink_MCP_TOKEN) {
+  process.stderr.write("[ALinLink-mcp] ALinLink_MCP_TOKEN not set\n");
   process.exit(1);
 }
 
 // Scoped session IDs (comma-separated). When set (even if empty), only listed
 // sessions are accessible. When unset, scope enforcement falls back to the
 // TCP bridge's own scoping (which also defaults to no-access when empty).
-const SCOPED_SESSION_IDS = process.env.NETCATTY_MCP_SESSION_IDS != null
-  ? process.env.NETCATTY_MCP_SESSION_IDS.split(",").map(s => s.trim()).filter(Boolean)
+const SCOPED_SESSION_IDS = process.env.ALinLink_MCP_SESSION_IDS != null
+  ? process.env.ALinLink_MCP_SESSION_IDS.split(",").map(s => s.trim()).filter(Boolean)
   : null;
 
 // Chat session ID for per-scope metadata isolation
-const CHAT_SESSION_ID = process.env.NETCATTY_MCP_CHAT_SESSION_ID || null;
+const CHAT_SESSION_ID = process.env.ALinLink_MCP_CHAT_SESSION_ID || null;
 
 // Permission mode: 'observer' | 'confirm' | 'autonomous' (defense-in-depth, TCP bridge also checks)
-const PERMISSION_MODE = process.env.NETCATTY_MCP_PERMISSION_MODE || "confirm";
+const PERMISSION_MODE = process.env.ALinLink_MCP_PERMISSION_MODE || "confirm";
 
 // Default command blocklist (defense-in-depth, TCP bridge also checks)
 const DEFAULT_COMMAND_BLOCKLIST = require("../../lib/commandBlocklist.cjs");
@@ -99,9 +99,9 @@ let tcpBuffer = "";
 
 function connectTcp() {
   return new Promise((resolve, reject) => {
-    const sock = net.createConnection({ host: "127.0.0.1", port: NETCATTY_MCP_PORT }, () => {
+    const sock = net.createConnection({ host: "127.0.0.1", port: ALinLink_MCP_PORT }, () => {
       tcpSocket = sock;
-      debugLog("Connected to TCP bridge", { port: NETCATTY_MCP_PORT });
+      debugLog("Connected to TCP bridge", { port: ALinLink_MCP_PORT });
       resolve();
     });
     sock.setEncoding("utf-8");
@@ -109,7 +109,7 @@ function connectTcp() {
     sock.on("data", (chunk) => {
       tcpBuffer += chunk;
       if (tcpBuffer.length > MAX_BUFFER_SIZE) {
-        process.stderr.write(`[netcatty-mcp] TCP buffer exceeded ${MAX_BUFFER_SIZE} bytes, clearing buffer\n`);
+        process.stderr.write(`[ALinLink-mcp] TCP buffer exceeded ${MAX_BUFFER_SIZE} bytes, clearing buffer\n`);
         tcpBuffer = "";
         return;
       }
@@ -163,7 +163,7 @@ function connectTcp() {
 function rpcCall(method, params) {
   return new Promise((resolve, reject) => {
     if (!tcpSocket || tcpSocket.destroyed) {
-      return reject(new Error("Not connected to Netcatty"));
+      return reject(new Error("Not connected to ALinLink"));
     }
     const id = nextRpcId++;
     pendingRequests.set(id, { resolve, reject });
@@ -176,7 +176,7 @@ function rpcCall(method, params) {
 // ── MCP Server ──
 
 const server = new McpServer({
-  name: "netcatty-remote-hosts",
+  name: "ALinLink-remote-hosts",
   version: "1.0.0",
 });
 
@@ -191,13 +191,13 @@ const scopeParams = CHAT_SESSION_ID
 // Resource: environment context
 server.resource(
   "environment",
-  "netcatty://context",
-  { description: "Current Netcatty workspace context: connected hosts, session IDs, and environment description." },
+  "ALinLink://context",
+  { description: "Current ALinLink workspace context: connected hosts, session IDs, and environment description." },
   async () => {
-    const ctx = await rpcCall("netcatty/getContext", scopeParams);
+    const ctx = await rpcCall("ALinLink/getContext", scopeParams);
     return {
       contents: [{
-        uri: "netcatty://context",
+        uri: "ALinLink://context",
         mimeType: "application/json",
         text: JSON.stringify(ctx, null, 2),
       }],
@@ -208,12 +208,12 @@ server.resource(
 // Tool: get_environment
 server.tool(
   "get_environment",
-  "Get information about the current Netcatty scope: all terminal sessions exposed by Netcatty, their session IDs, OS, shell hints, and connection status. Sessions may be remote hosts, a local terminal, Mosh-backed shells, or serial port connections (network devices, embedded systems). Serial sessions have protocol 'serial' and shellType 'raw'. SSH sessions with deviceType 'network' are network equipment (Huawei VRP, Cisco IOS, etc.) using vendor CLIs instead of a standard shell. Call this first before executing commands.",
+  "Get information about the current ALinLink scope: all terminal sessions exposed by ALinLink, their session IDs, OS, shell hints, and connection status. Sessions may be remote hosts, a local terminal, Mosh-backed shells, or serial port connections (network devices, embedded systems). Serial sessions have protocol 'serial' and shellType 'raw'. SSH sessions with deviceType 'network' are network equipment (Huawei VRP, Cisco IOS, etc.) using vendor CLIs instead of a standard shell. Call this first before executing commands.",
   {},
   async () => {
-    process.stderr.write(`[netcatty-mcp] get_environment called, SCOPED_SESSION_IDS: ${JSON.stringify(SCOPED_SESSION_IDS)}, CHAT_SESSION_ID: ${CHAT_SESSION_ID}\n`);
-    const ctx = await rpcCall("netcatty/getContext", scopeParams);
-    process.stderr.write(`[netcatty-mcp] get_environment result: hostCount=${ctx.hostCount}, hosts=${JSON.stringify(ctx.hosts?.map(h => h.sessionId))}\n`);
+    process.stderr.write(`[ALinLink-mcp] get_environment called, SCOPED_SESSION_IDS: ${JSON.stringify(SCOPED_SESSION_IDS)}, CHAT_SESSION_ID: ${CHAT_SESSION_ID}\n`);
+    const ctx = await rpcCall("ALinLink/getContext", scopeParams);
+    process.stderr.write(`[ALinLink-mcp] get_environment result: hostCount=${ctx.hostCount}, hosts=${JSON.stringify(ctx.hosts?.map(h => h.sessionId))}\n`);
     debugLog("get_environment payload", {
       hostCount: ctx?.hostCount,
       hosts: Array.isArray(ctx?.hosts) ? ctx.hosts.map(h => ({
@@ -236,7 +236,7 @@ server.tool(
 // Tool: terminal_execute
 server.tool(
   "terminal_execute",
-  "Execute a short command on a Netcatty terminal session and wait for the full result. Use this only for commands expected to finish within about 60 seconds. For long-running commands such as builds, scans, log-following, or anything likely to exceed that budget, use terminal_start and then terminal_poll instead.",
+  "Execute a short command on a ALinLink terminal session and wait for the full result. Use this only for commands expected to finish within about 60 seconds. For long-running commands such as builds, scans, log-following, or anything likely to exceed that budget, use terminal_start and then terminal_poll instead.",
   {
     sessionId: z.string().describe("The terminal session ID (from get_environment) to execute on."),
     command: z.string().describe("The command to execute in the target session."),
@@ -249,7 +249,7 @@ server.tool(
       debugLog("terminal_execute blocked locally", { sessionId, guardErr });
       return { content: [{ type: "text", text: `Error: ${guardErr}` }], isError: true };
     }
-    const result = await rpcCall("netcatty/exec", { ...scopeParams, sessionId, command });
+    const result = await rpcCall("ALinLink/exec", { ...scopeParams, sessionId, command });
     debugLog("terminal_execute result", {
       sessionId,
       ok: result?.ok,
@@ -274,7 +274,7 @@ server.tool(
 
 server.tool(
   "terminal_start",
-  "Start a long-running command on a Netcatty terminal session without waiting for final completion. The command still runs in the visible terminal/PTTY so the user can watch live output. Prefer this whenever the command may exceed about 2 minutes, or when it streams output for an extended period, such as builds, scans, watch commands, and log-follow commands. After starting, wait at least about 30 seconds before the first terminal_poll unless you have a strong reason to check sooner.",
+  "Start a long-running command on a ALinLink terminal session without waiting for final completion. The command still runs in the visible terminal/PTTY so the user can watch live output. Prefer this whenever the command may exceed about 2 minutes, or when it streams output for an extended period, such as builds, scans, watch commands, and log-follow commands. After starting, wait at least about 30 seconds before the first terminal_poll unless you have a strong reason to check sooner.",
   {
     sessionId: z.string().describe("The terminal session ID (from get_environment) to execute on."),
     command: z.string().describe("The command to start in the target session."),
@@ -284,7 +284,7 @@ server.tool(
     if (guardErr) {
       return { content: [{ type: "text", text: `Error: ${guardErr}` }], isError: true };
     }
-    const result = await rpcCall("netcatty/jobStart", { ...scopeParams, sessionId, command });
+    const result = await rpcCall("ALinLink/jobStart", { ...scopeParams, sessionId, command });
     if (!result.ok) {
       return { content: [{ type: "text", text: `Error: ${result.error || "Failed to start background command"}` }], isError: true };
     }
@@ -306,13 +306,13 @@ server.tool(
 
 server.tool(
   "terminal_poll",
-  "Poll a long-running Netcatty command that was started with terminal_start. Returns incremental output since the given offset and the current status. Use the returned nextOffset for the next poll. If outputTruncated is true, only the retained tail starting at outputBaseOffset is still available. Do not poll aggressively: wait at least about 30 seconds between polls unless the tool output explicitly justifies checking sooner. As soon as completed is true, stop polling and analyze the final result immediately.",
+  "Poll a long-running ALinLink command that was started with terminal_start. Returns incremental output since the given offset and the current status. Use the returned nextOffset for the next poll. If outputTruncated is true, only the retained tail starting at outputBaseOffset is still available. Do not poll aggressively: wait at least about 30 seconds between polls unless the tool output explicitly justifies checking sooner. As soon as completed is true, stop polling and analyze the final result immediately.",
   {
     jobId: z.string().describe("The background job ID returned by terminal_start."),
     offset: z.number().int().min(0).optional().describe("Character offset previously returned as nextOffset. Omit or use 0 on the first poll."),
   },
   async ({ jobId, offset }) => {
-    const result = await rpcCall("netcatty/jobPoll", { ...scopeParams, jobId, offset: offset || 0 });
+    const result = await rpcCall("ALinLink/jobPoll", { ...scopeParams, jobId, offset: offset || 0 });
     if (!result.ok) {
       return { content: [{ type: "text", text: `Error: ${result.error || "Failed to poll background command"}` }], isError: true };
     }
@@ -322,12 +322,12 @@ server.tool(
 
 server.tool(
   "terminal_stop",
-  "Stop a long-running Netcatty command that was started with terminal_start. This sends Ctrl+C to the running terminal job and returns its latest state.",
+  "Stop a long-running ALinLink command that was started with terminal_start. This sends Ctrl+C to the running terminal job and returns its latest state.",
   {
     jobId: z.string().describe("The background job ID returned by terminal_start."),
   },
   async ({ jobId }) => {
-    const result = await rpcCall("netcatty/jobStop", { ...scopeParams, jobId });
+    const result = await rpcCall("ALinLink/jobStop", { ...scopeParams, jobId });
     if (!result.ok) {
       return { content: [{ type: "text", text: `Error: ${result.error || "Failed to stop background command"}` }], isError: true };
     }
@@ -339,8 +339,8 @@ server.tool(
 
 async function main() {
   debugLog("Starting MCP server", {
-    port: NETCATTY_MCP_PORT,
-    hasToken: Boolean(NETCATTY_MCP_TOKEN),
+    port: ALinLink_MCP_PORT,
+    hasToken: Boolean(ALinLink_MCP_TOKEN),
     scopedSessionIds: SCOPED_SESSION_IDS,
     chatSessionId: CHAT_SESSION_ID,
     permissionMode: PERMISSION_MODE,
@@ -348,18 +348,18 @@ async function main() {
   await connectTcp();
 
   // Authenticate with the TCP bridge before accepting any tool calls
-  const authResult = await rpcCall("auth/verify", { token: NETCATTY_MCP_TOKEN });
+  const authResult = await rpcCall("auth/verify", { token: ALinLink_MCP_TOKEN });
   debugLog("auth/verify result", authResult);
   if (!authResult?.ok) {
     throw new Error("TCP bridge authentication failed");
   }
-  process.stderr.write("[netcatty-mcp] Authenticated with TCP bridge\n");
+  process.stderr.write("[ALinLink-mcp] Authenticated with TCP bridge\n");
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
 
 main().catch((err) => {
-  process.stderr.write(`[netcatty-mcp] Fatal: ${err.message}\n`);
+  process.stderr.write(`[ALinLink-mcp] Fatal: ${err.message}\n`);
   process.exit(1);
 });

@@ -202,7 +202,7 @@ async function enableCloseToTray(bridge, electronModule = createElectronStub()) 
   bridge.init({ electronModule });
   const ipcMain = createIpcMainStub();
   bridge.registerHandlers(ipcMain);
-  await ipcMain.handlers.get("netcatty:tray:setCloseToTray")(null, { enabled: true });
+  await ipcMain.handlers.get("ALinLink:tray:setCloseToTray")(null, { enabled: true });
   return { ipcMain, electronModule };
 }
 
@@ -362,7 +362,7 @@ test("focusing a visible window cancels a pending fullscreen hide", async () => 
       };
       const { ipcMain } = await enableCloseToTray(bridge, electronModule);
 
-      await ipcMain.handlers.get("netcatty:globalHotkey:register")(null, { hotkey: "Ctrl + `" });
+      await ipcMain.handlers.get("ALinLink:globalHotkey:register")(null, { hotkey: "Ctrl + `" });
       const result = bridge.handleWindowClose({ preventDefault() {} }, win);
       assert.equal(result, true);
       assert.equal(getPendingTimerCount(), 1);
@@ -394,7 +394,7 @@ test("openMainWindow cancels a pending fullscreen hide before showing the window
       assert.equal(result, true);
       assert.equal(getPendingTimerCount(), 1);
 
-      await ipcMain.handlers.get("netcatty:trayPanel:openMainWindow")();
+      await ipcMain.handlers.get("ALinLink:trayPanel:openMainWindow")();
 
       assert.equal(win.showCalls, 1);
       assert.equal(getPendingTimerCount(), 0);
@@ -445,7 +445,7 @@ test("disabling close-to-tray clears a pending fullscreen hide", async () => {
       assert.equal(result, true);
       assert.equal(getPendingTimerCount(), 1);
 
-      await ipcMain.handlers.get("netcatty:tray:setCloseToTray")(null, { enabled: false });
+      await ipcMain.handlers.get("ALinLink:tray:setCloseToTray")(null, { enabled: false });
 
       assert.equal(getPendingTimerCount(), 0);
       assert.equal(win.listenerCount("leave-full-screen"), 0);

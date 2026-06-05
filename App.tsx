@@ -45,7 +45,7 @@ import {
   ensureVersionChangeBackup,
 } from './application/localVaultBackups';
 import { getCredentialProtectionAvailability } from './infrastructure/services/credentialProtection';
-import { netcattyBridge } from './infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from './infrastructure/services/ALinLinkBridge';
 import { localStorageAdapter } from './infrastructure/persistence/localStorageAdapter';
 import {
   STORAGE_KEY_DEBUG_HOTKEYS,
@@ -80,6 +80,10 @@ function App({ settings }: { settings: SettingsState }) {
   const { t } = useI18n();
 
   const [isQuickSwitcherOpen, setIsQuickSwitcherOpen] = useState(false);
+  const [isBatchCommandOpen, setIsBatchCommandOpen] = useState(false);
+  const [isSessionRecordingOpen, setIsSessionRecordingOpen] = useState(false);
+  const [isTunnelVizOpen, setIsTunnelVizOpen] = useState(false);
+  const [isHostDashboardOpen, setIsHostDashboardOpen] = useState(false);
   const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false);
   // Combined state for the AddToWorkspaceDialog. null = closed; mode
   // determines whether picking targets appends them to an existing
@@ -438,7 +442,7 @@ function App({ settings }: { settings: SettingsState }) {
     let cancelled = false;
     void (async () => {
       try {
-        const info = await netcattyBridge.get()?.getAppInfo?.();
+        const info = await ALinLinkBridge.get()?.getAppInfo?.();
         await ensureVersionChangeBackup(payload, info?.version ?? null);
       } catch (error) {
         if (!cancelled) {
@@ -527,7 +531,7 @@ function App({ settings }: { settings: SettingsState }) {
   useAppStartupEffects({ dismissUpdate, groupConfigs, hosts, identities, installUpdate, isVaultInitialized, keys, openSettingsWindow, portForwardingRules, proxyProfiles, sessions, setKeyboardInteractiveQueue, t, terminalSettings, updateState, workspaces });
 
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onTrayFocusSession || !bridge?.onTrayTogglePortForward) return;
 
     const unsubscribeFocus = bridge.onTrayFocusSession((sessionId) => {
@@ -544,7 +548,7 @@ function App({ settings }: { settings: SettingsState }) {
   }, []);
 
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onTrayPanelJumpToSession || !bridge?.onTrayPanelConnectToHost) return;
 
     const unsubscribeJump = bridge.onTrayPanelJumpToSession((sessionId) => {
@@ -560,14 +564,14 @@ function App({ settings }: { settings: SettingsState }) {
   }, []);
 
   // Handle keyboard-interactive submit
-  const handleKeyboardInteractiveSubmit = useCallback((requestId: string, responses: string[], savePassword?: string) => { return handleKeyboardInteractiveSubmitImpl(() => ({ hosts, keyboardInteractiveQueue, netcattyBridge, requestId, responses, savePassword, sessions, setKeyboardInteractiveQueue, updateHosts }), requestId, responses, savePassword); }, [keyboardInteractiveQueue, sessions, hosts, updateHosts]);
+  const handleKeyboardInteractiveSubmit = useCallback((requestId: string, responses: string[], savePassword?: string) => { return handleKeyboardInteractiveSubmitImpl(() => ({ hosts, keyboardInteractiveQueue, ALinLinkBridge, requestId, responses, savePassword, sessions, setKeyboardInteractiveQueue, updateHosts }), requestId, responses, savePassword); }, [keyboardInteractiveQueue, sessions, hosts, updateHosts]);
 
   // Handle keyboard-interactive cancel
-  const handleKeyboardInteractiveCancel = useCallback((requestId: string) => { return handleKeyboardInteractiveCancelImpl(() => ({ netcattyBridge, requestId, setKeyboardInteractiveQueue }), requestId); }, []);
+  const handleKeyboardInteractiveCancel = useCallback((requestId: string) => { return handleKeyboardInteractiveCancelImpl(() => ({ ALinLinkBridge, requestId, setKeyboardInteractiveQueue }), requestId); }, []);
 
   // Passphrase request event listener for encrypted SSH keys
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onPassphraseRequest) return;
 
     const unsubscribe = bridge.onPassphraseRequest(async (request) => {
@@ -624,17 +628,17 @@ function App({ settings }: { settings: SettingsState }) {
   }, [updateKeys]);
 
   // Handle passphrase submit
-  const handlePassphraseSubmit = useCallback(async (requestId: string, passphrase: string, remember: boolean) => { return handlePassphraseSubmitImpl(() => ({ keysRef, netcattyBridge, passphrase, passphraseQueue, remember, rememberKeyPassphrase, requestId, setPassphraseQueue, updateKeys }), requestId, passphrase, remember); }, [passphraseQueue, updateKeys]);
+  const handlePassphraseSubmit = useCallback(async (requestId: string, passphrase: string, remember: boolean) => { return handlePassphraseSubmitImpl(() => ({ keysRef, ALinLinkBridge, passphrase, passphraseQueue, remember, rememberKeyPassphrase, requestId, setPassphraseQueue, updateKeys }), requestId, passphrase, remember); }, [passphraseQueue, updateKeys]);
 
   // Handle passphrase cancel
-  const handlePassphraseCancel = useCallback((requestId: string) => { return handlePassphraseCancelImpl(() => ({ netcattyBridge, requestId, setPassphraseQueue }), requestId); }, []);
+  const handlePassphraseCancel = useCallback((requestId: string) => { return handlePassphraseCancelImpl(() => ({ ALinLinkBridge, requestId, setPassphraseQueue }), requestId); }, []);
 
   // Handle passphrase skip (skip this key, continue with others)
-  const handlePassphraseSkip = useCallback((requestId: string) => { return handlePassphraseSkipImpl(() => ({ netcattyBridge, requestId, setPassphraseQueue }), requestId); }, []);
+  const handlePassphraseSkip = useCallback((requestId: string) => { return handlePassphraseSkipImpl(() => ({ ALinLinkBridge, requestId, setPassphraseQueue }), requestId); }, []);
 
   // Handle passphrase timeout (request expired on backend)
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onPassphraseTimeout) return;
 
     const unsubscribe = bridge.onPassphraseTimeout((event) => {
@@ -652,7 +656,7 @@ function App({ settings }: { settings: SettingsState }) {
 
   // Handle passphrase cancellation (owning connection was stopped)
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onPassphraseCancelled) return;
 
     const unsubscribe = bridge.onPassphraseCancelled((event) => {
@@ -667,7 +671,7 @@ function App({ settings }: { settings: SettingsState }) {
 
   // Handle passphrase auth failure (saved passphrase was wrong, clear it)
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onPassphraseAuthFailed) return;
 
     const unsubscribe = bridge.onPassphraseAuthFailed((event) => {
@@ -721,7 +725,7 @@ function App({ settings }: { settings: SettingsState }) {
   }, [hotkeyScheme, keyBindings]);
 
   const confirmIfBusyLocalTerminal = useCallback(
-    async (sessionIds: string[]): Promise<boolean> => { return confirmIfBusyLocalTerminalImpl(() => ({ netcattyBridge, sessionIds, sessions, t }), sessionIds); },
+    async (sessionIds: string[]): Promise<boolean> => { return confirmIfBusyLocalTerminalImpl(() => ({ ALinLinkBridge, sessionIds, sessions, t }), sessionIds); },
     [sessions, t],
   );
 
@@ -802,7 +806,7 @@ function App({ settings }: { settings: SettingsState }) {
   useEffect(() => {
     void (async () => {
       try {
-        const bridge = netcattyBridge.get();
+        const bridge = ALinLinkBridge.get();
         const info = await bridge?.getSystemInfo?.();
         if (info) {
           systemInfoRef.current = info;
@@ -898,6 +902,117 @@ function App({ settings }: { settings: SettingsState }) {
   }, [openSettingsWindow, t]);
   handleOpenSettingsRef.current = handleOpenSettings;
 
+  // Command Palette action handler - dispatches actions from QuickSwitcher
+  const handleExecuteAction = useCallback((actionId: string) => {
+    switch (actionId) {
+      case "open-settings":
+        handleOpenSettings();
+        break;
+      case "toggle-theme":
+        handleToggleTheme();
+        break;
+      case "open-sftp":
+        if (settings.showSftpTab) setActiveTabId("sftp");
+        break;
+      case "open-hosts":
+        setActiveTabId("vault");
+        break;
+      case "port-forwarding":
+        setActiveTabId("vault");
+        setNavigateToSection("port");
+        break;
+      case "snippets":
+        setActiveTabId("vault");
+        setNavigateToSection("snippets");
+        break;
+      case "new-workspace":
+        setAddToWorkspaceDialog({ mode: "create" });
+        break;
+      case "split-horizontal":
+      case "split-vertical":
+        // These are handled by the terminal layer
+        break;
+      case "broadcast":
+        toggleBroadcast();
+        break;
+      case "batch-command":
+        setIsBatchCommandOpen(true);
+        break;
+      case "session-recording":
+        setIsSessionRecordingOpen(true);
+        break;
+      case "tunnel-viz":
+        setIsTunnelVizOpen(true);
+        break;
+      case "host-dashboard":
+        setIsHostDashboardOpen(true);
+        break;
+      case "local-terminal":
+        handleCreateLocalTerminal();
+        break;
+    }
+  }, [handleOpenSettings, handleToggleTheme, settings.showSftpTab, setActiveTabId, setNavigateToSection, setAddToWorkspaceDialog, toggleBroadcast, handleCreateLocalTerminal]);
+
+  // Session recording state
+  const [recordings, setRecordings] = useState<import('./components/SessionRecordingPanel').SessionRecording[]>([]);
+  const [activeRecordingIds, setActiveRecordingIds] = useState<Set<string>>(new Set());
+  const recordingDataRef = useRef<Map<string, import('./components/SessionRecordingPanel').RecordingEntry[]>>(new Map());
+
+  const handleStartRecording = useCallback((sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+    const recordingId = crypto.randomUUID();
+    const newRecording: import('./components/SessionRecordingPanel').SessionRecording = {
+      id: recordingId,
+      sessionId,
+      hostLabel: session.hostLabel,
+      startTime: Date.now(),
+      entries: [],
+      status: "recording",
+    };
+    setRecordings(prev => [...prev, newRecording]);
+    setActiveRecordingIds(prev => new Set(prev).add(sessionId));
+    recordingDataRef.current.set(sessionId, []);
+  }, [sessions]);
+
+  const handleStopRecording = useCallback((sessionId: string) => {
+    setActiveRecordingIds(prev => {
+      const next = new Set(prev);
+      next.delete(sessionId);
+      return next;
+    });
+    setRecordings(prev => prev.map(r =>
+      r.sessionId === sessionId ? { ...r, status: "stopped" as const, endTime: Date.now() } : r
+    ));
+  }, []);
+
+  const handlePauseRecording = useCallback((sessionId: string) => {
+    setRecordings(prev => prev.map(r =>
+      r.sessionId === sessionId ? { ...r, status: "paused" as const } : r
+    ));
+  }, []);
+
+  const handleResumeRecording = useCallback((sessionId: string) => {
+    setRecordings(prev => prev.map(r =>
+      r.sessionId === sessionId ? { ...r, status: "recording" as const } : r
+    ));
+  }, []);
+
+  const handleExportRecording = useCallback((recordingId: string) => {
+    const recording = recordings.find(r => r.id === recordingId);
+    if (!recording) return;
+    import('./components/SessionRecordingPanel').then(({ exportToCast }) => {
+      const castContent = exportToCast(recording);
+      const blob = new Blob([castContent], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `recording-${recording.hostLabel}-${new Date(recording.startTime).toISOString().slice(0, 19)}.cast`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }, [recordings]);
+
   const hasShownCredentialProtectionWarningRef = useRef(false);
 
   useEffect(() => {
@@ -923,7 +1038,7 @@ function App({ settings }: { settings: SettingsState }) {
   }, [handleOpenSettings, t]);
 
   // Delete-from-sidepanel plumbing: ScriptsSidePanel's right-click menu
-  // dispatches `netcatty:snippets:delete` with the snippet id. Handled here
+  // dispatches `ALinLink:snippets:delete` with the snippet id. Handled here
   // (rather than in QuickAddSnippetDialog) because delete needs no UI.
   useEffect(() => {
     const handler = (e: Event) => {
@@ -931,8 +1046,8 @@ function App({ settings }: { settings: SettingsState }) {
       if (!id) return;
       updateSnippets(snippets.filter((s) => s.id !== id));
     };
-    window.addEventListener('netcatty:snippets:delete', handler);
-    return () => window.removeEventListener('netcatty:snippets:delete', handler);
+    window.addEventListener('ALinLink:snippets:delete', handler);
+    return () => window.removeEventListener('ALinLink:snippets:delete', handler);
   }, [snippets, updateSnippets]);
 
   const handleEndSessionDrag = useCallback(() => {
@@ -947,7 +1062,7 @@ function App({ settings }: { settings: SettingsState }) {
     [orderedTabs, editorTabs],
   );
 
-  return <AppView ctx={{ accentMode, activeTabId, activeTerminalTheme, addShellHistoryEntry, addSessionToWorkspace, addToWorkspaceDialog, appendHostToWorkspace, appendLocalTerminalToWorkspace, clearAndRemoveSource, clearAndRemoveSources, clearUnsavedConnectionLogs, closeLogView, closeSession, closeTabsBatch, copySessionWithCurrentShell, closeWorkspace, connectionLogs, convertKnownHostToHost, createWorkspaceFromSessions, createWorkspaceFromTargets, createWorkspaceWithHosts, customAccent, customGroups, currentTerminalTheme, deleteConnectionLog, draggingSessionId, effectiveKnownHosts, editorTabs, editorWordWrap, emptyVaultConflict, followAppTerminalTheme, groupConfigs, handleAddKnownHost, handleConnectSerial, handleConnectToHost, handleCreateLocalTerminal, handleDeleteHost, handleEndSessionDrag, handleHostConnectWithProtocolCheck, handleHotkeyAction, handleKeyboardInteractiveCancel, handleKeyboardInteractiveSubmit, handleOpenQuickSwitcher, handleOpenSettings, handleRootContextMenu, handlePassphraseCancel, handlePassphraseSkip, handlePassphraseSubmit, handleProtocolSelect, handleRequestCloseEditorTabRef, handleSessionStatusChange, handleSyncNowManual, handleTerminalDataCapture, handleToggleTheme, handleUpdateHostFromTerminal, hostById, hosts, hotkeyScheme, identities, importOrReuseKey, isBroadcastEnabled, isCreateWorkspaceOpen, isMacClient, isQuickSwitcherOpen, keyBindings, keyboardInteractiveQueue, keys, logViews, managedSources, navigateToSection, openLogView, orderedTabsWithEditors, orphanSessions, passphraseQueue, protocolSelectHost, proxyProfiles, quickResults, quickSearch, reorderTabs, reorderWorkspaceSessions, resetSessionRename, resetWorkspaceRename, resolveEmptyVaultConflict, resolvedTheme, runSnippet: handleRunSnippet, sessionLogsDir, sessionLogsEnabled, sessionLogsFormat, sessionRenameTarget, sessionRenameValue, sessions, setActiveTabId, setAddToWorkspaceDialog, setDraggingSessionId, setEditorWordWrap, setIsCreateWorkspaceOpen, setIsQuickSwitcherOpen, setNavigateToSection, setProtocolSelectHost, setQuickSearch, setSessionRenameValue, setTerminalFontFamilyId, setTerminalFontSize, setTerminalThemeId, setWorkspaceFocusedSession, setWorkspaceRenameValue, settings, sftpAutoOpenSidebar, sftpAutoSync, sftpDefaultViewMode, sftpDoubleClickBehavior, sftpShowHiddenFiles, sftpUseCompressedUpload, shellHistory, snippetPackages, snippets, splitSessionWithCurrentShell, sshDebugLogsEnabled: settings.sshDebugLogsEnabled, startSessionRename, startWorkspaceRename, submitSessionRename, submitWorkspaceRename, t, terminalFontFamilyId, terminalFontSize, terminalSettings, terminalThemeId, toggleBroadcast, toggleConnectionLogSaved, toggleScriptsSidePanelRef, toggleSidePanelRef, toggleWorkspaceViewMode, unmanageSource, updateConnectionLog, updateCustomGroups, updateGroupConfigs, updateHostDistro, updateHosts, updateIdentities, updateKeys, updateKnownHosts, updateManagedSources, updateProxyProfiles, updateSnippetPackages, updateSnippets, updateSplitSizes, updateTerminalSetting, workspaceRenameTarget, workspaceRenameValue, workspaces, VaultViewContainer, SftpViewMount, TerminalLayerMount, LogViewWrapper }} />;
+  return <AppView ctx={{ accentMode, activeTabId, activeTerminalTheme, addShellHistoryEntry, addSessionToWorkspace, addToWorkspaceDialog, appendHostToWorkspace, appendLocalTerminalToWorkspace, clearAndRemoveSource, clearAndRemoveSources, clearUnsavedConnectionLogs, closeLogView, closeSession, closeTabsBatch, copySessionWithCurrentShell, closeWorkspace, connectionLogs, convertKnownHostToHost, createWorkspaceFromSessions, createWorkspaceFromTargets, createWorkspaceWithHosts, customAccent, customGroups, currentTerminalTheme, deleteConnectionLog, draggingSessionId, effectiveKnownHosts, editorTabs, editorWordWrap, emptyVaultConflict, followAppTerminalTheme, groupConfigs, handleAddKnownHost, handleConnectSerial, handleConnectToHost, handleCreateLocalTerminal, handleDeleteHost, handleEndSessionDrag, handleExecuteAction, handleHostConnectWithProtocolCheck, handleHotkeyAction, handleKeyboardInteractiveCancel, handleKeyboardInteractiveSubmit, handleOpenQuickSwitcher, handleOpenSettings, handleRootContextMenu, handlePassphraseCancel, handlePassphraseSkip, handlePassphraseSubmit, handleProtocolSelect, handleRequestCloseEditorTabRef, handleSessionStatusChange, handleSyncNowManual, handleTerminalDataCapture, handleToggleTheme, handleUpdateHostFromTerminal, hostById, hosts, hotkeyScheme, identities, importOrReuseKey, isBatchCommandOpen, isBroadcastEnabled, isCreateWorkspaceOpen, isHostDashboardOpen, isMacClient, isQuickSwitcherOpen, isSessionRecordingOpen, isTunnelVizOpen, keyBindings, keyboardInteractiveQueue, keys, logViews, managedSources, navigateToSection, openLogView, orderedTabsWithEditors, orphanSessions, passphraseQueue, protocolSelectHost, proxyProfiles, quickResults, quickSearch, recordings, activeRecordingIds, handleStartRecording, handleStopRecording, handlePauseRecording, handleResumeRecording, handleExportRecording, reorderTabs, reorderWorkspaceSessions, resetSessionRename, resetWorkspaceRename, resolveEmptyVaultConflict, resolvedTheme, runSnippet: handleRunSnippet, portForwardingRules, serverStatsMap: new Map(), sessionLogsDir, sessionLogsEnabled, sessionLogsFormat, sessionRenameTarget, sessionRenameValue, sessions, setActiveTabId, setAddToWorkspaceDialog, setDraggingSessionId, setEditorWordWrap, setIsBatchCommandOpen, setIsCreateWorkspaceOpen, setIsHostDashboardOpen, setIsQuickSwitcherOpen, setIsSessionRecordingOpen, setIsTunnelVizOpen, setNavigateToSection, setProtocolSelectHost, setQuickSearch, setSessionRenameValue, setTerminalFontFamilyId, setTerminalFontSize, setTerminalThemeId, setWorkspaceFocusedSession, setWorkspaceRenameValue, settings, sftpAutoOpenSidebar, sftpAutoSync, sftpDefaultViewMode, sftpDoubleClickBehavior, sftpShowHiddenFiles, sftpUseCompressedUpload, shellHistory, snippetPackages, snippets, splitSessionWithCurrentShell, sshDebugLogsEnabled: settings.sshDebugLogsEnabled, startSessionRename, startWorkspaceRename, submitSessionRename, submitWorkspaceRename, t, terminalFontFamilyId, terminalFontSize, terminalSettings, terminalThemeId, toggleBroadcast, toggleConnectionLogSaved, toggleScriptsSidePanelRef, toggleSidePanelRef, toggleWorkspaceViewMode, unmanageSource, updateConnectionLog, updateCustomGroups, updateGroupConfigs, updateHostDistro, updateHosts, updateIdentities, updateKeys, updateKnownHosts, updateManagedSources, updateProxyProfiles, updateSnippetPackages, updateSnippets, updateSplitSizes, updateTerminalSetting, workspaceRenameTarget, workspaceRenameValue, workspaces, VaultViewContainer, SftpViewMount, TerminalLayerMount, LogViewWrapper }} />;
 }
 
 function AppWithProviders() {
@@ -963,7 +1078,7 @@ function AppWithProviders() {
         setTimeout(() => splash.remove(), 200);
       }
       // Notify main process that renderer is ready
-      netcattyBridge.get()?.rendererReady?.();
+      ALinLinkBridge.get()?.rendererReady?.();
     } catch {
       // ignore
     }

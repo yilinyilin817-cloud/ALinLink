@@ -122,7 +122,7 @@ test('buildManagedAgentState only rewrites settings-managed discovered agents', 
     agents,
     'my-codex-wrapper',
     'codex',
-    { path: '/opt/netcatty/codex-acp', version: 'Bundled ACP', available: true },
+    { path: '/opt/ALinLink/codex-acp', version: 'Bundled ACP', available: true },
   );
 
   assert.deepEqual(

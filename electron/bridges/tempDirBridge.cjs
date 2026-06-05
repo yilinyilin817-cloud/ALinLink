@@ -1,22 +1,22 @@
 /**
- * Temp Directory Bridge - Manages Netcatty's dedicated temp directory
+ * Temp Directory Bridge - Manages ALinLink's dedicated temp directory
  * 
  * All temporary files (SFTP downloads, etc.) are stored in a dedicated
- * Netcatty folder within the system temp directory for easier cleanup.
+ * ALinLink folder within the system temp directory for easier cleanup.
  */
 
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
 
-// Netcatty temp directory name
-const NETCATTY_TEMP_DIR_NAME = "Netcatty";
+// ALinLink temp directory name
+const ALinLink_TEMP_DIR_NAME = "ALinLink";
 
 // Cached temp directory path
 let cachedTempDir = null;
 
 /**
- * Get the Netcatty temp directory path
+ * Get the ALinLink temp directory path
  * Creates the directory if it doesn't exist
  */
 function getTempDir() {
@@ -32,15 +32,15 @@ function getTempDir() {
   }
   
   const systemTempDir = os.tmpdir();
-  const netcattyTempDir = path.join(systemTempDir, NETCATTY_TEMP_DIR_NAME);
+  const ALinLinkTempDir = path.join(systemTempDir, ALinLink_TEMP_DIR_NAME);
   
   try {
-    if (!fs.existsSync(netcattyTempDir)) {
-      fs.mkdirSync(netcattyTempDir, { recursive: true });
-      console.log(`[TempDir] Created Netcatty temp directory: ${netcattyTempDir}`);
+    if (!fs.existsSync(ALinLinkTempDir)) {
+      fs.mkdirSync(ALinLinkTempDir, { recursive: true });
+      console.log(`[TempDir] Created ALinLink temp directory: ${ALinLinkTempDir}`);
     }
-    cachedTempDir = netcattyTempDir;
-    return netcattyTempDir;
+    cachedTempDir = ALinLinkTempDir;
+    return ALinLinkTempDir;
   } catch (err) {
     console.error(`[TempDir] Failed to create temp directory:`, err.message);
     // Fallback to system temp dir
@@ -53,7 +53,7 @@ function getTempDir() {
  */
 function ensureTempDir() {
   const tempDir = getTempDir();
-  console.log(`[TempDir] Netcatty temp directory: ${tempDir}`);
+  console.log(`[TempDir] ALinLink temp directory: ${tempDir}`);
   return tempDir;
 }
 
@@ -151,19 +151,19 @@ function getTempFilePath(fileName) {
  * Register IPC handlers
  */
 function registerHandlers(ipcMain, shell) {
-  ipcMain.handle("netcatty:tempdir:getInfo", async () => {
+  ipcMain.handle("ALinLink:tempdir:getInfo", async () => {
     return getTempDirInfo();
   });
   
-  ipcMain.handle("netcatty:tempdir:clear", async () => {
+  ipcMain.handle("ALinLink:tempdir:clear", async () => {
     return clearTempDir();
   });
   
-  ipcMain.handle("netcatty:tempdir:getPath", () => {
+  ipcMain.handle("ALinLink:tempdir:getPath", () => {
     return getTempDir();
   });
   
-  ipcMain.handle("netcatty:tempdir:open", async () => {
+  ipcMain.handle("ALinLink:tempdir:open", async () => {
     const tempDir = getTempDir();
     if (shell?.openPath) {
       await shell.openPath(tempDir);

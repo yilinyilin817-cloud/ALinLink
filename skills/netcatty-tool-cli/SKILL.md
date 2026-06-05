@@ -1,18 +1,18 @@
 ---
-name: netcatty-tool-cli
-description: Use this skill when an external agent needs to operate on Netcatty sessions through Skills + CLI instead of the netcatty-remote-hosts MCP server.
+name: ALinLink-tool-cli
+description: Use this skill when an external agent needs to operate on ALinLink sessions through Skills + CLI instead of the ALinLink-remote-hosts MCP server.
 ---
 
-# Netcatty Tool CLI
+# ALinLink Tool CLI
 
-Use this skill for external ACP agents when Netcatty is configured for `Skills + CLI` mode.
+Use this skill for external ACP agents when ALinLink is configured for `Skills + CLI` mode.
 
 For routine tasks, the host prompt is usually enough. Read only the reference that matches the task type.
 
 ## Router
 
-1. Use the exact Netcatty CLI prefix provided by the host prompt.
-2. Keep `--chat-session <chat-session-id>` on every Netcatty CLI call. Do not omit it.
+1. Use the exact ALinLink CLI prefix provided by the host prompt.
+2. Keep `--chat-session <chat-session-id>` on every ALinLink CLI call. Do not omit it.
 3. Treat `--chat-session <chat-session-id>` as required for `env`, `session`, real `exec`, and every `sftp` operation. Treat `--session <session-id>` as required for `session`, `exec`, and every `sftp` operation.
 4. Classify the task before choosing a command path:
    - Remote command execution tasks go through the exec reference.
@@ -26,9 +26,9 @@ For routine tasks, the host prompt is usually enough. Read only the reference th
 
 - Treat the host-provided CLI prefix as the only supported entrypoint for this session.
 - If a command launcher is needed, prefer the operating system's built-in launcher for the current environment; do not require optional shells that may not be installed.
-- Run Netcatty CLI commands strictly serially.
-- Treat Netcatty CLI errors as authoritative.
-- Never ask the user for SSH credentials, key paths, proxy settings, or jump-host details when Netcatty session access already exists.
+- Run ALinLink CLI commands strictly serially.
+- Treat ALinLink CLI errors as authoritative.
+- Never ask the user for SSH credentials, key paths, proxy settings, or jump-host details when ALinLink session access already exists.
 - Do not pause to explain the plan, re-read this skill, or design scripts before trying that shortest path.
 - When presenting structured results, prefer a concise table if it fits clearly.
 
@@ -36,7 +36,7 @@ Examples:
 
 - On Windows, if a literal shell command line is required, use the host-provided prefix with the system launcher available in the environment, such as `cmd.exe` or Windows PowerShell; do not assume PowerShell 7 `pwsh.exe` exists.
 - On macOS or Linux, use the host-provided prefix directly, or the system shell already available in that environment when a shell command line is unavoidable.
-- When the execution surface accepts argv-style calls, use the Netcatty launcher path as the executable and pass subcommands and flags as separate arguments instead of wrapping it in another shell.
+- When the execution surface accepts argv-style calls, use the ALinLink launcher path as the executable and pass subcommands and flags as separate arguments instead of wrapping it in another shell.
 
 ## References
 

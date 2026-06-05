@@ -200,7 +200,7 @@ test("window focus IPC handler focuses the sender owner window", async () => {
 
   registerWindowHandlers(ipcMain, { themeSource: "light" });
 
-  const result = await handlers.get("netcatty:window:focus")({
+  const result = await handlers.get("ALinLink:window:focus")({
     sender: {
       id: 202,
       getOwnerBrowserWindow() {

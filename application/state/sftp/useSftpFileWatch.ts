@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { netcattyBridge } from "../../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../../infrastructure/services/ALinLinkBridge";
 import type { FileWatchErrorEvent, FileWatchSyncedEvent, SftpStateOptions } from "./types";
 
 export const useSftpFileWatch = (options?: SftpStateOptions) => {
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onFileWatchSynced || !bridge?.onFileWatchError) return;
 
     const unsubscribeSynced = bridge.onFileWatchSynced((payload: FileWatchSyncedEvent) => {

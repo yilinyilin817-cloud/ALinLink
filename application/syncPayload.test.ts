@@ -265,7 +265,7 @@ test("applySyncPayload dispatches a same-window AI-state-changed event so the op
 
     await applySyncPayload(payload, { importVaultData: () => {} });
 
-    const events = dispatched.filter((e) => e.type === "netcatty:ai-state-changed");
+    const events = dispatched.filter((e) => e.type === "ALinLink:ai-state-changed");
     const keys = events.map((e) => (e.detail as { key?: string })?.key);
     assert.ok(keys.includes(storageKeys.STORAGE_KEY_AI_PROVIDERS), "providers nudge");
     assert.ok(keys.includes(storageKeys.STORAGE_KEY_AI_AGENT_PROVIDER_MAP), "agentProviderMap nudge");

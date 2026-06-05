@@ -119,7 +119,7 @@ import { useVaultGroupDragHandlers } from "./vault/useVaultGroupDragHandlers";
 const LazyProtocolSelectDialog = lazy(() => import("./ProtocolSelectDialog"));
 const LazyConnectionLogsManager = lazy(() => import("./ConnectionLogsManager"));
 
-export type VaultSection = "hosts" | "keys" | "proxies" | "snippets" | "port" | "knownhosts" | "logs";
+export type VaultSection = "hosts" | "keys" | "proxies" | "snippets" | "port" | "knownhosts" | "logs" | "scanner" | "ops-tools";
 
 const VAULT_SIDEBAR_MIN_WIDTH = 56;
 const VAULT_SIDEBAR_DEFAULT_WIDTH = 208;

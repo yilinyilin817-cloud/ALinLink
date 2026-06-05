@@ -7,6 +7,8 @@ import {
   vaultHeaderIconButtonClass,
   vaultHeaderSecondaryButtonClass,
 } from "./VaultPageHeader";
+import { NetworkScanPanel } from "../network-scan/panel/NetworkScanPanel";
+import { OpsToolsPanel } from "../ops-tools/OpsToolsPanel";
 
 type VaultViewLayoutContext = Record<string, any>;
 
@@ -79,7 +81,7 @@ export function VaultViewLayout({ ctx }: { ctx: VaultViewLayoutContext }) {
                   <AppLogo className="h-8 w-8 flex-shrink-0" />
                   {!sidebarCollapsed && (
                     <p className="text-xl font-black italic tracking-tight text-foreground leading-none">
-                      Netcatty
+                      ALinLink
                     </p>
                   )}
                 </button>
@@ -225,6 +227,42 @@ export function VaultViewLayout({ ctx }: { ctx: VaultViewLayoutContext }) {
                 </RippleButton>
               </TooltipTrigger>
               {sidebarCollapsed && <TooltipContent side="right">{t("vault.nav.logs")}</TooltipContent>}
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <RippleButton
+                  variant={currentSection === "scanner" ? "secondary" : "ghost"}
+                  className={cn(
+                    "w-full h-10",
+                    sidebarCollapsed ? "justify-center p-0" : "justify-start gap-3",
+                    currentSection === "scanner" &&
+                    "bg-foreground/10 text-foreground hover:bg-foreground/15 border-border/40",
+                  )}
+                  onClick={() => setCurrentSection("scanner")}
+                >
+                  <Network size={16} className="flex-shrink-0" />
+                  {!sidebarCollapsed && (t("vault.nav.scanner") || "内网扫描")}
+                </RippleButton>
+              </TooltipTrigger>
+              {sidebarCollapsed && <TooltipContent side="right">{t("vault.nav.scanner") || "内网扫描"}</TooltipContent>}
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <RippleButton
+                  variant={currentSection === "ops-tools" ? "secondary" : "ghost"}
+                  className={cn(
+                    "w-full h-10",
+                    sidebarCollapsed ? "justify-center p-0" : "justify-start gap-3",
+                    currentSection === "ops-tools" &&
+                    "bg-foreground/10 text-foreground hover:bg-foreground/15 border-border/40",
+                  )}
+                  onClick={() => setCurrentSection("ops-tools")}
+                >
+                  <Network size={16} className="flex-shrink-0" />
+                  {!sidebarCollapsed && "运维工具"}
+                </RippleButton>
+              </TooltipTrigger>
+              {sidebarCollapsed && <TooltipContent side="right">运维工具</TooltipContent>}
             </Tooltip>
           </div>
 
@@ -655,6 +693,38 @@ export function VaultViewLayout({ ctx }: { ctx: VaultViewLayoutContext }) {
               onOpenLogView={onOpenLogView}
             />
           </Suspense>
+        )}
+        {/* Network Scanner */}
+        {currentSection === "scanner" && (
+          <div className="flex-1 min-h-0 flex flex-col">
+            <NetworkScanPanel
+              onAddHost={(host) => {
+                // Convert discovered host to ALinLink host format and add to hosts
+                const sshService = host.services.find(s => s.port === 22);
+                const newHost = {
+                  id: `scan-${host.ip.replace(/\./g, "-")}-${Date.now()}`,
+                  label: host.hostname || host.ip,
+                  hostname: host.ip,
+                  port: sshService?.port ?? 22,
+                  protocol: "ssh" as const,
+                  os: "linux" as const,
+                  username: "",
+                  group: "Scanned Hosts",
+                  tags: ["scanned"],
+                  createdAt: Date.now(),
+                };
+                onUpdateHosts([...hosts, newHost]);
+              }}
+            />
+          </div>
+        )}
+        {/* Ops Tools */}
+        {currentSection === "ops-tools" && (
+          <OpsToolsPanel
+            isOpen={true}
+            onClose={() => setCurrentSection("hosts")}
+            embedded={true}
+          />
         )}
       </div>
 

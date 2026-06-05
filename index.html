@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' data: blob: ws: wss: https:; img-src 'self' data: https:;" />
-  <title>netcatty SSH</title>
+  <title>ALinLink SSH</title>
   <style>
     /* Load extended Unicode ranges for terminal box drawing characters */
     @font-face {
@@ -152,10 +152,10 @@
   <script>
     (function () {
       try {
-        var theme = localStorage.getItem('netcatty_theme_v1');
-        var accentMode = localStorage.getItem('netcatty_accent_mode_v1');
-        var accentColor = localStorage.getItem('netcatty_color_v1');
-        var lang = localStorage.getItem('netcatty_ui_language_v1');
+        var theme = localStorage.getItem('ALinLink_theme_v1');
+        var accentMode = localStorage.getItem('ALinLink_accent_mode_v1');
+        var accentColor = localStorage.getItem('ALinLink_color_v1');
+        var lang = localStorage.getItem('ALinLink_ui_language_v1');
         var root = document.documentElement;
 
         // Resolve 'system' (or absent — default is 'system') via OS preference
@@ -182,6 +182,11 @@
         }
 
         if (lang) root.lang = lang;
+
+        // Expose active UI theme id for dynamic theme CSS targeting
+        var themeIdKey = resolved === 'dark' ? 'ALinLink_ui_theme_dark_v1' : 'ALinLink_ui_theme_light_v1';
+        var activeThemeId = localStorage.getItem(themeIdKey);
+        if (activeThemeId) root.setAttribute('data-active-ui-theme', activeThemeId);
       } catch (e) {
         // ignore
       }
@@ -195,7 +200,7 @@
     <!-- Splash screen: shown while React loads, hidden after first paint -->
     <div id="splash" class="splash-screen">
       <div class="splash-content">
-        <img class="splash-logo" src="/logo.svg" alt="netcatty" draggable="false" />
+        <img class="splash-logo" src="/logo.svg" alt="ALinLink" draggable="false" />
 
         <div class="splash-spinner"></div>
       </div>

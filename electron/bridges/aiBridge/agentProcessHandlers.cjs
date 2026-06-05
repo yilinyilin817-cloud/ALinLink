@@ -8,7 +8,7 @@ function registerAgentProcessHandlers(ctx) {
     "copilot",
   ]);
 
-  ipcMain.handle("netcatty:ai:agent:spawn", async (event, { agentId, command, args, env, closeStdin }) => {
+  ipcMain.handle("ALinLink:ai:agent:spawn", async (event, { agentId, command, args, env, closeStdin }) => {
     // Validate IPC sender (Issue #17)
     if (!validateSender(event)) {
       return { ok: false, error: "Unauthorized IPC sender" };
@@ -78,14 +78,14 @@ function registerAgentProcessHandlers(ctx) {
       });
 
       proc.stdout.on("data", (data) => {
-        safeSend(event.sender, "netcatty:ai:agent:stdout", {
+        safeSend(event.sender, "ALinLink:ai:agent:stdout", {
           agentId,
           data: data.toString(),
         });
       });
 
       proc.stderr.on("data", (data) => {
-        safeSend(event.sender, "netcatty:ai:agent:stderr", {
+        safeSend(event.sender, "ALinLink:ai:agent:stderr", {
           agentId,
           data: data.toString(),
         });
@@ -93,12 +93,12 @@ function registerAgentProcessHandlers(ctx) {
 
       proc.on("exit", (code) => {
         agentProcesses.delete(agentId);
-        safeSend(event.sender, "netcatty:ai:agent:exit", { agentId, code });
+        safeSend(event.sender, "ALinLink:ai:agent:exit", { agentId, code });
       });
 
       proc.on("error", (err) => {
         agentProcesses.delete(agentId);
-        safeSend(event.sender, "netcatty:ai:agent:error", {
+        safeSend(event.sender, "ALinLink:ai:agent:error", {
           agentId,
           error: err.message,
         });
@@ -113,7 +113,7 @@ function registerAgentProcessHandlers(ctx) {
   });
 
   // Send data to agent's stdin
-  ipcMain.handle("netcatty:ai:agent:write", async (event, { agentId, data }) => {
+  ipcMain.handle("ALinLink:ai:agent:write", async (event, { agentId, data }) => {
     if (!validateSender(event)) {
       return { ok: false, error: "Unauthorized IPC sender" };
     }
@@ -131,7 +131,7 @@ function registerAgentProcessHandlers(ctx) {
   });
 
   // Close agent's stdin (signal EOF)
-  ipcMain.handle("netcatty:ai:agent:close-stdin", async (event, { agentId }) => {
+  ipcMain.handle("ALinLink:ai:agent:close-stdin", async (event, { agentId }) => {
     if (!validateSender(event)) {
       return { ok: false, error: "Unauthorized IPC sender" };
     }
@@ -149,13 +149,13 @@ function registerAgentProcessHandlers(ctx) {
 
   // ── MCP Server session metadata ──
 
-  ipcMain.handle("netcatty:ai:mcp:update-sessions", async (event, { sessions: sessionList, chatSessionId }) => {
+  ipcMain.handle("ALinLink:ai:mcp:update-sessions", async (event, { sessions: sessionList, chatSessionId }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     mcpServerBridge.updateSessionMetadata(sessionList || [], chatSessionId);
     return { ok: true };
   });
 
-  ipcMain.handle("netcatty:ai:mcp:set-command-blocklist", async (event, { blocklist }) => {
+  ipcMain.handle("ALinLink:ai:mcp:set-command-blocklist", async (event, { blocklist }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     // Validate: must be an array of strings, each a valid regex pattern
     if (!Array.isArray(blocklist)) {
@@ -175,7 +175,7 @@ function registerAgentProcessHandlers(ctx) {
     return { ok: true };
   });
 
-  ipcMain.handle("netcatty:ai:mcp:set-command-timeout", async (event, { timeout }) => {
+  ipcMain.handle("ALinLink:ai:mcp:set-command-timeout", async (event, { timeout }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const value = Number(timeout);
     if (!Number.isFinite(value) || value < 1 || value > 3600) {
@@ -185,7 +185,7 @@ function registerAgentProcessHandlers(ctx) {
     return { ok: true };
   });
 
-  ipcMain.handle("netcatty:ai:mcp:set-max-iterations", async (event, { maxIterations }) => {
+  ipcMain.handle("ALinLink:ai:mcp:set-max-iterations", async (event, { maxIterations }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const value = Number(maxIterations);
     if (!Number.isFinite(value) || value < 1 || value > 100) {
@@ -195,7 +195,7 @@ function registerAgentProcessHandlers(ctx) {
     return { ok: true };
   });
 
-  ipcMain.handle("netcatty:ai:mcp:set-permission-mode", async (event, { mode }) => {
+  ipcMain.handle("ALinLink:ai:mcp:set-permission-mode", async (event, { mode }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const validModes = ["observer", "confirm", "autonomous"];
     if (!validModes.includes(mode)) {
@@ -205,7 +205,7 @@ function registerAgentProcessHandlers(ctx) {
     return { ok: true };
   });
 
-  ipcMain.handle("netcatty:ai:mcp:set-tool-integration-mode", async (event, { mode }) => {
+  ipcMain.handle("ALinLink:ai:mcp:set-tool-integration-mode", async (event, { mode }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const validModes = ["mcp", "skills"];
     if (!validModes.includes(mode)) {
@@ -216,7 +216,7 @@ function registerAgentProcessHandlers(ctx) {
   });
 
   // ── MCP Approval response (renderer → main) ──
-  ipcMain.handle("netcatty:ai:mcp:approval-response", async (event, { approvalId, approved }) => {
+  ipcMain.handle("ALinLink:ai:mcp:approval-response", async (event, { approvalId, approved }) => {
     if (!validateSender(event)) return { ok: false, error: "Unauthorized IPC sender" };
     mcpServerBridge.resolveApprovalFromRenderer(approvalId, approved);
     return { ok: true };

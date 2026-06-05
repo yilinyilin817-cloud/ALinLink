@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { netcattyBridge } from "../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../infrastructure/services/ALinLinkBridge";
+import { localStorageAdapter } from "../../infrastructure/persistence/localStorageAdapter";
 
 export type ApplicationInfo = {
   name: string;
@@ -15,7 +16,7 @@ export type SshAgentStatus = {
 
 export const useApplicationBackend = () => {
   const openExternal = useCallback(async (url: string) => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.openExternal) {
       // Bridge resolves on success (either via system browser or in-app
       // fallback window) and rejects only when both paths fail. Let the
@@ -28,17 +29,23 @@ export const useApplicationBackend = () => {
   }, []);
 
   const getApplicationInfo = useCallback(async (): Promise<ApplicationInfo | null> => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     const info = await bridge?.getAppInfo?.();
     return info ?? null;
   }, []);
 
   const checkSshAgent = useCallback(async (): Promise<SshAgentStatus | null> => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     const status = await bridge?.checkSshAgent?.();
     return status ?? null;
   }, []);
 
-  return { openExternal, getApplicationInfo, checkSshAgent };
+  const clearAppCache = useCallback((): number => {
+    const keysToRemove = localStorageAdapter.keys().filter((key) => key.startsWith("ALinLink-cache-"));
+    keysToRemove.forEach((key) => localStorageAdapter.remove(key));
+    return keysToRemove.length;
+  }, []);
+
+  return { openExternal, getApplicationInfo, checkSshAgent, clearAppCache };
 };
 

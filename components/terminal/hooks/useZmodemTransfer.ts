@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { netcattyBridge } from '../../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../../infrastructure/services/ALinLinkBridge';
 
 export interface ZmodemTransferState {
   active: boolean;
@@ -35,7 +35,7 @@ export function useZmodemTransfer(sessionId: string | null) {
   useEffect(() => {
     if (!sessionId) return;
 
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.onZmodemEvent) return;
 
     disposeRef.current = bridge.onZmodemEvent(sessionId, (event) => {
@@ -101,13 +101,13 @@ export function useZmodemTransfer(sessionId: string | null) {
 
   const cancel = useCallback(() => {
     if (!sessionId) return;
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     bridge?.cancelZmodem?.(sessionId);
   }, [sessionId]);
 
   const respondOverwrite = useCallback((action: "overwrite" | "skip" | "cancel", applyToRest: boolean) => {
     setOverwriteRequest((req) => {
-      if (req) netcattyBridge.get()?.respondZmodemOverwrite?.({ requestId: req.requestId, action, applyToRest });
+      if (req) ALinLinkBridge.get()?.respondZmodemOverwrite?.({ requestId: req.requestId, action, applyToRest });
       return null;
     });
   }, []);

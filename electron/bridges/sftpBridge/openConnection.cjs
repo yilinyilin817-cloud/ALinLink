@@ -111,7 +111,7 @@ function createOpenConnectionApi(ctx) {
     
           let authAgent = null;
           if (hasCertificate) {
-            authAgent = new NetcattyAgent({
+            authAgent = new ALinLinkAgent({
               mode: "certificate",
               webContents: event.sender,
               meta: {
@@ -639,7 +639,7 @@ function createOpenConnectionApi(ctx) {
     
       let authAgent = null;
       if (hasCertificate) {
-        authAgent = new NetcattyAgent({
+        authAgent = new ALinLinkAgent({
           mode: "certificate",
           webContents: event.sender,
           meta: {
@@ -847,7 +847,7 @@ function createOpenConnectionApi(ctx) {
         }
     
         // Used by transferBridge to decide whether isolated fast-transfer channels are safe.
-        client.__netcattySudoMode = !!options.sudo;
+        client.__ALinLinkSudoMode = !!options.sudo;
         sftpClients.set(connId, client);
     
         // Store jump connections for cleanup when SFTP is closed

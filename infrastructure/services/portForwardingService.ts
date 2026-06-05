@@ -15,7 +15,7 @@ const FALLBACK_KEEPALIVE = { keepaliveInterval: 30, keepaliveCountMax: 10 };
 import { logger } from '../../lib/logger';
 import { localStorageAdapter } from '../persistence/localStorageAdapter';
 import { STORAGE_KEY_PF_RECONNECT_CANCEL } from '../config/storageKeys';
-import { netcattyBridge } from './netcattyBridge';
+import { ALinLinkBridge } from './ALinLinkBridge';
 
 export interface PortForwardingConnection {
   ruleId: string;
@@ -95,7 +95,7 @@ export const initReconnectCancelListener = (): (() => void) => {
     // Also ask the backend to stop any tunnel for this rule.
     // This catches tunnels still in SSH handshake that aren't yet
     // in the renderer's activeConnections or the backend's list output.
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (bridge?.stopPortForwardByRuleId) {
       bridge.stopPortForwardByRuleId(ruleId).catch((err: unknown) => {
         logger.warn(`[PortForwardingService] Cross-window stopByRuleId failed for ${ruleId}:`, err);
@@ -191,7 +191,7 @@ export const stopAndCleanupRule = (ruleId: string): void => {
 
   // Use stopPortForwardByRuleId so every tunnel for this rule is marked
   // cancelled before its sockets are closed.
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   if (bridge?.stopPortForwardByRuleId) {
     bridge.stopPortForwardByRuleId(ruleId).catch((err: unknown) => {
       logger.warn(`[PortForwardingService] Backend stopByRuleId failed for ${ruleId}:`, err);
@@ -239,7 +239,7 @@ const parseRuleIdFromTunnelId = (tunnelId: string): string | null => {
  * This updates the local activeConnections map to match the backend state.
  */
 export const syncWithBackend = async (): Promise<void> => {
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   
   if (!bridge?.listPortForwards) {
     logger.warn('[PortForwardingService] Backend not available for sync');
@@ -285,7 +285,7 @@ export const reconcileWithBackend = async (): Promise<{
   appeared: string[];
 }> => {
   const result = { gone: [] as string[], appeared: [] as string[] };
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
 
   if (!bridge?.listPortForwards) return result;
 
@@ -370,7 +370,7 @@ export const startPortForward = async (
   terminalSettings?: Pick<TerminalSettings, 'keepaliveInterval' | 'keepaliveCountMax'>,
 ): Promise<{ success: boolean; error?: string }> => {
   const globalKeepalive = terminalSettings ?? FALLBACK_KEEPALIVE;
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   
   // Clear any existing reconnect timer
   clearReconnectTimer(rule.id);
@@ -400,7 +400,7 @@ export const startPortForward = async (
         password: sanitizeCredentialValue(host.proxyConfig.password),
       }
       : undefined;
-    let jumpHosts: NetcattyJumpHost[] | undefined;
+    let jumpHosts: ALinLinkJumpHost[] | undefined;
     if (host.hostChain?.hostIds?.length) {
       const resolvedJumpHosts = host.hostChain.hostIds.map((hostId) =>
         hosts.find((candidate) => candidate.id === hostId),
@@ -613,7 +613,7 @@ export const stopPortForward = async (
   ruleId: string,
   onStatusChange: (status: PortForwardingRule['status']) => void
 ): Promise<{ success: boolean; error?: string }> => {
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   const conn = activeConnections.get(ruleId);
   
   // Clear any pending reconnect timer
@@ -663,14 +663,14 @@ export const getPortForwardStatus = async (
  * Check if backend is available
  */
 export const isBackendAvailable = (): boolean => {
-  return !!(netcattyBridge.get()?.startPortForward);
+  return !!(ALinLinkBridge.get()?.startPortForward);
 };
 
 /**
  * Stop all active tunnels (cleanup on unmount)
  */
 export const stopAllPortForwards = async (): Promise<void> => {
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   
   // Stop everything the renderer knows about
   for (const [ruleId, conn] of activeConnections) {

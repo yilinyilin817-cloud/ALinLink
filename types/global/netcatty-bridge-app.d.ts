@@ -1,6 +1,6 @@
 
 declare global {
-  interface NetcattyBridge {
+  interface ALinLinkBridge {
     // Auto-update
     checkForUpdate?(): Promise<{
       available: boolean;
@@ -90,6 +90,54 @@ declare global {
         status: "inactive" | "connecting" | "active" | "error";
         hostId?: string;
       }>;
+    }) => void): () => void;
+
+    // Network Scanner
+    startNetworkScan?(payload: {
+      cidr: string;
+      scanPorts?: number[];
+      timeout?: number;
+      concurrency?: number;
+      detectHostname?: boolean;
+      detectServices?: boolean;
+    }): Promise<{ scanId: string; total: number }>;
+    cancelNetworkScan?(payload: { scanId: string }): Promise<{ success: boolean; error?: string }>;
+    quickScanNetwork?(payload: { ports?: number[]; timeout?: number }): Promise<{ scanId: string; total: number }>;
+    getNetworkInterfaces?(): Promise<Array<{
+      name: string;
+      ip: string;
+      netmask: string;
+      cidr: string;
+      mac: string;
+    }>>;
+    onScanProgress?(callback: (data: {
+      scanId: string;
+      scanned: number;
+      total: number;
+      active: number;
+      found: number;
+    }) => void): () => void;
+    onScanHostFound?(callback: (data: {
+      scanId: string;
+      host: {
+        ip: string;
+        hostname: string | null;
+        services: Array<{ port: number; service: string }>;
+        mac: string | null;
+        discoveredAt: string;
+      };
+    }) => void): () => void;
+    onScanComplete?(callback: (data: {
+      scanId: string;
+      hosts: Array<{
+        ip: string;
+        hostname: string | null;
+        services: Array<{ port: number; service: string }>;
+        mac: string | null;
+        discoveredAt: string;
+      }>;
+      total: number;
+      found: number;
     }) => void): () => void;
   }
 }

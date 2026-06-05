@@ -297,7 +297,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: netcatty-${{ matrix.name }}
+          name: ALinLink-${{ matrix.name }}
           path: |
             release/*.dmg
             release/*.zip
@@ -394,7 +394,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: netcatty-linux-x64
+          name: ALinLink-linux-x64
           path: |
             release/*.AppImage
             release/*.deb
@@ -489,7 +489,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: netcatty-linux-arm64
+          name: ALinLink-linux-arm64
           path: |
             release/*.AppImage
             release/*.deb
@@ -543,7 +543,7 @@ jobs:
           done
           if [ "$missing" = "1" ]; then
             echo "Re-downloading individual artifacts to recover missing files..."
-            for name in netcatty-macos netcatty-windows netcatty-linux-x64 netcatty-linux-arm64; do
+            for name in ALinLink-macos ALinLink-windows ALinLink-linux-x64 ALinLink-linux-arm64; do
               tmpdir="/tmp/artifact-${name}"
               gh run download ${{ github.run_id }} --name "${name}" --dir "${tmpdir}" 2>/dev/null || true
               if [ -d "${tmpdir}" ]; then
@@ -622,10 +622,10 @@ jobs:
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
-          name: netcatty-macos
+          name: ALinLink-macos
           path: artifacts/
 
-      - name: Bump Cask in binaricat/homebrew-netcatty
+      - name: Bump Cask in binaricat/homebrew-ALinLink
         env:
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           ARTIFACTS_DIR: artifacts

@@ -320,7 +320,7 @@ test("createHostVerifier prompts for unknown host keys and waits for user respon
   const acceptedPromise = new Promise((resolve) => verifier(rawKey, resolve));
 
   assert.equal(sent.length, 1);
-  assert.equal(sent[0].channel, "netcatty:host-key:verify");
+  assert.equal(sent[0].channel, "ALinLink:host-key:verify");
   assert.equal(sent[0].payload.hostname, "switch.local");
   assert.equal(sent[0].payload.status, "unknown");
 
@@ -363,7 +363,7 @@ test("createHostVerifier includes existing known host details when a key changes
   const acceptedPromise = new Promise((resolve) => verifier(rawKey, resolve));
 
   assert.equal(sent.length, 1);
-  assert.equal(sent[0].channel, "netcatty:host-key:verify");
+  assert.equal(sent[0].channel, "ALinLink:host-key:verify");
   assert.equal(sent[0].payload.status, "changed");
   assert.equal(sent[0].payload.knownHostId, "kh-1");
   assert.equal(sent[0].payload.knownFingerprint, "old-key");

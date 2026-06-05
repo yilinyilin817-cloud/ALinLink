@@ -3,17 +3,17 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-CLI_SCRIPT="$SCRIPT_DIR/netcatty-tool-cli.cjs"
+CLI_SCRIPT="$SCRIPT_DIR/ALinLink-tool-cli.cjs"
 
 APP_BIN=""
-if [ -n "${NETCATTY_CLI_ELECTRON_EXEC_PATH:-}" ] && [ -x "${NETCATTY_CLI_ELECTRON_EXEC_PATH}" ]; then
-  APP_BIN="${NETCATTY_CLI_ELECTRON_EXEC_PATH}"
-elif [ -x "$SCRIPT_DIR/../../../../MacOS/Netcatty" ]; then
-  APP_BIN="$SCRIPT_DIR/../../../../MacOS/Netcatty"
-elif [ -x "$SCRIPT_DIR/../../../../Netcatty" ]; then
-  APP_BIN="$SCRIPT_DIR/../../../../Netcatty"
-elif [ -x "$SCRIPT_DIR/../../../../netcatty" ]; then
-  APP_BIN="$SCRIPT_DIR/../../../../netcatty"
+if [ -n "${ALinLink_CLI_ELECTRON_EXEC_PATH:-}" ] && [ -x "${ALinLink_CLI_ELECTRON_EXEC_PATH}" ]; then
+  APP_BIN="${ALinLink_CLI_ELECTRON_EXEC_PATH}"
+elif [ -x "$SCRIPT_DIR/../../../../MacOS/ALinLink" ]; then
+  APP_BIN="$SCRIPT_DIR/../../../../MacOS/ALinLink"
+elif [ -x "$SCRIPT_DIR/../../../../ALinLink" ]; then
+  APP_BIN="$SCRIPT_DIR/../../../../ALinLink"
+elif [ -x "$SCRIPT_DIR/../../../../ALinLink" ]; then
+  APP_BIN="$SCRIPT_DIR/../../../../ALinLink"
 fi
 
 if [ -n "$APP_BIN" ]; then
@@ -25,5 +25,5 @@ if command -v node >/dev/null 2>&1; then
   exec node "$CLI_SCRIPT" "$@"
 fi
 
-printf '%s\n' "Failed to locate the bundled Netcatty runtime for netcatty-tool-cli." >&2
+printf '%s\n' "Failed to locate the bundled ALinLink runtime for ALinLink-tool-cli." >&2
 exit 1

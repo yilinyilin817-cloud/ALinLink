@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { netcattyBridge } from '../../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../../infrastructure/services/ALinLinkBridge';
 
 export interface DiskInfo {
   mountPoint: string;
@@ -107,7 +107,7 @@ export function useServerStats({
       return;
     }
 
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.getServerStats) {
       return;
     }

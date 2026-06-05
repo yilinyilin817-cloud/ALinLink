@@ -58,7 +58,7 @@ export const zhCNAiMessages: Messages = {
   'ai.codex.connectedCustomConfig': '使用 ~/.codex/config.toml 自定义 provider',
   'ai.codex.customConfigIncomplete': '检测到自定义配置（缺少环境变量）',
   'ai.codex.customConfigHint': '使用 ~/.codex/config.toml 中配置的自定义 provider "{provider}"，无需 ChatGPT 登录。',
-  'ai.codex.customConfigMissingEnvKey': '警告：环境变量 {envKey} 未在当前 shell 中设置。请 export 它（或从包含该变量的 shell 启动 netcatty），否则 Codex 无法鉴权。',
+  'ai.codex.customConfigMissingEnvKey': '警告：环境变量 {envKey} 未在当前 shell 中设置。请 export 它（或从包含该变量的 shell 启动 ALinLink），否则 Codex 无法鉴权。',
   'ai.codex.notConnected': '未连接',
   'ai.codex.statusUnknown': '状态未知',
   'ai.codex.path': '路径：',
@@ -104,12 +104,12 @@ export const zhCNAiMessages: Messages = {
   'ai.defaultAgent.description': '创建新 AI 会话时使用的 Agent',
   'ai.defaultAgent.catty': 'Catty（内置）',
   'ai.toolAccess.title': '工具接入',
-  'ai.toolAccess.mode': 'Netcatty 接入模式',
-  'ai.toolAccess.description': '选择外部 ACP Agent 访问 Netcatty 会话的方式。MCP 会暴露内置服务器，Skills + CLI 会引导 Agent 读取本地 Skill 并调用 Netcatty CLI。',
+  'ai.toolAccess.mode': 'ALinLink 接入模式',
+  'ai.toolAccess.description': '选择外部 ACP Agent 访问 ALinLink 会话的方式。MCP 会暴露内置服务器，Skills + CLI 会引导 Agent 读取本地 Skill 并调用 ALinLink CLI。',
   'ai.toolAccess.mode.mcp': 'MCP',
   'ai.toolAccess.mode.skills': 'Skills + CLI',
   'ai.userSkills.title': '用户 Skills',
-  'ai.userSkills.description': '打开 Netcatty 的 Skills 文件夹以添加你自己的技能目录。Netcatty 会自动扫描这些 skills，默认只注入轻量索引，只有在请求明显命中某个 skill 时才展开正文。',
+  'ai.userSkills.description': '打开 ALinLink 的 Skills 文件夹以添加你自己的技能目录。ALinLink 会自动扫描这些 skills，默认只注入轻量索引，只有在请求明显命中某个 skill 时才展开正文。',
   'ai.userSkills.openFolder': '打开 Skills 文件夹',
   'ai.userSkills.reload': '重新加载 Skills',
   'ai.userSkills.location': '位置',
@@ -178,7 +178,7 @@ export const zhCNAiMessages: Messages = {
   'ai.chat.menuUserSkills': '用户 Skills',
 
   // AI Error
-  'ai.codex.bridgeError': 'Codex 主进程处理器尚未加载。请完全重启 Netcatty 或重启 Electron 开发进程，然后重试。',
+  'ai.codex.bridgeError': 'Codex 主进程处理器尚未加载。请完全重启 ALinLink 或重启 Electron 开发进程，然后重试。',
 
   // AI Web Search
   'ai.webSearch.title': '网络搜索',
@@ -198,7 +198,7 @@ export const zhCNAiMessages: Messages = {
   // AI Safety Settings
   'ai.safety.title': '安全',
   'ai.safety.permissionMode': '权限模式',
-  'ai.safety.permissionMode.description': '控制 AI 与终端的交互方式。观察者模式会通过 Netcatty 阻止所有写操作，对内置和 ACP Agent 均生效。确认模式对 ACP Agent 仅为建议性（ACP Agent 有自己的工具审批流程）。',
+  'ai.safety.permissionMode.description': '控制 AI 与终端的交互方式。观察者模式会通过 ALinLink 阻止所有写操作，对内置和 ACP Agent 均生效。确认模式对 ACP Agent 仅为建议性（ACP Agent 有自己的工具审批流程）。',
   'ai.safety.permissionMode.observer': '观察者 - 只读，禁止操作',
   'ai.safety.permissionMode.confirm': '确认 - 操作前询问',
   'ai.safety.permissionMode.autonomous': '自主 - 自由执行',
@@ -208,7 +208,7 @@ export const zhCNAiMessages: Messages = {
   'ai.safety.maxIterations': '最大迭代次数',
   'ai.safety.maxIterations.description': '防止 AI 失控执行的最大工具调用循环次数。ACP Agent 可能有自己的内部迭代限制，以其为准。',
   'ai.safety.blocklist': '命令黑名单',
-  'ai.safety.blocklist.description': '用于拦截危险命令的正则表达式。通过 Netcatty 执行层对内置和 ACP Agent 均生效。',
+  'ai.safety.blocklist.description': '用于拦截危险命令的正则表达式。通过 ALinLink 执行层对内置和 ACP Agent 均生效。',
   'ai.safety.blocklist.placeholder': '正则表达式...',
   'ai.safety.blocklist.reset': '恢复默认',
   'ai.safety.blocklist.add': '添加规则',

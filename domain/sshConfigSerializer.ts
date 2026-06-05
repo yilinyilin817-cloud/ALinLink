@@ -1,8 +1,8 @@
 import { Host } from "./models";
 
 const DEFAULT_SSH_PORT = 22;
-const MANAGED_BLOCK_BEGIN = "# BEGIN NETCATTY MANAGED - DO NOT EDIT THIS BLOCK";
-const MANAGED_BLOCK_END = "# END NETCATTY MANAGED";
+const MANAGED_BLOCK_BEGIN = "# BEGIN ALinLink MANAGED - DO NOT EDIT THIS BLOCK";
+const MANAGED_BLOCK_END = "# END ALinLink MANAGED";
 
 /**
  * Check if a string is an IPv6 address

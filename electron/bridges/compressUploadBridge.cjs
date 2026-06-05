@@ -277,7 +277,7 @@ async function startCompressedUpload(event, payload) {
 
   const sendProgress = (phase, transferred, total) => {
     if (compression.cancelled) return;
-    sender.send("netcatty:compress:progress", { 
+    sender.send("ALinLink:compress:progress", { 
       compressionId, 
       phase, 
       transferred, 
@@ -288,7 +288,7 @@ async function startCompressedUpload(event, payload) {
   const sendComplete = () => {
     // Send final 100% progress before completion
     if (!compression.cancelled) {
-      sender.send("netcatty:compress:progress", {
+      sender.send("ALinLink:compress:progress", {
         compressionId,
         phase: 'extracting',
         transferred: 100,
@@ -296,12 +296,12 @@ async function startCompressedUpload(event, payload) {
       });
     }
     activeCompressions.delete(compressionId);
-    sender.send("netcatty:compress:complete", { compressionId });
+    sender.send("ALinLink:compress:complete", { compressionId });
   };
 
   const sendError = (error) => {
     activeCompressions.delete(compressionId);
-    sender.send("netcatty:compress:error", { 
+    sender.send("ALinLink:compress:error", { 
       compressionId, 
       error: error.message || String(error) 
     });
@@ -451,7 +451,7 @@ async function startCompressedUpload(event, payload) {
 
     // Check if cancelled during extraction before reporting completion
     if (compression.cancelled) {
-      sender.send("netcatty:compress:cancelled", { compressionId });
+      sender.send("ALinLink:compress:cancelled", { compressionId });
       return { compressionId, cancelled: true };
     }
 
@@ -470,7 +470,7 @@ async function startCompressedUpload(event, payload) {
 
     if (err.message === 'Upload cancelled' || err.message === 'Compression cancelled' || err.message === 'Transfer cancelled') {
       activeCompressions.delete(compressionId);
-      sender.send("netcatty:compress:cancelled", { compressionId });
+      sender.send("ALinLink:compress:cancelled", { compressionId });
     } else {
       sendError(err.message || 'Unknown error occurred');
     }
@@ -543,9 +543,9 @@ async function checkCompressedUploadSupport(event, payload) {
  * Register IPC handlers
  */
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:compress:start", startCompressedUpload);
-  ipcMain.handle("netcatty:compress:cancel", cancelCompression);
-  ipcMain.handle("netcatty:compress:checkSupport", checkCompressedUploadSupport);
+  ipcMain.handle("ALinLink:compress:start", startCompressedUpload);
+  ipcMain.handle("ALinLink:compress:cancel", cancelCompression);
+  ipcMain.handle("ALinLink:compress:checkSupport", checkCompressedUploadSupport);
 }
 
 module.exports = {

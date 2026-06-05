@@ -25,11 +25,11 @@ let safeStorage = null;
 function registerHandlers(ipcMain, electronModule) {
   safeStorage = electronModule?.safeStorage ?? null;
 
-  ipcMain.handle("netcatty:credentials:available", () => {
+  ipcMain.handle("ALinLink:credentials:available", () => {
     return Boolean(safeStorage?.isEncryptionAvailable?.());
   });
 
-  ipcMain.handle("netcatty:credentials:encrypt", (_event, plaintext) => {
+  ipcMain.handle("ALinLink:credentials:encrypt", (_event, plaintext) => {
     if (typeof plaintext !== "string" || plaintext.length === 0) {
       return plaintext ?? "";
     }
@@ -59,7 +59,7 @@ function registerHandlers(ipcMain, electronModule) {
     }
   });
 
-  ipcMain.handle("netcatty:credentials:decrypt", (_event, value) => {
+  ipcMain.handle("ALinLink:credentials:decrypt", (_event, value) => {
     if (typeof value !== "string" || value.length === 0) {
       return value ?? "";
     }

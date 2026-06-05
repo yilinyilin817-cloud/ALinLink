@@ -1,5 +1,5 @@
 /**
- * Netcatty in-process SSH agent
+ * ALinLink in-process SSH agent
  *
  * Implements ssh2's BaseAgent interface to support:
  * - OpenSSH certificate authentication (client cert + private key)
@@ -10,11 +10,11 @@ const path = require("node:path");
 const { BaseAgent } = require("ssh2/lib/agent.js");
 const { parseKey } = require("ssh2/lib/protocol/keyParser.js");
 
-const DEBUG_SSH = process.env.NETCATTY_SSH_DEBUG === "1";
+const DEBUG_SSH = process.env.ALinLink_SSH_DEBUG === "1";
 
 // Debug logger (disabled by default)
 const logFile = DEBUG_SSH
-  ? path.join(require("os").tmpdir(), "netcatty-agent.log")
+  ? path.join(require("os").tmpdir(), "ALinLink-agent.log")
   : null;
 const log = (msg, data) => {
   if (!DEBUG_SSH) return;
@@ -149,7 +149,7 @@ function normalizeBaseTypeForConversion(type) {
   return type.replace(/-cert-v0[01]@openssh\.com$/i, "");
 }
 
-class NetcattyAgent extends BaseAgent {
+class ALinLinkAgent extends BaseAgent {
   constructor(opts) {
     super();
     this._mode = opts.mode;
@@ -286,5 +286,5 @@ class NetcattyAgent extends BaseAgent {
 }
 
 module.exports = {
-  NetcattyAgent,
+  ALinLinkAgent,
 };

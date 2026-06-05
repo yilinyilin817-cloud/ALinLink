@@ -115,7 +115,7 @@ function loadBridgeWithMocks(options = {}) {
       setMainWindowGetter() {},
       getOrCreateHost: async () => 4010,
       getScopedSessionIds: () => [],
-      buildMcpServerConfig: () => ({ name: "netcatty-remote-hosts", type: "http", url: "http://127.0.0.1:4010" }),
+      buildMcpServerConfig: () => ({ name: "ALinLink-remote-hosts", type: "http", url: "http://127.0.0.1:4010" }),
       getPermissionMode: () =>
         typeof options.getPermissionMode === "function"
           ? options.getPermissionMode()
@@ -128,8 +128,8 @@ function loadBridgeWithMocks(options = {}) {
       cleanup() {},
     },
     "../cli/discoveryPath.cjs": {
-      getCliLauncherPath: () => "/tmp/netcatty-tool-cli",
-      TOOL_CLI_DISCOVERY_ENV_VAR: "NETCATTY_TOOL_CLI_DISCOVERY_FILE",
+      getCliLauncherPath: () => "/tmp/ALinLink-tool-cli",
+      TOOL_CLI_DISCOVERY_ENV_VAR: "ALinLink_TOOL_CLI_DISCOVERY_FILE",
     },
     "./ai/userSkills.cjs": {
       scanUserSkills: async () => ({ readyCount: 0, warningCount: 0, skills: [], warnings: [] }),
@@ -305,7 +305,7 @@ test("does not discover Claude without a system Claude CLI", async () => {
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -317,7 +317,7 @@ test("does not discover Claude without a system Claude CLI", async () => {
 });
 
 test("does not discover Claude when the PATH Claude shim is broken", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-claude-broken-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-claude-broken-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -342,7 +342,7 @@ test("does not discover Claude when the PATH Claude shim is broken", async (t) =
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -354,7 +354,7 @@ test("does not discover Claude when the PATH Claude shim is broken", async (t) =
 });
 
 test("resolve-cli detects PATH Claude and reads its version", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-claude-resolve-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-claude-resolve-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -376,7 +376,7 @@ test("resolve-cli detects PATH Claude and reads its version", async (t) => {
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "claude", customPath: "" });
@@ -392,7 +392,7 @@ test("resolve-cli detects PATH Claude and reads its version", async (t) => {
 });
 
 test("resolve-cli rejects stored Claude adapter script paths", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-claude-acp-stored-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-claude-acp-stored-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -417,7 +417,7 @@ test("resolve-cli rejects stored Claude adapter script paths", async (t) => {
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "claude", customPath: scriptPath });
@@ -433,7 +433,7 @@ test("resolve-cli rejects stored Claude adapter script paths", async (t) => {
 });
 
 test("resolve-cli rejects broken PATH Claude shims", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-claude-resolve-broken-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-claude-resolve-broken-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -458,7 +458,7 @@ test("resolve-cli rejects broken PATH Claude shims", async (t) => {
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "claude", customPath: "" });
@@ -474,7 +474,7 @@ test("resolve-cli rejects broken PATH Claude shims", async (t) => {
 });
 
 test("ACP stream passes the configured system Claude executable to claude-agent-acp", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-claude-executable-env-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-claude-executable-env-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -510,7 +510,7 @@ test("ACP stream passes the configured system Claude executable to claude-agent-
   bridge.registerHandlers(ipcMain);
 
   try {
-    const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
+    const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
     assert.equal(typeof streamHandler, "function");
 
     await streamHandler({ sender: { id: 1 } }, {
@@ -540,7 +540,7 @@ test("ACP stream passes the configured system Claude executable to claude-agent-
 });
 
 test("ACP stream rewrites Windows Claude cmd shim env before creating claude-agent-acp", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-claude-cmd-env-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-claude-cmd-env-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -584,7 +584,7 @@ test("ACP stream rewrites Windows Claude cmd shim env before creating claude-age
   bridge.registerHandlers(ipcMain);
 
   try {
-    const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
+    const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
     assert.equal(typeof streamHandler, "function");
 
     await streamHandler({ sender: { id: 1 } }, {
@@ -619,7 +619,7 @@ test("replays fallback history only after creating a fresh ACP session when the 
   });
   bridge.registerHandlers(ipcMain);
 
-  const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
+  const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
   assert.equal(typeof streamHandler, "function");
 
   const historyMessages = [{ role: "user", content: "prior recovered context" }];

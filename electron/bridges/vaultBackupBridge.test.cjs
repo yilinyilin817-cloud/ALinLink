@@ -13,7 +13,7 @@ const {
 } = require("./vaultBackupBridge.cjs");
 
 function createTempRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-vault-backup-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-vault-backup-"));
 }
 
 // All tests default to encrypted=true because the bridge now refuses to

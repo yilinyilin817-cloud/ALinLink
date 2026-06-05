@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 function registerAcpHandlers(ctx) {
   with (ctx) {
-  ipcMain.handle("netcatty:ai:acp:list-models", async (event, { acpCommand, acpArgs, cwd, providerId, chatSessionId, agentEnv: requestedAgentEnv }) => {
+  ipcMain.handle("ALinLink:ai:acp:list-models", async (event, { acpCommand, acpArgs, cwd, providerId, chatSessionId, agentEnv: requestedAgentEnv }) => {
     if (!validateSender(event)) {
       return { ok: false, error: "Unauthorized IPC sender" };
     }
@@ -45,7 +45,7 @@ function registerAcpHandlers(ctx) {
       }
       // Claude agent auth is owned entirely by its CLI config/login state
       // (`claude auth login`, ~/.claude settings, or ANTHROPIC_* in the user's
-      // shell env). netcatty's provider list must not override it.
+      // shell env). ALinLink's provider list must not override it.
 
       if (isCopilotAgent) {
         copilotConfigInfo = prepareCopilotHome(shellEnv, [], chatSessionId || `models_${Date.now()}`);
@@ -120,7 +120,7 @@ function registerAcpHandlers(ctx) {
     }
   });
 
-  ipcMain.handle("netcatty:ai:acp:stream", async (event, { requestId, chatSessionId, acpCommand, acpArgs, prompt, cwd, providerId, model, existingSessionId, historyMessages, images, toolIntegrationMode, defaultTargetSession, userSkillsContext, agentEnv: requestedAgentEnv }) => {
+  ipcMain.handle("ALinLink:ai:acp:stream", async (event, { requestId, chatSessionId, acpCommand, acpArgs, prompt, cwd, providerId, model, existingSessionId, historyMessages, images, toolIntegrationMode, defaultTargetSession, userSkillsContext, agentEnv: requestedAgentEnv }) => {
     // Validate IPC sender (Issue #17)
     if (!validateSender(event)) {
       return { ok: false, error: "Unauthorized IPC sender" };
@@ -222,7 +222,7 @@ function registerAcpHandlers(ctx) {
       // mid-request with an opaque "Missing environment variable" error.
       const preflightError = getCodexCustomConfigPreflightError(codexCustomConfig);
       if (preflightError) {
-        safeSend(event.sender, "netcatty:ai:acp:error", {
+        safeSend(event.sender, "ALinLink:ai:acp:error", {
           requestId,
           error: preflightError,
         });
@@ -242,7 +242,7 @@ function registerAcpHandlers(ctx) {
             invalidateCodexValidationCache();
           }
 
-          safeSend(event.sender, "netcatty:ai:acp:error", {
+          safeSend(event.sender, "ALinLink:ai:acp:error", {
             requestId,
             error: `Codex ChatGPT login is stale or invalid. Reconnect Codex in Settings -> AI.\n\nDetails: ${validation.error || "Unknown authentication error"}`,
           });
@@ -270,23 +270,23 @@ function registerAcpHandlers(ctx) {
           await ensureSkillsCliHost();
         } catch (err) {
           const message = err?.message || String(err);
-          safeSend(event.sender, "netcatty:ai:acp:error", {
+          safeSend(event.sender, "ALinLink:ai:acp:error", {
             requestId,
-            error: `Failed to initialize Netcatty Skills + CLI bridge.\n\nDetails: ${message}`,
+            error: `Failed to initialize ALinLink Skills + CLI bridge.\n\nDetails: ${message}`,
           });
           return { ok: false, error: message };
         }
       }
 
-      // Inject Netcatty MCP server for scoped terminal-session access only when
-      // the user selected MCP mode. Skills mode uses the Netcatty CLI instead.
+      // Inject ALinLink MCP server for scoped terminal-session access only when
+      // the user selected MCP mode. Skills mode uses the ALinLink CLI instead.
       if (effectiveToolIntegrationMode === "mcp") {
         try {
           const mcpPort = await mcpServerBridge.getOrCreateHost();
           const scopedIds = mcpServerBridge.getScopedSessionIds(chatSessionId);
-          const netcattyMcpConfig = mcpServerBridge.buildMcpServerConfig(mcpPort, scopedIds, chatSessionId);
-          mcpSnapshot.mcpServers.push(netcattyMcpConfig);
-          debugMcpLog("Injected Netcatty MCP server", {
+          const ALinLinkMcpConfig = mcpServerBridge.buildMcpServerConfig(mcpPort, scopedIds, chatSessionId);
+          mcpSnapshot.mcpServers.push(ALinLinkMcpConfig);
+          debugMcpLog("Injected ALinLink MCP server", {
             requestId,
             chatSessionId,
             mcpPort,
@@ -294,14 +294,14 @@ function registerAcpHandlers(ctx) {
             mcpServerNames: mcpSnapshot.mcpServers.map(server => server.name),
           });
           if (isCopilotAgent) {
-            logAcpDebug(agentLabel, "Injected Netcatty MCP server into session", {
+            logAcpDebug(agentLabel, "Injected ALinLink MCP server into session", {
               chatSessionId,
               scopedIds,
-              injectedServer: summarizeMcpServersForDebug([netcattyMcpConfig])[0],
+              injectedServer: summarizeMcpServersForDebug([ALinLinkMcpConfig])[0],
             });
           }
         } catch (err) {
-          console.error("[ACP] Failed to inject Netcatty MCP server:", err?.message || err);
+          console.error("[ACP] Failed to inject ALinLink MCP server:", err?.message || err);
         }
       }
       if (shouldAbortStartup()) return { ok: true };
@@ -554,13 +554,13 @@ function registerAcpHandlers(ctx) {
       }
       const activeProviderSessionId = providerEntry.provider.getSessionId?.() || null;
       if (activeProviderSessionId) {
-        safeSend(event.sender, "netcatty:ai:acp:event", {
+        safeSend(event.sender, "ALinLink:ai:acp:event", {
           requestId,
           event: { type: "session-id", sessionId: activeProviderSessionId },
         });
       }
 
-      // Prepend context hint so the agent uses the configured Netcatty access mode.
+      // Prepend context hint so the agent uses the configured ALinLink access mode.
       const contextualPrompt = buildExternalAgentContextualPrompt({
         mode: effectiveToolIntegrationMode,
         prompt,
@@ -650,7 +650,7 @@ function registerAcpHandlers(ctx) {
         stallTimer = setTimeout(() => {
           if (!abortController.signal.aborted) {
             if (!isActiveAcpRun(chatSessionId, requestId)) return;
-            safeSend(event.sender, "netcatty:ai:acp:event", {
+            safeSend(event.sender, "ALinLink:ai:acp:event", {
               requestId,
               event: { type: "status", message: "Waiting for response from agent..." },
             });
@@ -680,7 +680,7 @@ function registerAcpHandlers(ctx) {
               type: serialized.type,
               toolName: serialized.toolName || null,
             });
-            safeSend(event.sender, "netcatty:ai:acp:event", {
+            safeSend(event.sender, "ALinLink:ai:acp:event", {
               requestId,
               event: serialized,
             });
@@ -716,7 +716,7 @@ function registerAcpHandlers(ctx) {
           // node.exe processes (provider uses persistSession:true).
           cleanupAcpProvider(chatSessionId);
         }
-        safeSend(event.sender, "netcatty:ai:acp:error", {
+        safeSend(event.sender, "ALinLink:ai:acp:error", {
           requestId,
           error: isCodexAgent
             ? "Codex returned an empty response. Connect Codex in Settings -> AI, or configure an enabled OpenAI provider API key."
@@ -744,7 +744,7 @@ function registerAcpHandlers(ctx) {
         if (!isActiveAcpRun(chatSessionId, requestId)) {
           return { ok: true };
         }
-        safeSend(event.sender, "netcatty:ai:acp:done", { requestId });
+        safeSend(event.sender, "ALinLink:ai:acp:done", { requestId });
       }
     } catch (err) {
       console.error("[ACP] Handler caught error:", err?.message || err, err?.stack?.split("\n").slice(0, 3).join("\n"));
@@ -776,7 +776,7 @@ function registerAcpHandlers(ctx) {
         cleanupAcpProvider(chatSessionId);
       }
 
-      safeSend(event.sender, "netcatty:ai:acp:error", {
+      safeSend(event.sender, "ALinLink:ai:acp:error", {
         requestId,
         error: isAuthErr
           ? `Authentication failed. Connect Codex in Settings -> AI, or configure an enabled OpenAI provider API key.\n\nDetails: ${errMsg}`
@@ -797,7 +797,7 @@ function registerAcpHandlers(ctx) {
     return { ok: true };
   });
 
-  ipcMain.handle("netcatty:ai:acp:cancel", async (event, { requestId, chatSessionId }) => {
+  ipcMain.handle("ALinLink:ai:acp:cancel", async (event, { requestId, chatSessionId }) => {
     if (!validateSender(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const effectiveChatSessionId = chatSessionId || acpRequestSessions.get(requestId);
     const activeRun = effectiveChatSessionId ? acpChatRuns.get(effectiveChatSessionId) : null;
@@ -837,7 +837,7 @@ function registerAcpHandlers(ctx) {
     }
     // Preserve the ACP provider session on stop so the next user message can
     // continue within the same persisted conversation context. Full provider
-    // cleanup is handled by netcatty:ai:acp:cleanup when the chat is deleted.
+    // cleanup is handled by ALinLink:ai:acp:cleanup when the chat is deleted.
     if (effectiveChatSessionId) cancelled = true;
     if (effectiveRequestId) acpRequestSessions.delete(effectiveRequestId);
     void mcpServerBridge.cancelSftpOpsForSession?.(effectiveChatSessionId);
@@ -845,7 +845,7 @@ function registerAcpHandlers(ctx) {
   });
 
   // Cleanup a specific ACP session (when chat session is deleted)
-  ipcMain.handle("netcatty:ai:acp:cleanup", async (event, { chatSessionId }) => {
+  ipcMain.handle("ALinLink:ai:acp:cleanup", async (event, { chatSessionId }) => {
     if (!validateSender(event)) return { ok: false, error: "Unauthorized IPC sender" };
     mcpServerBridge.setChatSessionCancelled?.(chatSessionId, true);
     mcpServerBridge.cancelPtyExecsForSession(chatSessionId);

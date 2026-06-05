@@ -1,15 +1,15 @@
 {
-  "name": "netcatty",
-  "description": "Netcatty is a modern SSH manager and terminal app with host grouping, SFTP, keychain, port forwarding, and a rich UI.",
-  "homepage": "https://github.com/binaricat/Netcatty",
+  "name": "alinlink",
+  "description": "ALinLink is a modern SSH manager and terminal app with host grouping, SFTP, keychain, port forwarding, and a rich UI.",
+  "homepage": "https://github.com/binaricat/ALinLink",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "author": "binaricat <support@netcatty.com>",
+  "author": "binaricat <support@alinlink.com>",
   "license": "GPL-3.0-or-later",
   "main": "electron/main.cjs",
   "bin": {
-    "netcatty-tool-cli": "./electron/cli/netcatty-tool-cli.cjs"
+    "alinlink-tool-cli": "./electron/cli/ALinLink-tool-cli.cjs"
   },
   "scripts": {
     "dev": "npm run fetch:mosh:dev && npm run lint && concurrently -k \"vite\" \"npm:dev:electron\"",
@@ -30,7 +30,7 @@
     "pack:linux-arm64": "npm run build && cross-env npm_config_arch=arm64 NODE_OPTIONS=--disable-warning=DEP0190 electron-builder --config electron-builder.config.cjs --linux --arm64 --publish=never",
     "postinstall": "electron-builder install-app-deps && patch-package && node scripts/patch-xterm-webgl-atlas.cjs",
     "rebuild": "electron-builder install-app-deps",
-    "tool:cli": "node electron/cli/netcatty-tool-cli.cjs",
+    "tool:cli": "node electron/cli/ALinLink-tool-cli.cjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "node --test --import tsx electron/bridges/*.test.cjs electron/bridges/*/*.test.cjs scripts/*.test.cjs application/*.test.ts application/state/*.test.ts application/state/*/*.test.ts components/*.test.tsx components/editor/*.test.tsx components/ai/*.test.ts components/terminal/*.test.ts components/terminal/runtime/*.test.ts domain/*.test.ts infrastructure/ai/*.test.ts infrastructure/config/*.test.ts infrastructure/services/*/*.test.ts lib/*.test.ts"
@@ -51,6 +51,7 @@
     "@radix-ui/react-dialog": "1.1.15",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@radix-ui/react-popover": "1.1.15",
+    "@radix-ui/react-progress": "^1.1.8",
     "@radix-ui/react-scroll-area": "1.2.10",
     "@radix-ui/react-select": "2.2.6",
     "@radix-ui/react-slot": "1.2.4",
@@ -102,6 +103,7 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-unused-imports": "^4.3.0",
+    "node-gyp": "^12.3.0",
     "patch-package": "^8.0.0",
     "tailwindcss": "^4.1.17",
     "tsx": "^4.21.0",

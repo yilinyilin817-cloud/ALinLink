@@ -12,24 +12,24 @@ Use this reference for remote file or directory tasks.
 - Use SFTP only when that `session` result shows a connected SSH-backed session. For local, Mosh, Telnet, serial/raw, or network-device sessions, do not use SFTP.
 - Keep path semantics strict:
   - `--remote-path` always means a path on the remote host.
-  - `--local-path` always means a path on the local machine running Netcatty.
+  - `--local-path` always means a path on the local machine running ALinLink.
 - If the user says "download" to a local destination such as `/tmp`, `~/Downloads`, or Desktop, use `sftp download`.
 - If the user says to create or modify a file on the remote host, use `sftp write`, `sftp upload`, or another remote SFTP operation. Do not reinterpret that as a local download.
 
 ## One-Off Commands
 
 - List a directory:
-  - `<netcatty-cli-prefix> sftp list --session <session-id> --remote-path <remote-path> --json --chat-session <chat-session-id>`
+  - `<ALinLink-cli-prefix> sftp list --session <session-id> --remote-path <remote-path> --json --chat-session <chat-session-id>`
 - Read a file:
-  - `<netcatty-cli-prefix> sftp read --session <session-id> --remote-path <remote-path> --json --chat-session <chat-session-id>`
+  - `<ALinLink-cli-prefix> sftp read --session <session-id> --remote-path <remote-path> --json --chat-session <chat-session-id>`
 - Write a small text file with known content:
-  - `<netcatty-cli-prefix> sftp write --session <session-id> --remote-path <remote-path> --content <text> --json --chat-session <chat-session-id>`
+  - `<ALinLink-cli-prefix> sftp write --session <session-id> --remote-path <remote-path> --content <text> --json --chat-session <chat-session-id>`
 - Download a remote file to an existing local path:
-  - `<netcatty-cli-prefix> sftp download --session <session-id> --remote-path <remote-path> --local-path <local-path> --json --chat-session <chat-session-id>`
+  - `<ALinLink-cli-prefix> sftp download --session <session-id> --remote-path <remote-path> --local-path <local-path> --json --chat-session <chat-session-id>`
 - Upload an existing local file:
-  - `<netcatty-cli-prefix> sftp upload --session <session-id> --local-path <local-path> --remote-path <remote-path> --json --chat-session <chat-session-id>`
+  - `<ALinLink-cli-prefix> sftp upload --session <session-id> --local-path <local-path> --remote-path <remote-path> --json --chat-session <chat-session-id>`
 - Delete a remote path:
-  - `<netcatty-cli-prefix> sftp delete --session <session-id> --remote-path <remote-path> --json --chat-session <chat-session-id>`
+  - `<ALinLink-cli-prefix> sftp delete --session <session-id> --remote-path <remote-path> --json --chat-session <chat-session-id>`
 
 ## Rules
 

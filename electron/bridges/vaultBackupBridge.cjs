@@ -540,7 +540,7 @@ function registerHandlers(ipcMain, electronModule) {
       for (const win of BrowserWindow.getAllWindows()) {
         if (win.isDestroyed?.()) continue;
         try {
-          win.webContents?.send?.("netcatty:vaultBackups:changed");
+          win.webContents?.send?.("ALinLink:vaultBackups:changed");
         } catch (error) {
           console.warn("[vaultBackupBridge] Failed to notify window:", error);
         }
@@ -550,10 +550,10 @@ function registerHandlers(ipcMain, electronModule) {
     }
   };
 
-  ipcMain.handle("netcatty:vaultBackups:capabilities", async () => {
+  ipcMain.handle("ALinLink:vaultBackups:capabilities", async () => {
     return { encryptionAvailable: service.isEncryptionAvailable() };
   });
-  ipcMain.handle("netcatty:vaultBackups:create", async (_event, payload) => {
+  ipcMain.handle("ALinLink:vaultBackups:create", async (_event, payload) => {
     const result = await service.createBackup(payload || {});
     // Only broadcast when a new record was actually written; a
     // deduped (created=false) return means the on-disk state did not
@@ -563,20 +563,20 @@ function registerHandlers(ipcMain, electronModule) {
     }
     return result;
   });
-  ipcMain.handle("netcatty:vaultBackups:list", async () => {
+  ipcMain.handle("ALinLink:vaultBackups:list", async () => {
     return service.listBackups();
   });
-  ipcMain.handle("netcatty:vaultBackups:read", async (_event, payload) => {
+  ipcMain.handle("ALinLink:vaultBackups:read", async (_event, payload) => {
     return service.readBackup(payload || {});
   });
-  ipcMain.handle("netcatty:vaultBackups:trim", async (_event, payload) => {
+  ipcMain.handle("ALinLink:vaultBackups:trim", async (_event, payload) => {
     const result = await service.trimBackups(payload || {});
     if (result?.deletedCount) {
       broadcastBackupsChanged();
     }
     return result;
   });
-  ipcMain.handle("netcatty:vaultBackups:openDir", async () => {
+  ipcMain.handle("ALinLink:vaultBackups:openDir", async () => {
     return service.openBackupDir();
   });
 }

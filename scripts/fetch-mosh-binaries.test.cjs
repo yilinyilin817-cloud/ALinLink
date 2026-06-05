@@ -19,7 +19,7 @@ const {
 } = require("./fetch-mosh-binaries.cjs");
 
 function makeTmp(t) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-fetch-mosh-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-fetch-mosh-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
@@ -41,10 +41,10 @@ function makeTarGz(t, entries) {
 }
 
 test("fetch-mosh-binaries defaults to the dedicated mosh binary repository", () => {
-  assert.deepEqual(parseMoshBinRepository({}), { owner: "binaricat", repo: "Netcatty-mosh-bin" });
+  assert.deepEqual(parseMoshBinRepository({}), { owner: "binaricat", repo: "ALinLink-mosh-bin" });
   assert.deepEqual(parseMoshBinRepository({ GITHUB_REPOSITORY: "owner/project" }), {
     owner: "owner",
-    repo: "Netcatty-mosh-bin",
+    repo: "ALinLink-mosh-bin",
   });
   assert.deepEqual(
     parseMoshBinRepository({ GITHUB_REPOSITORY: "owner/project", MOSH_BIN_OWNER: "bin", MOSH_BIN_REPO: "binaries" }),
@@ -79,11 +79,11 @@ test("resolveHostTarget maps the local platform to the bundled target", () => {
 test("tar archive invocation uses a relative archive name for Windows paths", () => {
   assert.deepEqual(
     resolveTarArchiveInvocation(
-      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\netcatty-mosh-abc\\bundle.tar.gz",
+      "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ALinLink-mosh-abc\\bundle.tar.gz",
       "win32",
     ),
     {
-      cwd: "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\netcatty-mosh-abc",
+      cwd: "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ALinLink-mosh-abc",
       archive: "bundle.tar.gz",
     },
   );

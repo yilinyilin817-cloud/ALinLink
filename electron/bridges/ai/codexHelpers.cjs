@@ -318,7 +318,7 @@ function getCodexCustomConfigPreflightError(customConfig) {
 
 /**
  * Compute the ACP auth override object for Codex spawn sites.
- *   - netcatty-managed API key present → "codex-api-key"
+ *   - ALinLink-managed API key present → "codex-api-key"
  *   - user's own ~/.codex/config.toml custom provider detected → no override
  *     (so codex-acp resolves auth from the shell env / config itself)
  *   - otherwise → "chatgpt" (triggers the browser OAuth login flow)

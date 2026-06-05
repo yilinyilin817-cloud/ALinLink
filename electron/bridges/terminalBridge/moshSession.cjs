@@ -267,7 +267,7 @@ function createMoshSessionApi(ctx) {
         try {
           fs.unlinkSync(file);
         } catch {
-          // Best effort cleanup; Settings > System can clear Netcatty temp files.
+          // Best effort cleanup; Settings > System can clear ALinLink temp files.
         }
       }
     }
@@ -424,7 +424,7 @@ function createMoshSessionApi(ctx) {
     
       const { bufferData, flush } = createPtyOutputBuffer((data) => {
         const contents = electronModule.webContents.fromId(session.webContentsId);
-        contents?.send("netcatty:data", { sessionId, data });
+        contents?.send("ALinLink:data", { sessionId, data });
       });
       session.flushPendingData = flush;
     
@@ -473,7 +473,7 @@ function createMoshSessionApi(ctx) {
             flush();
             sessionLogStreamManager.stopStream(sessionId, logStreamToken);
             const contents = electronModule.webContents.fromId(session.webContentsId);
-            contents?.send("netcatty:exit", {
+            contents?.send("ALinLink:exit", {
               sessionId,
               reason: "error",
               error: `Failed to spawn mosh-client: ${err.message}`,
@@ -490,7 +490,7 @@ function createMoshSessionApi(ctx) {
         flush();
         sessionLogStreamManager.stopStream(sessionId, logStreamToken);
         const contents = electronModule.webContents.fromId(session.webContentsId);
-        contents?.send("netcatty:exit", {
+        contents?.send("ALinLink:exit", {
           sessionId,
           exitCode,
           signal,
@@ -546,7 +546,7 @@ function createMoshSessionApi(ctx) {
       // good. Stash them so sshBridge can lazily open a best-effort companion
       // SSH connection for host-info stats (CPU/mem/disk), which Mosh's UDP
       // channel cannot provide on its own (issue #1198). Only credentials
-      // Netcatty already holds are kept — a password typed interactively into
+      // ALinLink already holds are kept — a password typed interactively into
       // the handshake PTY is not captured, so that case degrades gracefully.
       session.moshStatsAuth = {
         // Use the configured SSH host, NOT parsed.host: a `MOSH IP` line
@@ -611,7 +611,7 @@ function createMoshSessionApi(ctx) {
         flush();
         sessionLogStreamManager.stopStream(sessionId, session.logStreamToken);
         const contents = electronModule.webContents.fromId(session.webContentsId);
-        contents?.send("netcatty:exit", {
+        contents?.send("ALinLink:exit", {
           sessionId,
           exitCode,
           signal,
@@ -631,7 +631,7 @@ function createMoshSessionApi(ctx) {
     /**
      * Start a Mosh session.
      *
-     * Netcatty only uses its bundled `mosh-client` binary here. System
+     * ALinLink only uses its bundled `mosh-client` binary here. System
      * `mosh` / `mosh-client` installs are intentionally ignored so dev,
      * CI, and release builds exercise the same binary.
      */
@@ -660,7 +660,7 @@ function createMoshSessionApi(ctx) {
         fileExists: (p) => isExecutableFile(p) || fs.existsSync(p),
       });
       if (!sshExe) {
-        throw new Error("OpenSSH client not found. Netcatty needs ssh to start the remote mosh-server handshake.");
+        throw new Error("OpenSSH client not found. ALinLink needs ssh to start the remote mosh-server handshake.");
       }
     
       return startMoshSessionViaHandshake(event, options, { bareClient, sshExe });

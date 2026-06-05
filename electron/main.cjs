@@ -1,5 +1,5 @@
 /**
- * Netcatty Electron Main Process
+ * ALinLink Electron Main Process
  * 
  * This is the main entry point for the Electron application.
  * All major functionality has been extracted into separate bridge modules:
@@ -123,24 +123,48 @@ const getAutoUpdateBridge = createLazyModule("./bridges/autoUpdateBridge.cjs");
 const getAiBridge = createLazyModule("./bridges/aiBridge.cjs");
 const getWindowManager = createLazyModule("./bridges/windowManager.cjs");
 const getVaultBackupBridge = createLazyModule("./bridges/vaultBackupBridge.cjs");
+const networkScanBridge = require("./bridges/networkScanBridge.cjs");
 const ptyProcessTree = require("./bridges/ptyProcessTree.cjs");
 const { queryDirtyEditors } = require("./bridges/dirtyEditorGuard.cjs");
 
 // GPU settings
 // NOTE: Do not disable Chromium sandbox by default.
-// If you need to debug with sandbox disabled, set NETCATTY_NO_SANDBOX=1.
-if (process.env.NETCATTY_NO_SANDBOX === "1") {
+// If you need to debug with sandbox disabled, set ALinLink_NO_SANDBOX=1.
+if (process.env.ALinLink_NO_SANDBOX === "1") {
   app.commandLine.appendSwitch("no-sandbox");
 }
-// Force hardware acceleration even on blocklisted GPUs (macs sometimes fall back to software)
-app.commandLine.appendSwitch("ignore-gpu-blocklist");
-app.commandLine.appendSwitch("ignore-gpu-blacklist"); // Some Chromium builds use this alias; keep both for safety
-app.commandLine.appendSwitch("enable-gpu-rasterization");
-app.commandLine.appendSwitch("enable-zero-copy");
+// Disable GPU acceleration if ALinLink_DISABLE_GPU=1 (fixes black screen on some systems)
+if (process.env.ALinLink_DISABLE_GPU === "1") {
+  app.commandLine.appendSwitch("disable-gpu");
+  app.commandLine.appendSwitch("disable-gpu-compositing");
+  app.disableHardwareAcceleration();
+} else {
+  // Force hardware acceleration even on blocklisted GPUs (macs sometimes fall back to software)
+  app.commandLine.appendSwitch("ignore-gpu-blocklist");
+  app.commandLine.appendSwitch("ignore-gpu-blacklist"); // Some Chromium builds use this alias; keep both for safety
+  app.commandLine.appendSwitch("enable-gpu-rasterization");
+  app.commandLine.appendSwitch("enable-zero-copy");
+}
 
 // Silence noisy DevTools Autofill CDP errors (Electron's backend doesn't expose this domain)
 app.on("web-contents-created", (_event, contents) => {
-  if (contents.getType() !== "devtools") return;
+  if (contents.getType() !== "devtools") {
+    // Forward renderer console errors to the main process stdout so they
+    // are visible in `npm run dev` logs even when the devtools window is
+    // hidden behind another window or the user can't open it.
+    contents.on("console-message", (event, level, message, line, sourceId) => {
+      // Level: 0 verbose, 1 info, 2 warning, 3 error
+      if (level >= 2) {
+        const tag = level === 3 ? "[RendererError]" : "[RendererWarn]";
+        const loc = sourceId ? ` (${sourceId}:${line})` : "";
+        console.log(`${tag}${loc} ${message}`);
+      }
+    });
+    contents.on("render-process-gone", (_event, details) => {
+      console.error(`[RendererGone] reason=${details?.reason} exitCode=${details?.exitCode}`);
+    });
+    return;
+  }
   // Drop console output from Autofill requests in DevTools frontend
   contents.on("did-finish-load", () => {
     contents
@@ -321,9 +345,9 @@ function focusMainWindow() {
 // Shared state
 const sessions = new Map();
 const sftpClients = new Map();
-const keyRoot = path.join(os.homedir(), ".netcatty", "keys");
+const keyRoot = path.join(os.homedir(), ".ALinLink", "keys");
 let cloudSyncSessionPassword = null;
-const CLOUD_SYNC_PASSWORD_FILE = "netcatty_cloud_sync_master_password_v1";
+const CLOUD_SYNC_PASSWORD_FILE = "ALinLink_cloud_sync_master_password_v1";
 
 // Key management helpers
 const ensureKeyDir = async () => {
@@ -394,6 +418,7 @@ const registerBridges = createBridgeRegistrar({
   getAiBridge,
   getWindowManager,
   getVaultBackupBridge,
+  networkScanBridge,
   isPathInside,
 });
 /**
@@ -488,12 +513,12 @@ function hasUsableWindow() {
 }
 
 function showStartupError(err) {
-  const title = "Netcatty";
+  const title = "ALinLink";
   const code = err && typeof err === "object" ? err.code : null;
   const message =
     code === "ENOENT"
-      ? "Renderer files are missing. Please reinstall or rebuild Netcatty."
-      : "Failed to load the UI. Please relaunch Netcatty.";
+      ? "Renderer files are missing. Please reinstall or rebuild ALinLink."
+      : "Failed to load the UI. Please relaunch ALinLink.";
 
   try {
     electronModule.dialog?.showErrorBox?.(title, message);
@@ -537,8 +562,8 @@ if (!gotLock) {
         // app:// is registered as a standard scheme in Chromium
         // (registerSchemesAsPrivileged above) but Node's WHATWG URL parser
         // doesn't include it in its special-scheme list, so
-        // `new URL('app://netcatty/...').origin` returns the string "null"
-        // — matching against an `app://netcatty` origin string would
+        // `new URL('app://ALinLink/...').origin` returns the string "null"
+        // — matching against an `app://ALinLink` origin string would
         // therefore fail in packaged builds. Match by protocol + host
         // instead, and only fall back to .origin for HTTP-family URLs
         // (the dev server).
@@ -555,7 +580,7 @@ if (!gotLock) {
           try {
             const parsed = new URL(String(rawUrl));
             if (parsed.protocol === "app:") {
-              return parsed.host === "netcatty";
+              return parsed.host === "ALinLink";
             }
             return allowedHttpOrigins.has(parsed.origin);
           } catch {

@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 function registerAgentDiscoveryHandlers(ctx) {
   with (ctx) {
-  ipcMain.handle("netcatty:ai:agents:discover", async (event) => {
+  ipcMain.handle("ALinLink:ai:agents:discover", async (event) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const agents = [];
     const knownAgents = [
@@ -132,7 +132,7 @@ function registerAgentDiscoveryHandlers(ctx) {
   });
 
   // Resolve a CLI binary path (auto-detect or validate custom path)
-  ipcMain.handle("netcatty:ai:resolve-cli", async (event, { command, customPath }) => {
+  ipcMain.handle("ALinLink:ai:resolve-cli", async (event, { command, customPath }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const shellEnv = await getShellEnv();
     let resolvedPath = null;
@@ -211,11 +211,11 @@ function registerAgentDiscoveryHandlers(ctx) {
     return { path: resolvedPath, version: hasPlausibleVersion ? version : "Bundled ACP", available: true };
   });
 
-  ipcMain.handle("netcatty:ai:codex:get-integration", async (event, options) => {
+  ipcMain.handle("ALinLink:ai:codex:get-integration", async (event, options) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     // When the user clicks "Refresh Status" in Settings we also want to
     // rescan the shell env — otherwise a newly-exported variable in
-    // .zshrc stays invisible until they restart netcatty entirely.
+    // .zshrc stays invisible until they restart ALinLink entirely.
     if (options && options.refreshShellEnv) {
       invalidateShellEnvCache();
     }
@@ -291,7 +291,7 @@ function registerAgentDiscoveryHandlers(ctx) {
     }
   });
 
-  ipcMain.handle("netcatty:ai:codex:start-login", async (event) => {
+  ipcMain.handle("ALinLink:ai:codex:start-login", async (event) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const existingSession = getActiveCodexLoginSession();
     if (existingSession) {
@@ -358,7 +358,7 @@ function registerAgentDiscoveryHandlers(ctx) {
     }
   });
 
-  ipcMain.handle("netcatty:ai:codex:get-login-session", async (event, { sessionId }) => {
+  ipcMain.handle("ALinLink:ai:codex:get-login-session", async (event, { sessionId }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const session = codexLoginSessions.get(sessionId);
     if (!session) {
@@ -367,7 +367,7 @@ function registerAgentDiscoveryHandlers(ctx) {
     return { ok: true, session: toCodexLoginSessionResponse(session) };
   });
 
-  ipcMain.handle("netcatty:ai:codex:cancel-login", async (event, { sessionId }) => {
+  ipcMain.handle("ALinLink:ai:codex:cancel-login", async (event, { sessionId }) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     const session = codexLoginSessions.get(sessionId);
     if (!session) {
@@ -384,7 +384,7 @@ function registerAgentDiscoveryHandlers(ctx) {
     return { ok: true, found: true, session: toCodexLoginSessionResponse(session) };
   });
 
-  ipcMain.handle("netcatty:ai:codex:logout", async (event) => {
+  ipcMain.handle("ALinLink:ai:codex:logout", async (event) => {
     if (!validateSenderOrSettings(event)) return { ok: false, error: "Unauthorized IPC sender" };
     try {
       const logoutResult = await runCodexCli(["logout"]);

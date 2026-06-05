@@ -63,7 +63,7 @@ function cancelPassphraseRequest(requestId, reason = "cancelled") {
     requestId,
     { cancelled: true },
     {
-      channel: "netcatty:passphrase-cancelled",
+      channel: "ALinLink:passphrase-cancelled",
       payload: { reason },
     }
   );
@@ -96,7 +96,7 @@ function requestPassphrase(sender, keyPath, keyName, hostname, passphraseInvalid
         settleRequest(
           requestId,
           null,
-          { channel: "netcatty:passphrase-timeout" }
+          { channel: "ALinLink:passphrase-timeout" }
         );
       }
     }, REQUEST_TTL_MS);
@@ -124,7 +124,7 @@ function requestPassphrase(sender, keyPath, keyName, hostname, passphraseInvalid
     console.log(`[Passphrase] Requesting passphrase for ${keyName} (${requestId})`);
     
     try {
-      sender.send('netcatty:passphrase-request', {
+      sender.send('ALinLink:passphrase-request', {
         requestId,
         keyPath,
         keyName,
@@ -170,7 +170,7 @@ function handleResponse(_event, payload) {
  * Register IPC handler for passphrase responses
  */
 function registerHandler(ipcMain) {
-  ipcMain.handle('netcatty:passphrase:respond', handleResponse);
+  ipcMain.handle('ALinLink:passphrase:respond', handleResponse);
 }
 
 /**

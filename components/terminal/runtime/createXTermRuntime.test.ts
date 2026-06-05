@@ -264,7 +264,7 @@ test("command execution records short commands when standard prompt echo lags by
     { lineText: "prod.web> l", command: "ls" },
     { lineText: "user@host:~$ l", command: "ls" },
     { lineText: "[user@host ~]$ l", command: "ls" },
-    { lineText: "➜  netcatty $ l", command: "ls" },
+    { lineText: "➜  ALinLink $ l", command: "ls" },
     { lineText: "➜  git l", command: "ls" },
     { lineText: "➜  git np", command: "npm" },
   ];
@@ -292,7 +292,7 @@ test("command execution records short commands when standard prompt echo lags by
 
 test("command execution records direct sends from themed bare directory prompts", () => {
   const cases = [
-    { lineText: "➜  netcatty ", command: "ls", promptText: "➜  netcatty " },
+    { lineText: "➜  ALinLink ", command: "ls", promptText: "➜  ALinLink " },
     { lineText: "➜  git ", command: "npm", promptText: "➜  git " },
     { lineText: "➜  git ", command: "git status", promptText: "➜  git " },
     { lineText: "➜  make ", command: "sudo", promptText: "➜  make " },

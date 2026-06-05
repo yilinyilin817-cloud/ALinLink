@@ -3,7 +3,7 @@
  * Helper functions for file type detection and extension handling
  */
 
-import { netcattyBridge } from "../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../infrastructure/services/ALinLinkBridge";
 
 // Common text file extensions
 const TEXT_EXTENSIONS = new Set([
@@ -564,7 +564,7 @@ async function processEntriesIteratively(
 export function getPathForFile(file: File): string | undefined {
   try {
     // Try Electron's webUtils API (exposed via preload)
-    const path = netcattyBridge.get()?.getPathForFile?.(file);
+    const path = ALinLinkBridge.get()?.getPathForFile?.(file);
     if (path) return path;
     // Fallback: try legacy file.path property
     return (file as File & { path?: string }).path;

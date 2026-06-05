@@ -313,10 +313,10 @@ function init(deps) {
 }
 
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:crashLogs:list", async () => listLogs());
-  ipcMain.handle("netcatty:crashLogs:read", async (_event, { fileName }) => readLog(fileName));
-  ipcMain.handle("netcatty:crashLogs:clear", async () => clearLogs());
-  ipcMain.handle("netcatty:crashLogs:openDir", async () => openDir());
+  ipcMain.handle("ALinLink:crashLogs:list", async () => listLogs());
+  ipcMain.handle("ALinLink:crashLogs:read", async (_event, { fileName }) => readLog(fileName));
+  ipcMain.handle("ALinLink:crashLogs:clear", async () => clearLogs());
+  ipcMain.handle("ALinLink:crashLogs:openDir", async () => openDir());
 }
 
 module.exports = {

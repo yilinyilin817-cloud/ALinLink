@@ -5,7 +5,7 @@ import { AlertTriangle, ChevronDown, ChevronRight, Download, ExternalLink, FileT
 import React, { useCallback, useEffect, useState } from "react";
 import { useI18n } from "../../../application/i18n/I18nProvider";
 import { getCredentialProtectionAvailability } from "../../../infrastructure/services/credentialProtection";
-import { netcattyBridge } from "../../../infrastructure/services/netcattyBridge";
+import { ALinLinkBridge } from "../../../infrastructure/services/ALinLinkBridge";
 import type { UpdateState } from '../../../application/state/useUpdateCheck';
 import { SessionLogFormat, keyEventToString } from "../../../domain/models";
 import { TabsContent } from "../../ui/tabs";
@@ -150,7 +150,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
 
   // Load app version on mount
   useEffect(() => {
-    const promise = netcattyBridge.get()?.getAppInfo?.();
+    const promise = ALinLinkBridge.get()?.getAppInfo?.();
     if (promise) {
       promise.then((info) => {
         setAppVersion(info?.version ?? '');
@@ -159,7 +159,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, []);
 
   const loadTempDirInfo = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.getTempDirInfo) return;
 
     setIsLoading(true);
@@ -192,7 +192,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [loadCredentialProtectionStatus]);
 
   const loadCrashLogs = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.getCrashLogs) return;
     setIsLoadingCrashLogs(true);
     try {
@@ -210,7 +210,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [loadCrashLogs]);
 
   const loadSshDebugLogInfo = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.getSshDebugLogInfo) return;
     setIsLoadingSshDebugLogInfo(true);
     try {
@@ -234,7 +234,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
       setLogEntries([]);
       return;
     }
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.readCrashLog) return;
     const requestId = ++expandRequestRef.current;
     // Optimistically show expanded state while loading
@@ -252,7 +252,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [expandedLog]);
 
   const handleClearCrashLogs = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.clearCrashLogs) return;
     setIsClearingCrashLogs(true);
     setCrashLogClearResult(null);
@@ -271,13 +271,13 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [loadCrashLogs]);
 
   const handleOpenCrashLogsDir = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.openCrashLogsDir) return;
     await bridge.openCrashLogsDir();
   }, []);
 
   const handleClearTempFiles = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.clearTempDir) return;
 
     setIsClearing(true);
@@ -295,13 +295,13 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [loadTempDirInfo]);
 
   const handleOpenTempDir = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!tempDirInfo?.path || !bridge?.openTempDir) return;
     await bridge.openTempDir();
   }, [tempDirInfo]);
 
   const handleSelectSessionLogsDir = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.selectSessionLogsDir) return;
 
     try {
@@ -315,7 +315,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [setSessionLogsDir]);
 
   const handleOpenSessionLogsDir = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!sessionLogsDir || !bridge?.openSessionLogsDir) return;
 
     try {
@@ -326,7 +326,7 @@ const SettingsSystemTab: React.FC<SettingsSystemTabProps> = ({
   }, [sessionLogsDir]);
 
   const handleOpenSshDebugLogDir = useCallback(async () => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     if (!bridge?.openSshDebugLogDir) return;
     await bridge.openSshDebugLogDir();
   }, []);

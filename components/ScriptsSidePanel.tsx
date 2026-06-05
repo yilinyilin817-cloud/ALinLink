@@ -213,18 +213,18 @@ const ScriptsSidePanelInner: React.FC<ScriptsSidePanelProps> = ({
     // Let the App shell listen and navigate to the Snippets section with
     // the "add" panel pre-opened, so the user does not have to leave the
     // terminal to jump back and click "New Snippet".
-    window.dispatchEvent(new CustomEvent('netcatty:snippets:add'));
+    window.dispatchEvent(new CustomEvent('ALinLink:snippets:add'));
   }, []);
 
   const handleEditSnippet = useCallback((snippet: Snippet) => {
     window.dispatchEvent(
-      new CustomEvent('netcatty:snippets:edit', { detail: { snippet } }),
+      new CustomEvent('ALinLink:snippets:edit', { detail: { snippet } }),
     );
   }, []);
 
   const handleDeleteSnippet = useCallback((id: string) => {
     window.dispatchEvent(
-      new CustomEvent('netcatty:snippets:delete', { detail: { id } }),
+      new CustomEvent('ALinLink:snippets:delete', { detail: { id } }),
     );
   }, []);
 

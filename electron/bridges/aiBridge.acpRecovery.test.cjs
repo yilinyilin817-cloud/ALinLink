@@ -115,7 +115,7 @@ function loadBridgeWithMocks(options = {}) {
       setMainWindowGetter() {},
       getOrCreateHost: async () => 4010,
       getScopedSessionIds: () => [],
-      buildMcpServerConfig: () => ({ name: "netcatty-remote-hosts", type: "http", url: "http://127.0.0.1:4010" }),
+      buildMcpServerConfig: () => ({ name: "ALinLink-remote-hosts", type: "http", url: "http://127.0.0.1:4010" }),
       getPermissionMode: () =>
         typeof options.getPermissionMode === "function"
           ? options.getPermissionMode()
@@ -128,8 +128,8 @@ function loadBridgeWithMocks(options = {}) {
       cleanup() {},
     },
     "../cli/discoveryPath.cjs": {
-      getCliLauncherPath: () => "/tmp/netcatty-tool-cli",
-      TOOL_CLI_DISCOVERY_ENV_VAR: "NETCATTY_TOOL_CLI_DISCOVERY_FILE",
+      getCliLauncherPath: () => "/tmp/ALinLink-tool-cli",
+      TOOL_CLI_DISCOVERY_ENV_VAR: "ALinLink_TOOL_CLI_DISCOVERY_FILE",
     },
     "./ai/userSkills.cjs": {
       scanUserSkills: async () => ({ readyCount: 0, warningCount: 0, skills: [], warnings: [] }),
@@ -339,8 +339,8 @@ test("clears replay fallback after a user-cancelled recovered turn so the fresh 
   });
   bridge.registerHandlers(ipcMain);
 
-  const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
-  const cancelHandler = ipcMain.handlers.get("netcatty:ai:acp:cancel");
+  const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
+  const cancelHandler = ipcMain.handlers.get("ALinLink:ai:acp:cancel");
   assert.equal(typeof streamHandler, "function");
   assert.equal(typeof cancelHandler, "function");
 
@@ -480,7 +480,7 @@ test("replays compact history on the first turn after app restart even when sess
   });
   bridge.registerHandlers(ipcMain);
 
-  const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
+  const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
   const historyMessages = [{ role: "user", content: "prior constraint: 不要提交" }];
   const event = { sender: { id: 1 } };
 
@@ -597,8 +597,8 @@ test("preserves recovered ACP session when user cancels then immediately sends t
   });
   bridge.registerHandlers(ipcMain);
 
-  const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
-  const cancelHandler = ipcMain.handlers.get("netcatty:ai:acp:cancel");
+  const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
+  const cancelHandler = ipcMain.handlers.get("ALinLink:ai:acp:cancel");
 
   const historyMessages = [{ role: "user", content: "prior recovered context" }];
   const event = { sender: { id: 1 } };
@@ -726,7 +726,7 @@ test("preserves history-replay across provider recreation caused by permission-m
   });
   bridge.registerHandlers(ipcMain);
 
-  const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
+  const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
   const historyMessages = [{ role: "user", content: "prior recovered context" }];
   const event = { sender: { id: 1 } };
 
@@ -800,7 +800,7 @@ test("keeps replay fallback enabled after an empty recovered turn by retrying in
   });
   bridge.registerHandlers(ipcMain);
 
-  const streamHandler = ipcMain.handlers.get("netcatty:ai:acp:stream");
+  const streamHandler = ipcMain.handlers.get("ALinLink:ai:acp:stream");
   assert.equal(typeof streamHandler, "function");
 
   const historyMessages = [{ role: "user", content: "prior recovered context" }];

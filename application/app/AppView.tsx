@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { AlertTriangle, Download, Trash2 } from 'lucide-react';
 import { activeTabStore, toEditorTabId } from '../state/activeTabStore';
 import { editorTabStore } from '../state/editorTabStore';
@@ -27,6 +27,21 @@ const LazyQuickSwitcher = lazy(() =>
 const LazyCreateWorkspaceDialog = lazy(() =>
   import('../../components/CreateWorkspaceDialog').then((m) => ({ default: m.CreateWorkspaceDialog })),
 );
+const LazyBatchCommandPanel = lazy(() =>
+  import('../../components/BatchCommandPanel').then((m) => ({ default: m.BatchCommandPanel })),
+);
+const LazySessionRecordingPanel = lazy(() =>
+  import('../../components/SessionRecordingPanel').then((m) => ({ default: m.SessionRecordingPanel })),
+);
+const LazyTunnelVisualization = lazy(() =>
+  import('../../components/TunnelVisualization').then((m) => ({ default: m.TunnelVisualization })),
+);
+const LazyHostDashboard = lazy(() =>
+  import('../../components/HostDashboard').then((m) => ({ default: m.HostDashboard })),
+);
+const LazyOpsToolsPanel = lazy(() =>
+  import('../../components/ops-tools/OpsToolsPanel').then((m) => ({ default: m.OpsToolsPanel })),
+);
 
 type AppViewContext = Record<string, any>;
 
@@ -37,15 +52,16 @@ export function AppView({ ctx }: { ctx: AppViewContext }) {
     connectionLogs, convertKnownHostToHost, createWorkspaceFromSessions, createWorkspaceFromTargets, createWorkspaceWithHosts, customAccent,
     customGroups, currentTerminalTheme, deleteConnectionLog, draggingSessionId, effectiveKnownHosts, editorTabs, editorWordWrap, emptyVaultConflict,
     followAppTerminalTheme, groupConfigs, handleAddKnownHost, handleConnectSerial, handleConnectToHost, handleCreateLocalTerminal, handleDeleteHost,
-    handleEndSessionDrag, handleHostConnectWithProtocolCheck, handleHotkeyAction, handleKeyboardInteractiveCancel, handleKeyboardInteractiveSubmit,
+    handleEndSessionDrag, handleExecuteAction, handleHostConnectWithProtocolCheck, handleHotkeyAction, handleKeyboardInteractiveCancel, handleKeyboardInteractiveSubmit,
     handleOpenQuickSwitcher, handleOpenSettings, handleRootContextMenu, handlePassphraseCancel, handlePassphraseSkip, handlePassphraseSubmit, handleProtocolSelect,
     handleRequestCloseEditorTabRef, handleSessionStatusChange, handleSyncNowManual, handleTerminalDataCapture, handleToggleTheme, handleUpdateHostFromTerminal,
-    hostById, hosts, hotkeyScheme, identities, importOrReuseKey, isBroadcastEnabled, isCreateWorkspaceOpen, isMacClient, isQuickSwitcherOpen,
-    keyBindings, keyboardInteractiveQueue, keys, logViews, managedSources, navigateToSection, openLogView, orderedTabsWithEditors, orphanSessions,
-    passphraseQueue, protocolSelectHost, proxyProfiles, quickResults, quickSearch, reorderTabs, reorderWorkspaceSessions, resetSessionRename,
+    hostById, hosts, hotkeyScheme, identities, importOrReuseKey, isBatchCommandOpen, isBroadcastEnabled, isCreateWorkspaceOpen, isHostDashboardOpen, isMacClient, isQuickSwitcherOpen,
+    isOpsToolsOpen, isSessionRecordingOpen, isTunnelVizOpen, keyBindings, keyboardInteractiveQueue, keys, logViews, managedSources, navigateToSection, openLogView, orderedTabsWithEditors, orphanSessions,
+    passphraseQueue, protocolSelectHost, proxyProfiles, quickResults, quickSearch, recordings, activeRecordingIds, handleStartRecording, handleStopRecording,
+    handlePauseRecording, handleResumeRecording, handleExportRecording, reorderTabs, reorderWorkspaceSessions, resetSessionRename,
     resetWorkspaceRename, resolveEmptyVaultConflict, resolvedTheme, runSnippet, sessionLogsDir, sessionLogsEnabled, sessionLogsFormat, sessionRenameTarget, sshDebugLogsEnabled,
-    sessionRenameValue, sessions, setActiveTabId, setAddToWorkspaceDialog, setDraggingSessionId, setEditorWordWrap, setIsCreateWorkspaceOpen, setIsQuickSwitcherOpen,
-    setNavigateToSection, setProtocolSelectHost, setQuickSearch, setSessionRenameValue, setTerminalFontFamilyId, setTerminalFontSize, setTerminalThemeId,
+    sessionRenameValue, sessions, setActiveTabId, setAddToWorkspaceDialog, setDraggingSessionId, setEditorWordWrap, setIsBatchCommandOpen, setIsCreateWorkspaceOpen, setIsHostDashboardOpen, setIsQuickSwitcherOpen,
+    setIsOpsToolsOpen, setIsSessionRecordingOpen, setIsTunnelVizOpen, setNavigateToSection, setProtocolSelectHost, setQuickSearch, setSessionRenameValue, setTerminalFontFamilyId, setTerminalFontSize, setTerminalThemeId,
     setWorkspaceFocusedSession, setWorkspaceRenameValue, settings, sftpAutoOpenSidebar, sftpAutoSync, sftpDefaultViewMode, sftpDoubleClickBehavior,
     sftpShowHiddenFiles, sftpUseCompressedUpload, shellHistory, snippetPackages, snippets, splitSessionWithCurrentShell, startSessionRename,
     startWorkspaceRename, submitSessionRename, submitWorkspaceRename, t, terminalFontFamilyId, terminalFontSize, terminalSettings, terminalThemeId,
@@ -103,7 +119,7 @@ export function AppView({ ctx }: { ctx: AppViewContext }) {
         handleRequestCloseEditorTabRef.current = handleRequestCloseEditorTab;
 
         return (
-    <div className={cn("flex flex-col h-screen text-foreground font-sans netcatty-shell", activeTerminalTheme && "immersive-transition")} onContextMenu={handleRootContextMenu}>
+    <div className={cn("flex flex-col h-screen text-foreground font-sans ALinLink-shell", activeTerminalTheme && "immersive-transition")} onContextMenu={handleRootContextMenu}>
       <TopTabs
         theme={resolvedTheme}
         followAppTerminalTheme={followAppTerminalTheme}
@@ -305,7 +321,7 @@ export function AppView({ ctx }: { ctx: AppViewContext }) {
       </div>
 
       {/* Global "quick add / edit snippet" dialog, triggered by the
-          netcatty:snippets:add and :edit window events (from ScriptsSidePanel
+          ALinLink:snippets:add and :edit window events (from ScriptsSidePanel
           "+" button and right-click menu). Delete is handled by a sibling
           useEffect above — it does not need a dialog. */}
       <QuickAddSnippetDialog
@@ -392,6 +408,11 @@ export function AppView({ ctx }: { ctx: AppViewContext }) {
             onClose={() => {
               setIsQuickSwitcherOpen(false);
               setQuickSearch('');
+            }}
+            onExecuteAction={(actionId) => {
+              setIsQuickSwitcherOpen(false);
+              setQuickSearch('');
+              handleExecuteAction(actionId);
             }}
             keyBindings={keyBindings}
           />
@@ -548,6 +569,73 @@ export function AppView({ ctx }: { ctx: AppViewContext }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* New Feature Panels */}
+      {isBatchCommandOpen && (
+        <Suspense fallback={null}>
+          <LazyBatchCommandPanel
+            isOpen={isBatchCommandOpen}
+            onClose={() => setIsBatchCommandOpen(false)}
+            hosts={hosts}
+            sessions={sessions}
+            onSendToSession={(sessionId, command) => {
+              // Command will be sent via the terminal layer's broadcast mechanism
+              // For now, we use a custom event that the terminal layer listens to
+              window.dispatchEvent(new CustomEvent('ALinLink:batch-command', {
+                detail: { sessionId, command }
+              }));
+            }}
+          />
+        </Suspense>
+      )}
+
+      {isSessionRecordingOpen && (
+        <Suspense fallback={null}>
+          <LazySessionRecordingPanel
+            isOpen={isSessionRecordingOpen}
+            onClose={() => setIsSessionRecordingOpen(false)}
+            sessions={sessions}
+            recordings={recordings}
+            activeRecordingIds={activeRecordingIds}
+            onStartRecording={handleStartRecording}
+            onStopRecording={handleStopRecording}
+            onPauseRecording={handlePauseRecording}
+            onResumeRecording={handleResumeRecording}
+            onExportRecording={handleExportRecording}
+          />
+        </Suspense>
+      )}
+
+      {isTunnelVizOpen && (
+        <Suspense fallback={null}>
+          <LazyTunnelVisualization
+            isOpen={isTunnelVizOpen}
+            onClose={() => setIsTunnelVizOpen(false)}
+            rules={ctx.portForwardingRules || []}
+            hosts={hosts}
+          />
+        </Suspense>
+      )}
+
+      {isHostDashboardOpen && (
+        <Suspense fallback={null}>
+          <LazyHostDashboard
+            isOpen={isHostDashboardOpen}
+            onClose={() => setIsHostDashboardOpen(false)}
+            sessions={sessions}
+            statsMap={ctx.serverStatsMap || new Map()}
+          />
+        </Suspense>
+      )}
+
+      {isOpsToolsOpen && (
+        <Suspense fallback={null}>
+          <LazyOpsToolsPanel
+            isOpen={isOpsToolsOpen}
+            onClose={() => setIsOpsToolsOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
         );
       }}

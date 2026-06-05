@@ -342,7 +342,7 @@ function createZmodemSentry(opts) {
 
       console.log(`[ZMODEM][${label}] Detected ${transferType} for session ${sessionId}`);
 
-      safeSend(contents, "netcatty:zmodem:detect", {
+      safeSend(contents, "ALinLink:zmodem:detect", {
         sessionId,
         transferType,
       });
@@ -365,13 +365,13 @@ function createZmodemSentry(opts) {
           // Only act if this is still the active session (not replaced by a new one)
           if (currentZSession !== zsession) return;
           console.log(`[ZMODEM][${label}] Transfer completed for session ${sessionId}`);
-          safeSend(contents, "netcatty:zmodem:complete", { sessionId });
+          safeSend(contents, "ALinLink:zmodem:complete", { sessionId });
         })
         .catch((err) => {
           if (currentZSession !== zsession) return;
           console.error(`[ZMODEM][${label}] Transfer error:`, err.message || err);
           try { zsession.abort(); } catch { /* ignore */ }
-          safeSend(contents, "netcatty:zmodem:error", {
+          safeSend(contents, "ALinLink:zmodem:error", {
             sessionId,
             error: String(err.message || err),
           });
@@ -452,7 +452,7 @@ function createZmodemSentry(opts) {
           }
           active = false;
           currentZSession = null;
-          safeSend(getWebContents(), "netcatty:zmodem:complete", { sessionId });
+          safeSend(getWebContents(), "ALinLink:zmodem:complete", { sessionId });
           try { sentry.consume(data); } catch { /* ignore */ }
           return;
         }
@@ -476,7 +476,7 @@ function createZmodemSentry(opts) {
         cooldownUntil = Date.now() + COOLDOWN_MS;
 
         if (wasActive) {
-          safeSend(getWebContents(), "netcatty:zmodem:error", {
+          safeSend(getWebContents(), "ALinLink:zmodem:error", {
             sessionId,
             error: errMsg,
           });
@@ -500,7 +500,7 @@ function createZmodemSentry(opts) {
         currentZSession = null;
         cooldownUntil = Date.now() + COOLDOWN_MS;
         scheduleRemoteInterruptAfterCancel(transferRole);
-        safeSend(getWebContents(), "netcatty:zmodem:error", {
+        safeSend(getWebContents(), "ALinLink:zmodem:error", {
           sessionId,
           error: "Transfer cancelled",
         });
@@ -616,7 +616,7 @@ async function handleUpload(zsession, opts) {
   for (let i = 0; i < offers.length; i++) {
     const { filePath, stat, name } = offers[i];
 
-    safeSend(contents, "netcatty:zmodem:progress", {
+    safeSend(contents, "ALinLink:zmodem:progress", {
       sessionId,
       filename: name,
       transferred: 0,
@@ -660,7 +660,7 @@ async function handleUpload(zsession, opts) {
         xfer.send(new Uint8Array(buf.buffer, buf.byteOffset, bytesRead));
         sent += bytesRead;
 
-        safeSend(contents, "netcatty:zmodem:progress", {
+        safeSend(contents, "ALinLink:zmodem:progress", {
           sessionId,
           filename: name,
           transferred: sent,
@@ -678,7 +678,7 @@ async function handleUpload(zsession, opts) {
       // All data written to Node.js buffer — but TCP may still be
       // flushing to the remote.  Show "finalizing" state while we
       // wait for the remote to acknowledge.
-      safeSend(contents, "netcatty:zmodem:progress", {
+      safeSend(contents, "ALinLink:zmodem:progress", {
         sessionId,
         filename: name,
         transferred: stat.size,
@@ -741,7 +741,7 @@ async function handleDownload(zsession, opts) {
     const savePath = path.join(downloadDir, name);
     const currentIndex = fileIndex++;
 
-    safeSend(contents, "netcatty:zmodem:progress", {
+    safeSend(contents, "ALinLink:zmodem:progress", {
       sessionId,
       filename: name,
       transferred: 0,
@@ -789,7 +789,7 @@ async function handleDownload(zsession, opts) {
         const now = Date.now();
         if (now - lastProgressTime >= 100) {
           lastProgressTime = now;
-          safeSend(contents, "netcatty:zmodem:progress", {
+          safeSend(contents, "ALinLink:zmodem:progress", {
             sessionId,
             filename: name,
             transferred: received,

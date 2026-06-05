@@ -10,30 +10,30 @@ const DEFAULT_EXEC_TIMEOUT_MS = 60_000;
 const EXEC_RPC_TIMEOUT_BUFFER_MS = 5_000;
 const DEFAULT_APPROVAL_TIMEOUT_MS = 110_000;
 const LONG_RUNNING_METHODS = new Set([
-  "netcatty/exec",
-  "netcatty/jobStart",
-  "netcatty/sftp/list",
-  "netcatty/sftp/read",
-  "netcatty/sftp/upload",
-  "netcatty/sftp/write",
-  "netcatty/sftp/download",
-  "netcatty/sftp/mkdir",
-  "netcatty/sftp/delete",
-  "netcatty/sftp/rename",
-  "netcatty/sftp/stat",
-  "netcatty/sftp/chmod",
-  "netcatty/sftp/home",
+  "ALinLink/exec",
+  "ALinLink/jobStart",
+  "ALinLink/sftp/list",
+  "ALinLink/sftp/read",
+  "ALinLink/sftp/upload",
+  "ALinLink/sftp/write",
+  "ALinLink/sftp/download",
+  "ALinLink/sftp/mkdir",
+  "ALinLink/sftp/delete",
+  "ALinLink/sftp/rename",
+  "ALinLink/sftp/stat",
+  "ALinLink/sftp/chmod",
+  "ALinLink/sftp/home",
 ]);
 const APPROVAL_WAIT_METHODS = new Set([
-  "netcatty/exec",
-  "netcatty/jobStart",
-  "netcatty/sftp/write",
-  "netcatty/sftp/download",
-  "netcatty/sftp/upload",
-  "netcatty/sftp/mkdir",
-  "netcatty/sftp/delete",
-  "netcatty/sftp/rename",
-  "netcatty/sftp/chmod",
+  "ALinLink/exec",
+  "ALinLink/jobStart",
+  "ALinLink/sftp/write",
+  "ALinLink/sftp/download",
+  "ALinLink/sftp/upload",
+  "ALinLink/sftp/mkdir",
+  "ALinLink/sftp/delete",
+  "ALinLink/sftp/rename",
+  "ALinLink/sftp/chmod",
 ]);
 
 function createError(code, message) {
@@ -77,7 +77,7 @@ function loadDiscovery() {
   } catch (err) {
     throw createError(
       "APP_NOT_RUNNING",
-      `Netcatty is not running or discovery file is missing at ${discoveryPath}. Start Netcatty first.`,
+      `ALinLink is not running or discovery file is missing at ${discoveryPath}. Start ALinLink first.`,
     );
   }
 
@@ -87,14 +87,14 @@ function loadDiscovery() {
   } catch (err) {
     throw createError(
       "DISCOVERY_INVALID",
-      `Netcatty discovery file at ${discoveryPath} is invalid JSON.`,
+      `ALinLink discovery file at ${discoveryPath} is invalid JSON.`,
     );
   }
 
   if (!parsed?.port || !parsed?.token) {
     throw createError(
       "DISCOVERY_INVALID",
-      `Netcatty discovery file at ${discoveryPath} is missing required port/token fields.`,
+      `ALinLink discovery file at ${discoveryPath} is missing required port/token fields.`,
     );
   }
 
@@ -107,7 +107,7 @@ async function connectClient() {
     const sock = net.createConnection({ host: "127.0.0.1", port: discovery.port }, () => resolve(sock));
     sock.setEncoding("utf8");
     sock.once("error", (err) => {
-      reject(createError("CONNECT_FAILED", `Failed to connect to Netcatty TCP bridge: ${err?.message || err}`));
+      reject(createError("CONNECT_FAILED", `Failed to connect to ALinLink TCP bridge: ${err?.message || err}`));
     });
   });
 
@@ -165,12 +165,12 @@ async function connectClient() {
 
   socket.on("error", (err) => {
     rejectAllPending(
-      createError("CONNECTION_ERROR", `Connection to Netcatty TCP bridge failed: ${err?.message || err}`),
+      createError("CONNECTION_ERROR", `Connection to ALinLink TCP bridge failed: ${err?.message || err}`),
     );
   });
 
   socket.on("close", () => {
-    rejectAllPending(createError("CONNECTION_CLOSED", "Connection to Netcatty TCP bridge closed."));
+    rejectAllPending(createError("CONNECTION_CLOSED", "Connection to ALinLink TCP bridge closed."));
   });
 
   let bridgeCommandTimeoutMs = null;
@@ -179,7 +179,7 @@ async function connectClient() {
 
   async function call(method, params) {
     if (socket.destroyed || !socket.writable) {
-      throw createError("CONNECTION_CLOSED", "Connection to Netcatty TCP bridge is closed.");
+      throw createError("CONNECTION_CLOSED", "Connection to ALinLink TCP bridge is closed.");
     }
     const id = nextRpcId++;
     const timeoutMs = resolveRpcTimeoutMs(
@@ -192,7 +192,7 @@ async function connectClient() {
       const timeoutId = setTimeout(() => {
         rejectPending(
           id,
-          createError("RPC_TIMEOUT", `Timed out waiting for Netcatty RPC response to "${method}" after ${timeoutMs}ms.`),
+          createError("RPC_TIMEOUT", `Timed out waiting for ALinLink RPC response to "${method}" after ${timeoutMs}ms.`),
         );
       }, timeoutMs);
 
@@ -205,7 +205,7 @@ async function connectClient() {
             if (err) {
               rejectPending(
                 id,
-                createError("WRITE_FAILED", `Failed to send Netcatty RPC "${method}": ${err?.message || err}`),
+                createError("WRITE_FAILED", `Failed to send ALinLink RPC "${method}": ${err?.message || err}`),
               );
             }
           },
@@ -213,7 +213,7 @@ async function connectClient() {
       } catch (err) {
         rejectPending(
           id,
-          createError("WRITE_FAILED", `Failed to send Netcatty RPC "${method}": ${err?.message || err}`),
+          createError("WRITE_FAILED", `Failed to send ALinLink RPC "${method}": ${err?.message || err}`),
         );
       }
     });
@@ -221,11 +221,11 @@ async function connectClient() {
 
   const authResult = await call("auth/verify", { token: discovery.token });
   if (!authResult?.ok) {
-    throw createError("AUTH_FAILED", "Failed to authenticate to Netcatty TCP bridge.");
+    throw createError("AUTH_FAILED", "Failed to authenticate to ALinLink TCP bridge.");
   }
 
   try {
-    const statusResult = await call("netcatty/getStatus", {});
+    const statusResult = await call("ALinLink/getStatus", {});
     if (Number.isFinite(statusResult?.commandTimeoutMs) && statusResult.commandTimeoutMs > 0) {
       bridgeCommandTimeoutMs = statusResult.commandTimeoutMs;
     }

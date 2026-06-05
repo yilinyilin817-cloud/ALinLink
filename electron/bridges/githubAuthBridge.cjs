@@ -14,7 +14,7 @@ const pendingPollControllers = new Map();
  * @param {Electron.IpcMain} ipcMain
  */
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:github:deviceFlow:start", async (_event, payload) => {
+  ipcMain.handle("ALinLink:github:deviceFlow:start", async (_event, payload) => {
     const clientId = payload?.clientId || GITHUB_CLIENT_ID;
     const scope = payload?.scope || "gist read:user";
 
@@ -51,7 +51,7 @@ function registerHandlers(ipcMain) {
     };
   });
 
-  ipcMain.handle("netcatty:github:deviceFlow:poll", async (_event, payload) => {
+  ipcMain.handle("ALinLink:github:deviceFlow:poll", async (_event, payload) => {
     const clientId = payload?.clientId || GITHUB_CLIENT_ID;
     const deviceCode = payload?.deviceCode;
     const pollId = payload?.pollId;
@@ -94,7 +94,7 @@ function registerHandlers(ipcMain) {
     }
   });
 
-  ipcMain.handle("netcatty:github:deviceFlow:cancelPoll", async (_event, pollId) => {
+  ipcMain.handle("ALinLink:github:deviceFlow:cancelPoll", async (_event, pollId) => {
     if (!pollId) return;
     const controller = pendingPollControllers.get(pollId);
     if (!controller) return;

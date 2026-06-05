@@ -72,7 +72,7 @@ export function TerminalLayerView({ ctx }: { ctx: TerminalLayerViewContext }) {
                           data-tab-id="sftp"
                           data-tab-type="sidepanel"
                           data-state={activeSidePanelTab === 'sftp' ? 'active' : 'inactive'}
-                          className="netcatty-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
+                          className="ALinLink-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
                           style={{
                             backgroundColor: activeSidePanelTab === 'sftp'
                               ? 'color-mix(in srgb, var(--terminal-sidepanel-accent) 24%, transparent)'
@@ -96,7 +96,7 @@ export function TerminalLayerView({ ctx }: { ctx: TerminalLayerViewContext }) {
                           data-tab-id="scripts"
                           data-tab-type="sidepanel"
                           data-state={activeSidePanelTab === 'scripts' ? 'active' : 'inactive'}
-                          className="netcatty-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
+                          className="ALinLink-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
                           style={{
                             backgroundColor: activeSidePanelTab === 'scripts'
                               ? 'color-mix(in srgb, var(--terminal-sidepanel-accent) 24%, transparent)'
@@ -120,7 +120,7 @@ export function TerminalLayerView({ ctx }: { ctx: TerminalLayerViewContext }) {
                           data-tab-id="theme"
                           data-tab-type="sidepanel"
                           data-state={activeSidePanelTab === 'theme' ? 'active' : 'inactive'}
-                          className="netcatty-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
+                          className="ALinLink-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
                           style={{
                             backgroundColor: activeSidePanelTab === 'theme'
                               ? 'color-mix(in srgb, var(--terminal-sidepanel-accent) 24%, transparent)'
@@ -144,7 +144,7 @@ export function TerminalLayerView({ ctx }: { ctx: TerminalLayerViewContext }) {
                           data-tab-id="ai"
                           data-tab-type="sidepanel"
                           data-state={activeSidePanelTab === 'ai' ? 'active' : 'inactive'}
-                          className="netcatty-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
+                          className="ALinLink-tab h-7 w-7 rounded-md p-0 hover:bg-transparent"
                           style={{
                             backgroundColor: activeSidePanelTab === 'ai'
                               ? 'color-mix(in srgb, var(--terminal-sidepanel-accent) 24%, transparent)'

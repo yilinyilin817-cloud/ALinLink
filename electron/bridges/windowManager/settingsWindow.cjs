@@ -126,7 +126,7 @@ function createSettingsWindowApi(ctx) {
       });
     
       const win = new BrowserWindow({
-        title: "netcatty Settings",
+        title: "ALinLink Settings",
         width: settingsWidth,
         height: settingsHeight,
         ...(settingsX !== undefined && settingsY !== undefined ? { x: settingsX, y: settingsY } : {}),
@@ -174,7 +174,7 @@ function createSettingsWindowApi(ctx) {
       });
     
       // Same navigation hardening as the main window (settings has preload access too).
-      const allowedOrigins = new Set(["app://netcatty"]);
+      const allowedOrigins = new Set(["app://ALinLink"]);
       if (isDev && devServerUrl) {
         try {
           allowedOrigins.add(new URL(getDevRendererBaseUrl(devServerUrl)).origin);
@@ -220,11 +220,11 @@ function createSettingsWindowApi(ctx) {
       };
     
       win.on("enter-full-screen", () => {
-        safeSend("netcatty:window:fullscreen-changed", true);
+        safeSend("ALinLink:window:fullscreen-changed", true);
       });
     
       win.on("leave-full-screen", () => {
-        safeSend("netcatty:window:fullscreen-changed", false);
+        safeSend("ALinLink:window:fullscreen-changed", false);
       });
     
       // Ensure native background matches frontend background, even before first paint.
@@ -270,7 +270,7 @@ function createSettingsWindowApi(ctx) {
       }
     
       // Production mode - load via custom protocol.
-      await win.loadURL("app://netcatty/index.html#/settings");
+      await win.loadURL("app://ALinLink/index.html#/settings");
       if (showOnLoad) { showAndFocusWindow(win); }
     
       return win;

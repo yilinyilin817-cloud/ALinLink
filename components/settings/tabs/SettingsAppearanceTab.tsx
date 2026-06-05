@@ -144,6 +144,53 @@ export default function SettingsAppearanceTab(props: {
     </div>
   );
 
+  // Specialized renderer for the dynamic ("Particle Glass") theme swatch.
+  // It carries a Sparkles badge so the user can tell at a glance that
+  // selecting it will enable the animated particle background. The swatch
+  // background uses a conic-gradient that hints at the particle palette
+  // (cyan / violet / pink) so it is visually distinct from the flat-color
+  // static swatches above it.
+  const renderDynamicSwatch = (
+    preset: { id: string; name: string; tokens: { background: string } } | undefined,
+    value: string,
+    onChange: (next: string) => void,
+    dynamicLabel: string,
+  ) => {
+    if (!preset) return null;
+    const active = value === preset.id;
+    return (
+      <div className="flex items-center gap-2 justify-end">
+        <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <Sparkles size={11} className="text-cyan-400" />
+          {dynamicLabel}
+        </span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => onChange(preset.id)}
+              className={cn(
+                "relative w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm border border-border/70",
+                active
+                  ? "ring-2 ring-offset-2 ring-foreground scale-110"
+                  : "hover:scale-105",
+              )}
+              style={{
+                background: `conic-gradient(from 90deg, hsl(${preset.tokens.background}), hsl(190 80% 50%), hsl(265 80% 65%), hsl(330 80% 60%), hsl(${preset.tokens.background}))`,
+              }}
+              aria-pressed={active}
+              aria-label={preset.name}
+            >
+              {active && <Check className="text-white drop-shadow-md" size={12} />}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {preset.name} · {dynamicLabel}
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    );
+  };
+
   return (
     <SettingsTabContent value="appearance">
       <SectionHeader title={t("settings.appearance.language")} />

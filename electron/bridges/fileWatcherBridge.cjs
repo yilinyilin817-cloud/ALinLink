@@ -211,13 +211,13 @@ async function handleFileChange(watchId, webContents) {
     
     // Show system notification for successful sync
     showSystemNotification(
-      "Netcatty",
+      "ALinLink",
       `File synced to remote: ${fileName}`
     );
     
     // Notify the renderer about successful sync
     if (webContents && !webContents.isDestroyed()) {
-      webContents.send("netcatty:filewatch:synced", {
+      webContents.send("ALinLink:filewatch:synced", {
         watchId,
         localPath,
         remotePath,
@@ -230,13 +230,13 @@ async function handleFileChange(watchId, webContents) {
     
     // Show system notification for sync failure
     showSystemNotification(
-      "Netcatty",
+      "ALinLink",
       `Failed to sync ${fileName}: ${err.message}`
     );
     
     // Notify the renderer about sync failure
     if (webContents && !webContents.isDestroyed()) {
-      webContents.send("netcatty:filewatch:error", {
+      webContents.send("ALinLink:filewatch:error", {
         watchId,
         localPath,
         remotePath,
@@ -355,13 +355,13 @@ function listWatchers() {
  */
 function registerHandlers(ipcMain) {
   console.log("[FileWatcher] Registering IPC handlers");
-  ipcMain.handle("netcatty:filewatch:start", (event, args) => {
-    console.log("[FileWatcher] IPC netcatty:filewatch:start received", args);
+  ipcMain.handle("ALinLink:filewatch:start", (event, args) => {
+    console.log("[FileWatcher] IPC ALinLink:filewatch:start received", args);
     return startWatching(event, args);
   });
-  ipcMain.handle("netcatty:filewatch:stop", stopWatching);
-  ipcMain.handle("netcatty:filewatch:list", listWatchers);
-  ipcMain.handle("netcatty:filewatch:registerTempFile", (_event, { sftpId, localPath }) => {
+  ipcMain.handle("ALinLink:filewatch:stop", stopWatching);
+  ipcMain.handle("ALinLink:filewatch:list", listWatchers);
+  ipcMain.handle("ALinLink:filewatch:registerTempFile", (_event, { sftpId, localPath }) => {
     registerTempFile(sftpId, localPath);
     return { success: true };
   });

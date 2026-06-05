@@ -12,7 +12,7 @@ const {
 } = require("./terminalBridge.cjs");
 
 function makeTmp() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-mosh-resolve-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-mosh-resolve-"));
 }
 
 function writeExecutable(filePath) {
@@ -229,7 +229,7 @@ test("removed Mosh client detection APIs are not exposed to the renderer", () =>
   for (const source of [bridgeSource, preloadSource, globalTypes]) {
     assert.equal(source.includes("detectMoshClient"), false);
     assert.equal(source.includes("pickMoshClient"), false);
-    assert.equal(source.includes("netcatty:mosh:detectClient"), false);
-    assert.equal(source.includes("netcatty:mosh:pickClient"), false);
+    assert.equal(source.includes("ALinLink:mosh:detectClient"), false);
+    assert.equal(source.includes("ALinLink:mosh:pickClient"), false);
   }
 });

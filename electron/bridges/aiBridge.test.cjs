@@ -115,7 +115,7 @@ function loadBridgeWithMocks(options = {}) {
       setMainWindowGetter() {},
       getOrCreateHost: async () => 4010,
       getScopedSessionIds: () => [],
-      buildMcpServerConfig: () => ({ name: "netcatty-remote-hosts", type: "http", url: "http://127.0.0.1:4010" }),
+      buildMcpServerConfig: () => ({ name: "ALinLink-remote-hosts", type: "http", url: "http://127.0.0.1:4010" }),
       getPermissionMode: () =>
         typeof options.getPermissionMode === "function"
           ? options.getPermissionMode()
@@ -128,8 +128,8 @@ function loadBridgeWithMocks(options = {}) {
       cleanup() {},
     },
     "../cli/discoveryPath.cjs": {
-      getCliLauncherPath: () => "/tmp/netcatty-tool-cli",
-      TOOL_CLI_DISCOVERY_ENV_VAR: "NETCATTY_TOOL_CLI_DISCOVERY_FILE",
+      getCliLauncherPath: () => "/tmp/ALinLink-tool-cli",
+      TOOL_CLI_DISCOVERY_ENV_VAR: "ALinLink_TOOL_CLI_DISCOVERY_FILE",
     },
     "./ai/userSkills.cjs": {
       scanUserSkills: async () => ({ readyCount: 0, warningCount: 0, skills: [], warnings: [] }),
@@ -288,7 +288,7 @@ function loadBridgeWithMocks(options = {}) {
 }
 
 test("discovers bundled Codex ACP fallback when --version prints usage", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -310,7 +310,7 @@ test("discovers bundled Codex ACP fallback when --version prints usage", async (
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -325,7 +325,7 @@ test("discovers bundled Codex ACP fallback when --version prints usage", async (
   }
 });
 test("discovers bundled Codex ACP fallback when PATH Codex shim is broken", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-broken-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-broken-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -356,7 +356,7 @@ test("discovers bundled Codex ACP fallback when PATH Codex shim is broken", asyn
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -372,7 +372,7 @@ test("discovers bundled Codex ACP fallback when PATH Codex shim is broken", asyn
 });
 
 test("discovers bundled Codex ACP fallback when PATH Codex exits nonzero", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-exit-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-exit-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -403,7 +403,7 @@ test("discovers bundled Codex ACP fallback when PATH Codex exits nonzero", async
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -419,7 +419,7 @@ test("discovers bundled Codex ACP fallback when PATH Codex exits nonzero", async
 });
 
 test("does not discover bundled Codex ACP fallback when the fallback cannot run", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-bad-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-bad-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -441,7 +441,7 @@ test("does not discover bundled Codex ACP fallback when the fallback cannot run"
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -453,7 +453,7 @@ test("does not discover bundled Codex ACP fallback when the fallback cannot run"
 });
 
 test("does not discover bundled Codex ACP fallback when the fallback prints a loader error", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-loader-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-loader-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -475,7 +475,7 @@ test("does not discover bundled Codex ACP fallback when the fallback prints a lo
   bridge.registerHandlers(ipcMain);
 
   try {
-    const discoverHandler = ipcMain.handlers.get("netcatty:ai:agents:discover");
+    const discoverHandler = ipcMain.handlers.get("ALinLink:ai:agents:discover");
     assert.equal(typeof discoverHandler, "function");
 
     const agents = await discoverHandler({ sender: { id: 1 } });
@@ -487,7 +487,7 @@ test("does not discover bundled Codex ACP fallback when the fallback prints a lo
 });
 
 test("resolve-cli accepts bundled Codex ACP fallback when --version prints usage", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-resolve-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-resolve-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -509,7 +509,7 @@ test("resolve-cli accepts bundled Codex ACP fallback when --version prints usage
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "codex", customPath: "" });
@@ -525,7 +525,7 @@ test("resolve-cli accepts bundled Codex ACP fallback when --version prints usage
 });
 
 test("resolve-cli accepts stored bundled Codex ACP path", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-stored-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-stored-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -548,7 +548,7 @@ test("resolve-cli accepts stored bundled Codex ACP path", async (t) => {
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler(
@@ -567,7 +567,7 @@ test("resolve-cli accepts stored bundled Codex ACP path", async (t) => {
 });
 
 test("resolve-cli probes Windows cmd paths with spaces", { skip: process.platform !== "win32" }, async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty codex resolve "));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink codex resolve "));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -593,7 +593,7 @@ test("resolve-cli probes Windows cmd paths with spaces", { skip: process.platfor
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "codex", customPath: "" });
@@ -609,7 +609,7 @@ test("resolve-cli probes Windows cmd paths with spaces", { skip: process.platfor
 });
 
 test("resolve-cli probes Windows Claude cmd paths with spaces", { skip: process.platform !== "win32" }, async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty claude resolve "));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink claude resolve "));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -635,7 +635,7 @@ test("resolve-cli probes Windows Claude cmd paths with spaces", { skip: process.
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "claude", customPath: "" });
@@ -651,7 +651,7 @@ test("resolve-cli probes Windows Claude cmd paths with spaces", { skip: process.
 });
 
 test("resolve-cli probes Windows Claude exe paths with spaces", { skip: process.platform !== "win32" }, async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty claude exe resolve "));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink claude exe resolve "));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -673,7 +673,7 @@ test("resolve-cli probes Windows Claude exe paths with spaces", { skip: process.
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "claude", customPath: "" });
@@ -689,7 +689,7 @@ test("resolve-cli probes Windows Claude exe paths with spaces", { skip: process.
 });
 
 test("resolve-cli falls back to bundled Codex ACP when a stored path is stale", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-stale-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-stale-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -713,7 +713,7 @@ test("resolve-cli falls back to bundled Codex ACP when a stored path is stale", 
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler(
@@ -732,7 +732,7 @@ test("resolve-cli falls back to bundled Codex ACP when a stored path is stale", 
 });
 
 test("resolve-cli falls back to bundled Codex ACP when PATH Codex shim is broken", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-resolve-broken-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-resolve-broken-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -763,7 +763,7 @@ test("resolve-cli falls back to bundled Codex ACP when PATH Codex shim is broken
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "codex", customPath: "" });
@@ -779,7 +779,7 @@ test("resolve-cli falls back to bundled Codex ACP when PATH Codex shim is broken
 });
 
 test("resolve-cli falls back to bundled Codex ACP when PATH Codex exits nonzero", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-resolve-exit-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-resolve-exit-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -810,7 +810,7 @@ test("resolve-cli falls back to bundled Codex ACP when PATH Codex exits nonzero"
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "codex", customPath: "" });
@@ -826,7 +826,7 @@ test("resolve-cli falls back to bundled Codex ACP when PATH Codex exits nonzero"
 });
 
 test("resolve-cli rejects bundled Codex ACP fallback when the fallback cannot run", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-resolve-bad-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-resolve-bad-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -848,7 +848,7 @@ test("resolve-cli rejects bundled Codex ACP fallback when the fallback cannot ru
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "codex", customPath: "" });
@@ -864,7 +864,7 @@ test("resolve-cli rejects bundled Codex ACP fallback when the fallback cannot ru
 });
 
 test("resolve-cli rejects bundled Codex ACP fallback when the fallback prints a loader error", async (t) => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-codex-acp-resolve-loader-"));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-codex-acp-resolve-loader-"));
   t.after(() => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
@@ -886,7 +886,7 @@ test("resolve-cli rejects bundled Codex ACP fallback when the fallback prints a 
   bridge.registerHandlers(ipcMain);
 
   try {
-    const resolveHandler = ipcMain.handlers.get("netcatty:ai:resolve-cli");
+    const resolveHandler = ipcMain.handlers.get("ALinLink:ai:resolve-cli");
     assert.equal(typeof resolveHandler, "function");
 
     const result = await resolveHandler({ sender: { id: 1 } }, { command: "codex", customPath: "" });

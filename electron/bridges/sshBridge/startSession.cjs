@@ -91,7 +91,7 @@ function createStartSessionApi(ctx) {
       // cap still forces an immediate flush for bursts of output.
       const { bufferData, flush: flushBuffer } = createPtyOutputBuffer((data) => {
         const contents = event.sender;
-        safeSend(contents, "netcatty:data", { sessionId, data });
+        safeSend(contents, "ALinLink:data", { sessionId, data });
       });
 
       const sshZmodemSentry = createZmodemSentry({
@@ -129,7 +129,7 @@ function createStartSessionApi(ctx) {
               clearTimeout(timer);
               resolve({ action: payload.action, applyToRest: !!payload.applyToRest });
             });
-            safeSend(event.sender, "netcatty:zmodem:overwrite-request", {
+            safeSend(event.sender, "ALinLink:zmodem:overwrite-request", {
               sessionId, requestId, filename,
             });
           });
@@ -195,7 +195,7 @@ function createStartSessionApi(ctx) {
           const liveSession = sessions.get(sessionId);
           const transportError = liveSession?._transportError;
           if (transportError) {
-            safeSend(contents, "netcatty:exit", { sessionId, exitCode: 1, error: transportError, reason: "error" });
+            safeSend(contents, "ALinLink:exit", { sessionId, exitCode: 1, error: transportError, reason: "error" });
           } else {
             // A shell TMOUT auto-logout is a clean exit (numeric code, no
             // signal) — identical to a user-typed `exit` by code/signal —
@@ -204,7 +204,7 @@ function createStartSessionApi(ctx) {
             // for reconnect instead of auto-closing it (#1062 / #977).
             const idleTimedOut = streamExited && looksLikeIdleAutoLogout(liveSession?._promptTrackTail);
             const reason = idleTimedOut ? "timeout" : (streamExited ? "exited" : "closed");
-            safeSend(contents, "netcatty:exit", { sessionId, exitCode: streamExitCode, reason });
+            safeSend(contents, "ALinLink:exit", { sessionId, exitCode: streamExitCode, reason });
           }
           liveSession?.zmodemSentry?.cancel();
           // Release this channel's hold on the shared connection. The transport
@@ -269,7 +269,7 @@ function createStartSessionApi(ctx) {
 
       const sendProgress = (status, error) => {
         if (!sender.isDestroyed()) {
-          sender.send("netcatty:chain:progress", {
+          sender.send("ALinLink:chain:progress", {
             sessionId, hop: 1, total: 1, label: options.hostname, status, error,
           });
         }
@@ -379,7 +379,7 @@ function createStartSessionApi(ctx) {
     async function startSSHSession(event, options) {
       const sessionId = options.sessionId || randomUUID();
       const log = createSshDiagnosticLogger(
-        !!options.sshDebugLogEnabled || process.env.NETCATTY_SSH_DEBUG === "1",
+        !!options.sshDebugLogEnabled || process.env.ALinLink_SSH_DEBUG === "1",
       );
 
       // Connection reuse (issue #1204): when a tab is duplicated we try to open
@@ -424,7 +424,7 @@ function createStartSessionApi(ctx) {
 
       const sendProgress = (hop, total, label, status, error) => {
         if (!sender.isDestroyed()) {
-          sender.send("netcatty:chain:progress", { sessionId, hop, total, label, status, error });
+          sender.send("ALinLink:chain:progress", { sessionId, hop, total, label, status, error });
         }
       };
 
@@ -535,7 +535,7 @@ function createStartSessionApi(ctx) {
         const effectiveIdentityPassphrase = inlineKey?.passphrase || identityFile?.passphrase;
 
         if (hasCertificate) {
-          authAgent = new NetcattyAgent({
+          authAgent = new ALinLinkAgent({
             mode: "certificate",
             webContents: event.sender,
             meta: {
@@ -792,7 +792,7 @@ function createStartSessionApi(ctx) {
                         password: connectOpts.password,
                       });
                     } else if (matchingMethod.type === "agent") {
-                      const agentType = typeof connectOpts.agent === "string" ? "path" : "NetcattyAgent";
+                      const agentType = typeof connectOpts.agent === "string" ? "path" : "ALinLinkAgent";
                       log("Trying agent auth (partial success)", { id: matchingMethod.id, agentType });
                       return callback("agent");
                     } else if (matchingMethod.type === "publickey") {
@@ -837,7 +837,7 @@ function createStartSessionApi(ctx) {
 
                 if (method.type === "agent") {
                   // Only log safe identifier, not the full agent object which may contain private keys
-                  const agentType = typeof connectOpts.agent === "string" ? "path" : "NetcattyAgent";
+                  const agentType = typeof connectOpts.agent === "string" ? "path" : "ALinLinkAgent";
                   log("Trying agent auth", { id: method.id, agentType });
                   sendProgress(totalHops, totalHops, options.hostname, 'auth-attempt', 'SSH agent');
                   // Return "agent" string to use SSH agent for authentication
@@ -989,7 +989,7 @@ function createStartSessionApi(ctx) {
             sendProgress(totalHops, totalHops, options.hostname, 'shell');
 
             const sendTerminalMessage = (data) => {
-              safeSend(event.sender, "netcatty:data", { sessionId, data });
+              safeSend(event.sender, "ALinLink:data", { sessionId, data });
             };
 
             const x11FakeCookie = options.x11Forwarding
@@ -1078,7 +1078,7 @@ function createStartSessionApi(ctx) {
             // session was already established (resolved), we still need to notify
             // the renderer about transport errors so the session shows as failed
             // rather than silently closing.
-            // Don't send netcatty:exit here — the stream close handler will flush
+            // Don't send ALinLink:exit here — the stream close handler will flush
             // any buffered data first and then send exit with this error info.
             if (settled) {
               console.warn(`${logPrefix} ${options.hostname} post-settle error:`, err.message);
@@ -1125,7 +1125,7 @@ function createStartSessionApi(ctx) {
                 code: err.code,
                 level: err.level,
               });
-              safeSend(contents, "netcatty:auth:failed", {
+              safeSend(contents, "ALinLink:auth:failed", {
                 sessionId,
                 error: err.message,
                 hostname: options.hostname
@@ -1142,7 +1142,7 @@ function createStartSessionApi(ctx) {
             }
 
             sendProgress(totalHops, totalHops, options.hostname, 'error', err.message);
-            safeSend(contents, "netcatty:exit", { sessionId, exitCode: 1, error: err.message, reason: "error" });
+            safeSend(contents, "ALinLink:exit", { sessionId, exitCode: 1, error: err.message, reason: "error" });
             sessionLogStreamManager.stopStream(sessionId, ownerLogStreamToken);
             if (detachX11Forwarding) {
               detachX11Forwarding();
@@ -1166,7 +1166,7 @@ function createStartSessionApi(ctx) {
             log("connection timeout", { sessionId, hostname: options.hostname, error: err.message });
             const contents = event.sender;
             sendProgress(totalHops, totalHops, options.hostname, 'error', err.message);
-            safeSend(contents, "netcatty:exit", { sessionId, exitCode: 1, error: err.message, reason: "timeout" });
+            safeSend(contents, "ALinLink:exit", { sessionId, exitCode: 1, error: err.message, reason: "timeout" });
             sessionLogStreamManager.stopStream(sessionId, ownerLogStreamToken);
             sessions.get(sessionId)?.zmodemSentry?.cancel();
             sessions.delete(sessionId);
@@ -1200,9 +1200,9 @@ function createStartSessionApi(ctx) {
               const transportError = session?._transportError;
               if (transportError) {
                 // A transport error was recorded — report it as an error exit
-                safeSend(contents, "netcatty:exit", { sessionId, exitCode: 1, error: transportError, reason: "error" });
+                safeSend(contents, "ALinLink:exit", { sessionId, exitCode: 1, error: transportError, reason: "error" });
               } else {
-                safeSend(contents, "netcatty:exit", { sessionId, exitCode: 0, reason: "closed" });
+                safeSend(contents, "ALinLink:exit", { sessionId, exitCode: 0, reason: "closed" });
               }
               // Use this connection's captured token so a late close from an
               // old transport can't stop a newer same-sessionId stream (#916).
@@ -1283,7 +1283,7 @@ function createStartSessionApi(ctx) {
       } catch (err) {
         console.error("[Chain] SSH chain connection error:", err.message);
         const contents = event.sender;
-        safeSend(contents, "netcatty:exit", { sessionId, exitCode: 1, error: err.message });
+        safeSend(contents, "ALinLink:exit", { sessionId, exitCode: 1, error: err.message });
         throw err;
       }
     }

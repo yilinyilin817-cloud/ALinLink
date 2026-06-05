@@ -95,7 +95,7 @@ test("startTelnetSession answers login prompts with saved credentials", async ()
     await waitFor(() => received.join("").includes("\radmin\rsecret\r"));
     assert.equal(received.join(""), "\radmin\rsecret\r");
     assert.ok(sentEvents.some((evt) =>
-      evt.channel === "netcatty:telnet:auto-login-complete" &&
+      evt.channel === "ALinLink:telnet:auto-login-complete" &&
       evt.payload?.sessionId === "telnet-auto-login-test",
     ));
     assert.deepEqual(serverErrors, []);
@@ -227,7 +227,7 @@ test("manual Telnet writes cancel auto-login", async () => {
     );
 
     await waitFor(() => sentEvents.some((evt) =>
-      evt.channel === "netcatty:telnet:auto-login-cancelled" &&
+      evt.channel === "ALinLink:telnet:auto-login-cancelled" &&
       evt.payload?.sessionId === "telnet-manual-write-test",
     ));
   } finally {

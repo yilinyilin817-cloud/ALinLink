@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { checkForUpdates, getReleaseUrl, type ReleaseInfo, type UpdateCheckResult } from '../../infrastructure/services/updateService';
 import { localStorageAdapter } from '../../infrastructure/persistence/localStorageAdapter';
 import { STORAGE_KEY_UPDATE_DISMISSED_VERSION, STORAGE_KEY_UPDATE_LAST_CHECK, STORAGE_KEY_UPDATE_LATEST_RELEASE, STORAGE_KEY_AUTO_UPDATE_ENABLED, STORAGE_KEY_DEBUG_UPDATE_DEMO } from '../../infrastructure/config/storageKeys';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 
 // Check for updates at most once per hour
 const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000;
@@ -117,7 +117,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
   useEffect(() => {
     const loadVersion = async () => {
       try {
-        const bridge = netcattyBridge.get();
+        const bridge = ALinLinkBridge.get();
         const info = await bridge?.getAppInfo?.();
         if (info?.version) {
           setUpdateState((prev) => ({ ...prev, currentVersion: info.version }));
@@ -133,7 +133,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
   // after the download started (e.g. Settings) immediately reflect the
   // current state instead of showing stale 'idle'.
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     void bridge?.getUpdateStatus?.().then((snapshot) => {
       if (!snapshot || snapshot.status === 'idle') return;
 
@@ -178,7 +178,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
   // Subscribe to electron-updater auto-download IPC events.
   // These fire automatically when autoDownload=true in the main process.
   useEffect(() => {
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
 
     // When electron-updater confirms no update in its feed, don't write
     // STORAGE_KEY_UPDATE_LAST_CHECK — that would throttle the GitHub API
@@ -312,9 +312,9 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
           latestRelease: {
             version: '1.0.0',
             tagName: 'v1.0.0',
-            name: 'Netcatty v1.0.0',
+            name: 'ALinLink v1.0.0',
             body: 'Demo release for testing update notification',
-            htmlUrl: 'https://github.com/binaricat/Netcatty/releases',
+            htmlUrl: 'https://github.com/binaricat/ALinLink/releases',
             publishedAt: new Date().toISOString(),
             assets: [],
           },
@@ -455,7 +455,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
       //    electron-updater feed may still be reachable. Without this,
       //    environments where api.github.com is blocked would never attempt
       //    the auto-download path.
-      void netcattyBridge.get()?.checkForUpdate?.().then((res) => {
+      void ALinLinkBridge.get()?.checkForUpdate?.().then((res) => {
         if (res?.error && res?.supported !== false) {
           // Surface actual download-feed errors; unsupported platforms
           // (res.supported === false) should keep autoDownloadStatus at
@@ -517,7 +517,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
       : getReleaseUrl();
 
     try {
-      const bridge = netcattyBridge.get();
+      const bridge = ALinLinkBridge.get();
       if (bridge?.openExternal) {
         await bridge.openExternal(url);
         return;
@@ -529,12 +529,12 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
   }, [updateState.latestRelease]);
 
   const installUpdate = useCallback(() => {
-    netcattyBridge.get()?.installUpdate?.();
+    ALinLinkBridge.get()?.installUpdate?.();
   }, []);
 
   const startDownload = useCallback(async () => {
     if (autoDownloadStatusRef.current === 'downloading' || autoDownloadStatusRef.current === 'ready') return;
-    const bridge = netcattyBridge.get();
+    const bridge = ALinLinkBridge.get();
     try {
       const checkResult = await bridge?.checkForUpdate?.();
       if (!checkResult || checkResult.checking === true || checkResult.ready === true || checkResult.downloading === true) return;
@@ -675,7 +675,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
       // fallback instead of permanently skipping it — the auto-check may
       // fail silently (check-phase errors aren't broadcast to the renderer).
       try {
-        const snapshot = await netcattyBridge.get()?.getUpdateStatus?.();
+        const snapshot = await ALinLinkBridge.get()?.getUpdateStatus?.();
         if (snapshot?.isChecking) {
           debugLog('Main process check still in flight — rescheduling fallback');
           startupCheckTimeoutRef.current = setTimeout(async () => {
@@ -683,7 +683,7 @@ export function useUpdateCheck(options?: { autoUpdateEnabled?: boolean; onNeedsS
             // Re-check if the main process check is still running to avoid
             // duplicate notifications on very slow networks.
             try {
-              const snap = await netcattyBridge.get()?.getUpdateStatus?.();
+              const snap = await ALinLinkBridge.get()?.getUpdateStatus?.();
               if (snap?.isChecking || (snap?.status && snap.status !== 'idle')) return;
             } catch { /* fall through */ }
             debugLog('=== Rescheduled fallback check triggered ===');

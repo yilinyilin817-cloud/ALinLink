@@ -10,7 +10,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { TerminalTheme } from '../../domain/models';
 import { TERMINAL_THEMES } from '../../infrastructure/config/terminalThemes';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 
 // ---------------------------------------------------------------------------
 // Hex → HSL conversion (returns "H S% L%" without the hsl() wrapper)
@@ -121,7 +121,7 @@ function getImmersiveCss(theme: TerminalTheme): string {
 // Style tag management
 // ---------------------------------------------------------------------------
 
-const STYLE_ID = 'netcatty-immersive-override';
+const STYLE_ID = 'ALinLink-immersive-override';
 
 function applyImmersiveStyle(css: string, isDark: boolean, bg: string) {
   const root = document.documentElement;
@@ -138,8 +138,8 @@ function applyImmersiveStyle(css: string, isDark: boolean, bg: string) {
   }
   style.textContent = css;
   // Sync native Electron window chrome
-  netcattyBridge.get()?.setTheme?.(isDark ? 'dark' : 'light');
-  netcattyBridge.get()?.setBackgroundColor?.(bg);
+  ALinLinkBridge.get()?.setTheme?.(isDark ? 'dark' : 'light');
+  ALinLinkBridge.get()?.setBackgroundColor?.(bg);
 }
 
 function removeImmersiveStyle() {

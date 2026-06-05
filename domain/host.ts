@@ -20,7 +20,7 @@ export const LINUX_DISTRO_OPTIONS = [
 ] as const;
 
 /**
- * Known network-device vendor IDs that Netcatty can detect from the SSH
+ * Known network-device vendor IDs that ALinLink can detect from the SSH
  * server identification string. When a host is classified as one of these,
  * features that assume a POSIX shell (e.g. the periodic server stats poll)
  * are disabled, because the stats command would either be rejected outright
@@ -266,8 +266,18 @@ export const sanitizeHost = (host: Host): Host => {
         : undefined;
   const migrated = migrateDeprecatedFontOverride(host);
   const cleanNotes = host.notes?.trim() || undefined;
+  // Legacy hosts (or hosts added via the network scanner before the label
+  // migration) may be missing the required `label` field. Fall back to
+  // `name` / `hostname` / id so the UI sort logic never blows up.
+  const fallbackLabel =
+    (typeof host.label === 'string' && host.label.trim()) ||
+    (typeof (host as { name?: unknown }).name === 'string' && (host as { name: string }).name.trim()) ||
+    cleanHostname ||
+    host.id ||
+    'Untitled host';
   return {
     ...migrated,
+    label: fallbackLabel,
     hostname: cleanHostname,
     distro: cleanDistro,
     distroMode: cleanDistroMode,

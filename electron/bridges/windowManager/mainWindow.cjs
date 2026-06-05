@@ -108,7 +108,7 @@ function createMainWindowApi(ctx) {
     
       // Prevent top-level navigation away from the app origin. If a remote origin ever
       // loads in a privileged window (with preload), it can become an RCE vector.
-      const allowedOrigins = new Set(["app://netcatty"]);
+      const allowedOrigins = new Set(["app://ALinLink"]);
       if (isDev && devServerUrl) {
         try {
           allowedOrigins.add(new URL(getDevRendererBaseUrl(devServerUrl)).origin);
@@ -247,12 +247,12 @@ function createMainWindowApi(ctx) {
       };
     
       win.on("enter-full-screen", () => {
-        safeSend("netcatty:window:fullscreen-changed", true);
+        safeSend("ALinLink:window:fullscreen-changed", true);
         scheduleSaveState();
       });
     
       win.on("leave-full-screen", () => {
-        safeSend("netcatty:window:fullscreen-changed", false);
+        safeSend("ALinLink:window:fullscreen-changed", false);
         updateNormalBounds();
         scheduleSaveState();
       });
@@ -304,7 +304,9 @@ function createMainWindowApi(ctx) {
       if (isDev) {
         try {
           await win.loadURL(getDevRendererBaseUrl(devServerUrl));
-          win.webContents.openDevTools({ mode: "detach" });
+          if (process.env.ALinLink_OPEN_DEVTOOLS !== "0") {
+            win.webContents.openDevTools({ mode: "detach" });
+          }
           return win;
         } catch (e) {
           console.warn("Dev server not reachable, falling back to bundled dist.", e);
@@ -312,7 +314,7 @@ function createMainWindowApi(ctx) {
       }
     
       // Production mode - load via custom protocol.
-      await win.loadURL("app://netcatty/index.html");
+      await win.loadURL("app://ALinLink/index.html");
       return win;
     }
 

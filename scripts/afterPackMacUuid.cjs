@@ -34,7 +34,7 @@ const MACH_HEADER_64_SIZE = 32;
  * @returns {Buffer}
  */
 function deriveUuid(appId) {
-  const hash = crypto.createHash("sha1").update(`netcatty-local-network|${appId}`).digest();
+  const hash = crypto.createHash("sha1").update(`ALinLink-local-network|${appId}`).digest();
   const uuid = Buffer.from(hash.subarray(0, 16));
   uuid[6] = (uuid[6] & 0x0f) | 0x50; // version 5
   uuid[8] = (uuid[8] & 0x3f) | 0x80; // RFC 4122 variant
@@ -109,7 +109,7 @@ function patchMachOFile(file, uuid) {
 async function afterPack(context) {
   if (context.electronPlatformName !== "darwin") return;
 
-  const appId = context.packager.appInfo.id || "com.netcatty.app";
+  const appId = context.packager.appInfo.id || "com.ALinLink.app";
   const productFilename = context.packager.appInfo.productFilename;
   const exePath = path.join(
     context.appOutDir,

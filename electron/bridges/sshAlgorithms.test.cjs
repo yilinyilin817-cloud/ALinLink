@@ -84,7 +84,7 @@ function readLegacyGexRequestBits(compatFlags) {
     _strictMode: undefined,
     _kex: undefined,
     _kexinit: Buffer.from("local-kexinit"),
-    _identRaw: Buffer.from("SSH-2.0-netcatty-test"),
+    _identRaw: Buffer.from("SSH-2.0-ALinLink-test"),
     _remoteIdentRaw: Buffer.from("SSH-2.0-Comware-5.20"),
     _packetRW: {
       write: {

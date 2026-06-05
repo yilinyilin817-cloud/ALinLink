@@ -1,7 +1,7 @@
 import type { S3Config, SyncedFile, WebDAVConfig } from "../../domain/sync";
 
 declare global {
-  interface NetcattyBridge {
+  interface ALinLinkBridge {
     setTheme?(theme: 'light' | 'dark' | 'system'): Promise<boolean>;
     setBackgroundColor?(color: string): Promise<boolean>;
     setLanguage?(language: string): Promise<boolean>;

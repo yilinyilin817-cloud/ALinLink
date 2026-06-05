@@ -58,7 +58,7 @@ export const enAiMessages: Messages = {
   'ai.codex.connectedCustomConfig': 'Connected via ~/.codex/config.toml',
   'ai.codex.customConfigIncomplete': 'Custom config detected (env var missing)',
   'ai.codex.customConfigHint': 'Using custom provider "{provider}" configured in ~/.codex/config.toml — no ChatGPT login needed.',
-  'ai.codex.customConfigMissingEnvKey': 'Warning: {envKey} is not set in your shell environment. Export it (or launch netcatty from a shell that has it) so Codex can authenticate.',
+  'ai.codex.customConfigMissingEnvKey': 'Warning: {envKey} is not set in your shell environment. Export it (or launch ALinLink from a shell that has it) so Codex can authenticate.',
   'ai.codex.notConnected': 'Not connected',
   'ai.codex.statusUnknown': 'Status unknown',
   'ai.codex.path': 'Path:',
@@ -104,12 +104,12 @@ export const enAiMessages: Messages = {
   'ai.defaultAgent.description': 'Agent to use when starting a new AI session',
   'ai.defaultAgent.catty': 'Catty (Built-in)',
   'ai.toolAccess.title': 'Tool Access',
-  'ai.toolAccess.mode': 'Netcatty Access Mode',
-  'ai.toolAccess.description': 'Choose how external ACP agents access Netcatty sessions. MCP exposes the built-in server, while Skills + CLI points agents to the local Netcatty skill and CLI commands.',
+  'ai.toolAccess.mode': 'ALinLink Access Mode',
+  'ai.toolAccess.description': 'Choose how external ACP agents access ALinLink sessions. MCP exposes the built-in server, while Skills + CLI points agents to the local ALinLink skill and CLI commands.',
   'ai.toolAccess.mode.mcp': 'MCP',
   'ai.toolAccess.mode.skills': 'Skills + CLI',
   'ai.userSkills.title': 'User Skills',
-  'ai.userSkills.description': 'Open the Netcatty skills folder to add your own skill directories. Netcatty scans these skills automatically and injects only lightweight indexes unless a skill clearly matches the current request.',
+  'ai.userSkills.description': 'Open the ALinLink skills folder to add your own skill directories. ALinLink scans these skills automatically and injects only lightweight indexes unless a skill clearly matches the current request.',
   'ai.userSkills.openFolder': 'Open Skills Folder',
   'ai.userSkills.reload': 'Reload Skills',
   'ai.userSkills.location': 'Location',
@@ -178,7 +178,7 @@ export const enAiMessages: Messages = {
   'ai.chat.menuUserSkills': 'User Skills',
 
   // AI Error
-  'ai.codex.bridgeError': 'Codex main-process handlers are not loaded yet. Fully restart Netcatty, or restart the Electron dev process, then try again.',
+  'ai.codex.bridgeError': 'Codex main-process handlers are not loaded yet. Fully restart ALinLink, or restart the Electron dev process, then try again.',
 
   // AI Web Search
   'ai.webSearch.title': 'Web Search',
@@ -198,7 +198,7 @@ export const enAiMessages: Messages = {
   // AI Safety Settings
   'ai.safety.title': 'Safety',
   'ai.safety.permissionMode': 'Permission Mode',
-  'ai.safety.permissionMode.description': 'Controls how the AI interacts with your terminals. Observer mode blocks all write operations through Netcatty, enforced for both built-in and ACP agents. Confirm mode is advisory for ACP agents (they control their own tool approval flow).',
+  'ai.safety.permissionMode.description': 'Controls how the AI interacts with your terminals. Observer mode blocks all write operations through ALinLink, enforced for both built-in and ACP agents. Confirm mode is advisory for ACP agents (they control their own tool approval flow).',
   'ai.safety.permissionMode.observer': 'Observer - Read only, no actions',
   'ai.safety.permissionMode.confirm': 'Confirm - Ask before actions',
   'ai.safety.permissionMode.autonomous': 'Autonomous - Execute freely',
@@ -208,7 +208,7 @@ export const enAiMessages: Messages = {
   'ai.safety.maxIterations': 'Max Iterations',
   'ai.safety.maxIterations.description': 'Maximum number of AI tool-use loops to prevent runaway execution. ACP agents may have their own internal iteration limits that take precedence.',
   'ai.safety.blocklist': 'Command Blocklist',
-  'ai.safety.blocklist.description': 'Regex patterns to block dangerous commands. Applies to both built-in and ACP agents through Netcatty execution.',
+  'ai.safety.blocklist.description': 'Regex patterns to block dangerous commands. Applies to both built-in and ACP agents through ALinLink execution.',
   'ai.safety.blocklist.placeholder': 'Regex pattern...',
   'ai.safety.blocklist.reset': 'Reset to defaults',
   'ai.safety.blocklist.add': 'Add pattern',

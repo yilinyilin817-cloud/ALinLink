@@ -1,7 +1,7 @@
-import { netcattyBridge } from "./netcattyBridge";
+import { ALinLinkBridge } from "./ALinLinkBridge";
 
 export const getCredentialProtectionAvailability = async (): Promise<boolean | null> => {
-  const bridge = netcattyBridge.get();
+  const bridge = ALinLinkBridge.get();
   if (!bridge?.credentialsAvailable) return null;
 
   try {

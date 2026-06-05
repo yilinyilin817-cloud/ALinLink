@@ -17,7 +17,7 @@
 //                       Skip the whole step if unset (printed as a notice
 //                       so the build doesn't silently miss the bundling).
 //   MOSH_BIN_OWNER    — defaults to the GITHUB_REPOSITORY owner, or 'binaricat'
-//   MOSH_BIN_REPO     — default 'Netcatty-mosh-bin' (a dedicated binary
+//   MOSH_BIN_REPO     — default 'ALinLink-mosh-bin' (a dedicated binary
 //                       repository so the client repo stays source-only).
 //   MOSH_BIN_BASE_URL — full override (e.g. for staging / local mirror).
 //   MOSH_BIN_RES_DIR  — override output dir for tests.
@@ -218,7 +218,7 @@ function parseMoshBinRepository(env) {
   const githubOwner = (env.GITHUB_REPOSITORY || "").split("/")[0];
   return {
     owner: env.MOSH_BIN_OWNER || githubOwner || "binaricat",
-    repo: env.MOSH_BIN_REPO || "Netcatty-mosh-bin",
+    repo: env.MOSH_BIN_REPO || "ALinLink-mosh-bin",
   };
 }
 
@@ -314,7 +314,7 @@ function replaceDir(srcDir, destDir) {
 }
 
 function unpackTarGz(buf, target, { resDir }) {
-  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-mosh-"));
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-mosh-"));
   const archive = path.join(tmpRoot, "bundle.tar.gz");
   const extractDir = path.join(tmpRoot, "extract");
   const destDir = path.join(resDir, target.localDir);
@@ -338,7 +338,7 @@ function unpackTarGz(buf, target, { resDir }) {
 
 function writeFlatAsset(buf, target, asset, { resDir }) {
   const dest = path.join(resDir, asset.local);
-  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "netcatty-mosh-flat-"));
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "ALinLink-mosh-flat-"));
   const tmpDest = path.join(tmpRoot, path.basename(dest));
   try {
     fs.writeFileSync(tmpDest, buf);

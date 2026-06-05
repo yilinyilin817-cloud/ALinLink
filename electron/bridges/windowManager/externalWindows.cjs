@@ -51,7 +51,7 @@ function createExternalWindowApi(ctx) {
           sandbox: true,
           webSecurity: true,
           // Isolated session so users' browsing does not mix with main app state.
-          partition: "persist:netcatty-fallback-browser",
+          partition: "persist:ALinLink-fallback-browser",
         },
       });
     
@@ -254,7 +254,7 @@ function createExternalWindowApi(ctx) {
             icon: appIcon,
             autoHideMenuBar: true,
             menuBarVisible: false,
-            title: "Netcatty Authorization",
+            title: "ALinLink Authorization",
             webPreferences: {
               contextIsolation: true,
               nodeIntegration: false,

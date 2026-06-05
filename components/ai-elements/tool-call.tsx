@@ -11,15 +11,15 @@ import { useI18n } from '../../application/i18n/I18nProvider';
  * Pull the user-meaningful shell command out of the tool-call args.
  *
  * Different tool surfaces hand us different shapes:
- *   - Netcatty's own `terminal_execute` MCP tool → `{command: "<string>"}`
+ *   - ALinLink's own `terminal_execute` MCP tool → `{command: "<string>"}`
  *   - Codex `local_shell` (ACP)                 → `{command: ["zsh","-lc","<full>"]}`
  *   - Claude `Bash` (ACP)                       → `{command: "<string>"}`
  *
  * And under the "Skill + CLI" integration, the agent's shell tool wraps a
- * call to our internal `netcatty-tool-cli` binary, so the real intent is one
+ * call to our internal `ALinLink-tool-cli` binary, so the real intent is one
  * level deeper:
  *
- *   netcatty-tool-cli exec --session <id> --chat-session <id> -- <real-cmd>
+ *   ALinLink-tool-cli exec --session <id> --chat-session <id> -- <real-cmd>
  *
  * We unwrap both layers so the chat panel shows what the user actually
  * cares about (the remote command), not Codex's wrapper title which is
@@ -45,11 +45,11 @@ function extractDisplayCommand(args: Record<string, unknown> | undefined): strin
     return null;
   }
 
-  // Netcatty CLI wrapper extraction.
-  const cliIdx = cmdString.indexOf('netcatty-tool-cli');
+  // ALinLink CLI wrapper extraction.
+  const cliIdx = cmdString.indexOf('ALinLink-tool-cli');
   if (cliIdx >= 0) {
     const afterCli = cmdString
-      .slice(cliIdx + 'netcatty-tool-cli'.length)
+      .slice(cliIdx + 'ALinLink-tool-cli'.length)
       .replace(/^["']?\s*/, '');
     const subMatch = afterCli.match(/^(\S+)/);
     const sub = subMatch ? subMatch[1] : '';
@@ -69,12 +69,12 @@ function extractDisplayCommand(args: Record<string, unknown> | undefined): strin
         return inner;
       }
     }
-    if (sub === 'job-poll') return 'netcatty: poll job';
-    if (sub === 'job-stop') return 'netcatty: stop job';
-    if (sub === 'session') return 'netcatty: inspect session';
-    if (sub === 'env') return 'netcatty: list sessions';
-    if (sub === 'status') return 'netcatty: status';
-    if (sub) return `netcatty: ${sub}`;
+    if (sub === 'job-poll') return 'ALinLink: poll job';
+    if (sub === 'job-stop') return 'ALinLink: stop job';
+    if (sub === 'session') return 'ALinLink: inspect session';
+    if (sub === 'env') return 'ALinLink: list sessions';
+    if (sub === 'status') return 'ALinLink: status';
+    if (sub) return `ALinLink: ${sub}`;
   }
 
   return cmdString;

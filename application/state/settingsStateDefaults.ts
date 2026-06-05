@@ -5,7 +5,7 @@ import { DARK_UI_THEMES, LIGHT_UI_THEMES, type UiThemeTokens } from '../../infra
 import { UI_FONTS } from '../../infrastructure/config/uiFonts';
 import { uiFontStore } from './uiFontStore';
 import { localStorageAdapter } from '../../infrastructure/persistence/localStorageAdapter';
-import { netcattyBridge } from '../../infrastructure/services/netcattyBridge';
+import { ALinLinkBridge } from '../../infrastructure/services/ALinLinkBridge';
 
 export const DEFAULT_THEME: 'light' | 'dark' | 'system' = 'dark';
 
@@ -18,7 +18,7 @@ export const DEFAULT_LIGHT_UI_THEME = 'snow';
 export const DEFAULT_DARK_UI_THEME = 'midnight';
 export const DEFAULT_ACCENT_MODE: 'theme' | 'custom' = 'theme';
 export const DEFAULT_CUSTOM_ACCENT = '221.2 83.2% 53.3%';
-export const DEFAULT_TERMINAL_THEME = 'netcatty-dark';
+export const DEFAULT_TERMINAL_THEME = 'ALinLink-dark';
 export const DEFAULT_FONT_FAMILY = 'menlo';
 
 /**
@@ -122,7 +122,7 @@ export const applyThemeTokens = (
 ) => {
   const root = window.document.documentElement;
   // If immersive override is active (style tag present), it owns the dark/light class — don't override
-  if (!document.getElementById('netcatty-immersive-override')) {
+  if (!document.getElementById('ALinLink-immersive-override')) {
     root.classList.remove('light', 'dark');
     root.classList.add(resolvedTheme);
   }
@@ -153,6 +153,6 @@ export const applyThemeTokens = (
   root.style.setProperty('--ring', accentToken);
 
   // Sync with native window title bar (Electron)
-  netcattyBridge.get()?.setTheme?.(themeSource);
-  netcattyBridge.get()?.setBackgroundColor?.(tokens.background);
+  ALinLinkBridge.get()?.setTheme?.(themeSource);
+  ALinLinkBridge.get()?.setBackgroundColor?.(tokens.background);
 };

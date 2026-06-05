@@ -241,7 +241,7 @@ const SftpSidePanelInner: React.FC<SftpSidePanelProps> = ({
       const target = event.target as Node | null;
       const elementTarget = target instanceof Element ? target : null;
       const isPortalInteraction = !!elementTarget?.closest(
-        '#netcatty-context-menu-root, [role="dialog"], [data-radix-popper-content-wrapper]',
+        '#ALinLink-context-menu-root, [role="dialog"], [data-radix-popper-content-wrapper]',
       );
       if (isPortalInteraction) {
         return;

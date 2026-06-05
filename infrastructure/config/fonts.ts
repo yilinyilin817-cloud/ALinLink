@@ -65,7 +65,7 @@ export const DEFAULT_FONT_SIZE = 14;
 export const MIN_FONT_SIZE = 10;
 export const MAX_FONT_SIZE = 32;
 
-// Font ids that earlier versions of netcatty exposed in the primary font
+// Font ids that earlier versions of ALinLink exposed in the primary font
 // dropdown but that are proportional (non-monospace) and produce broken
 // cell-grid alignment when used as a terminal font. Reads should migrate
 // these to a sane default.

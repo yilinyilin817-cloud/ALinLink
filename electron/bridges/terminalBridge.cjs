@@ -401,7 +401,7 @@ function startLocalSession(event, payload) {
 
   const { bufferData: bufferLocalData, flush: flushLocal } = createPtyOutputBuffer((data) => {
     const contents = electronModule.webContents.fromId(session.webContentsId);
-    contents?.send("netcatty:data", { sessionId, data });
+    contents?.send("ALinLink:data", { sessionId, data });
   });
   session.flushPendingData = flushLocal;
 
@@ -450,7 +450,7 @@ function startLocalSession(event, payload) {
     // No signal = process exited normally, even with non-zero code
     // (e.g. user typed `exit` after a failed command), so auto-close.
     const reason = evt.signal ? "error" : "exited";
-    contents?.send("netcatty:exit", { sessionId, ...evt, reason });
+    contents?.send("ALinLink:exit", { sessionId, ...evt, reason });
   });
 
   return { sessionId };
@@ -471,7 +471,7 @@ const telnetSessionApi = createTelnetSessionApi({
 const { startTelnetSession } = telnetSessionApi;
 
 /**
- * Resolve Netcatty's bundled bare `mosh-client` binary.
+ * Resolve ALinLink's bundled bare `mosh-client` binary.
  *
  * Returns the absolute path or null.
  */
@@ -599,7 +599,7 @@ async function startSerialSession(event, options) {
             const decoded = serialDecoderRef.current.write(buf);
             if (!decoded) return;
             const contents = electronModule.webContents.fromId(session.webContentsId);
-            contents?.send("netcatty:data", { sessionId, data: decoded });
+            contents?.send("ALinLink:data", { sessionId, data: decoded });
             sessionLogStreamManager.appendData(sessionId, decoded);
           },
           writeToRemote(buf) {
@@ -622,7 +622,7 @@ async function startSerialSession(event, options) {
           session.zmodemSentry?.cancel();
           sessionLogStreamManager.stopStream(sessionId, logStreamToken);
           const contents = electronModule.webContents.fromId(session.webContentsId);
-          contents?.send("netcatty:exit", { sessionId, exitCode: 1, error: err.message, reason: "error" });
+          contents?.send("ALinLink:exit", { sessionId, exitCode: 1, error: err.message, reason: "error" });
           ptyProcessTree.unregisterPid(sessionId);
           sessions.delete(sessionId);
         });
@@ -632,7 +632,7 @@ async function startSerialSession(event, options) {
           session.zmodemSentry?.cancel();
           sessionLogStreamManager.stopStream(sessionId, logStreamToken);
           const contents = electronModule.webContents.fromId(session.webContentsId);
-          contents?.send("netcatty:exit", { sessionId, exitCode: 0, reason: "closed" });
+          contents?.send("ALinLink:exit", { sessionId, exitCode: 0, reason: "closed" });
           ptyProcessTree.unregisterPid(sessionId);
           sessions.delete(sessionId);
         });
@@ -859,19 +859,19 @@ function setSessionEncoding(_event, { sessionId, encoding }) {
  * Register IPC handlers for terminal operations
  */
 function registerHandlers(ipcMain) {
-  ipcMain.handle("netcatty:local:start", startLocalSession);
-  ipcMain.handle("netcatty:telnet:start", startTelnetSession);
-  ipcMain.handle("netcatty:mosh:start", startMoshSession);
-  ipcMain.handle("netcatty:serial:start", startSerialSession);
-  ipcMain.handle("netcatty:serial:list", listSerialPorts);
-  ipcMain.handle("netcatty:local:defaultShell", getDefaultShell);
-  ipcMain.handle("netcatty:local:validatePath", validatePath);
-  ipcMain.handle("netcatty:shells:discover", () => discoverShells());
-  ipcMain.handle("netcatty:terminal:setEncoding", setSessionEncoding);
-  ipcMain.on("netcatty:write", writeToSession);
-  ipcMain.on("netcatty:resize", resizeSession);
-  ipcMain.on("netcatty:flow", setSessionFlowPaused);
-  ipcMain.on("netcatty:close", closeSession);
+  ipcMain.handle("ALinLink:local:start", startLocalSession);
+  ipcMain.handle("ALinLink:telnet:start", startTelnetSession);
+  ipcMain.handle("ALinLink:mosh:start", startMoshSession);
+  ipcMain.handle("ALinLink:serial:start", startSerialSession);
+  ipcMain.handle("ALinLink:serial:list", listSerialPorts);
+  ipcMain.handle("ALinLink:local:defaultShell", getDefaultShell);
+  ipcMain.handle("ALinLink:local:validatePath", validatePath);
+  ipcMain.handle("ALinLink:shells:discover", () => discoverShells());
+  ipcMain.handle("ALinLink:terminal:setEncoding", setSessionEncoding);
+  ipcMain.on("ALinLink:write", writeToSession);
+  ipcMain.on("ALinLink:resize", resizeSession);
+  ipcMain.on("ALinLink:flow", setSessionFlowPaused);
+  ipcMain.on("ALinLink:close", closeSession);
 }
 
 /**
@@ -893,7 +893,7 @@ const { getDefaultShell, validatePath } = pathValidationApi;
  * root so the helper is testable without packaging the app.
  *
  * Note this returns the network-protocol `mosh-client`, not the `mosh`
- * wrapper script. Netcatty drives the SSH bootstrap itself and then
+ * wrapper script. ALinLink drives the SSH bootstrap itself and then
  * launches this bundled client directly.
  */
 function bundledMoshClient(opts = {}) {
