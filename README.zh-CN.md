@@ -1,12 +1,7 @@
-<p align="center">
-  <img src="public/icon.png" alt="ALinLink" width="128" height="128">
-</p>
 
 <h1 align="center">ALinLink</h1>
-
 <p align="center">
   <strong>现代化 SSH 客户端、SFTP 浏览器 & 终端管理器</strong><br/>
-  <a href="https://ALinLink.app"><strong>ALinLink.app</strong></a>
 </p>
 
 <p align="center">
@@ -15,34 +10,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/binaricat/ALinLink/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/binaricat/ALinLink?style=for-the-badge&logo=github&label=Release"></a>
-  &nbsp;
-  <a href="#"><img alt="Platform" src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-blue?style=for-the-badge&logo=electron"></a>
-  &nbsp;
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-green?style=for-the-badge"></a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/binaricat/ALinLink/releases/latest">
-    <img src="https://img.shields.io/github/v/release/binaricat/ALinLink?style=for-the-badge&logo=github&label=下载最新版&color=success" alt="下载最新版">
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://ko-fi.com/binaricat">
-    <img src="https://cdn.ko-fi.com/cdn/kofi3.png?v=2" width="150" alt="在 Ko-fi 上支持我">
-  </a>
-</p>
-
-<p align="center">
   <a href="./README.md">English</a> · <a href="./README.zh-CN.md">简体中文</a> · <a href="./README.ja-JP.md">日本語</a>
 </p>
 
 ---
 
-[![ALinLink 主界面](screenshots/main-window-dark.png)](screenshots/main-window-dark.png)
+[![ALinLink 主界面]
 
----
 
 # 目录 <!-- omit in toc -->
 
@@ -63,7 +37,6 @@
 - [Star 历史](#star-历史)
 - [开源协议](#开源协议)
 
----
 
 <a name="ALinLink-是什么"></a>
 # ALinLink 是什么
@@ -76,8 +49,6 @@
 - **ALinLink 支持** SSH、本地终端、Telnet、Mosh、串口（Serial）等连接方式（视环境而定）
 - **ALinLink 不是** Shell 替代品 —— 它通过 SSH/Telnet/Mosh 或本地/串口会话连接到 Shell
 
----
-
 <a name="为什么是-ALinLink"></a>
 # 为什么是 ALinLink
 
@@ -87,7 +58,6 @@
 - **Vault 管理** —— 网格/列表/树形视图，配合搜索与拖拽更顺手
 - **认真做的 SFTP** —— 内置编辑器 + 拖拽上传，文件操作更丝滑
 
----
 
 <a name="功能特性"></a>
 # 功能特性
@@ -108,7 +78,6 @@
 - **自定义主题** —— 按喜好调整应用外观
 - **关键词高亮** —— 自定义终端输出高亮规则
 
----
 
 <a name="演示"></a>
 # 演示
@@ -118,34 +87,20 @@
 ### Vault 视图：网格 / 列表 / 树形
 根据不同场景自由切换视图：网格适合总览，列表适合密集浏览，树形适合层级导航与整理。
 
-https://github.com/user-attachments/assets/e2742987-3131-404d-bd4b-06423e5bfd99
-
 ### 分屏终端 + 会话管理
 用分屏把多个会话并排放在同一个工作区里，降低来回切换窗口/标签页的成本。
-
-https://github.com/user-attachments/assets/377d0c46-cc5a-4382-aa31-5acfd412ce62
 
 ### SFTP：拖拽 + 内置编辑器
 通过拖拽完成文件传输，并用内置编辑器快速修改文件内容，不用来回切换工具。
 
-https://github.com/user-attachments/assets/c6e06af4-b0d5-461c-b0c7-9d6f655af6c7
-
 ### 拖拽文件上传
 把文件直接拖进应用即可触发上传流程，省去多层对话框与路径选择。
-
-https://github.com/user-attachments/assets/c8e0c4ff-f020-4e18-9b09-681ec97b003f
 
 ### 自定义主题
 按自己的审美与习惯定制主题与界面外观，让日常使用更顺手。
 
-https://github.com/user-attachments/assets/77e2a693-4ef2-4823-8ca1-9bcbf14ed98b
-
 ### 关键词高亮
 让关键输出一眼可见：错误、告警或特定标记被高亮后更容易扫到与定位。
-
-https://github.com/user-attachments/assets/e6516993-ad66-4594-8c28-57426082339b
-
----
 
 <a name="界面截图"></a>
 # 界面截图
@@ -155,59 +110,22 @@ https://github.com/user-attachments/assets/e6516993-ad66-4594-8c28-57426082339b
 
 主界面围绕长期 SSH 工作流设计：把会话、导航和常用工具集中到同一处，减少切换成本。
 
-![主界面（深色）](screenshots/main-window-dark.png)
-
-![主界面（浅色）](screenshots/main-window-light.png)
 
 <a name="vault-视图"></a>
 ## Vault 视图
 
 用更适合当前任务的方式管理与浏览主机：网格看全局，列表做筛选，树形做整理与层级导航。
 
-![Vault 网格视图](screenshots/vault_grid_view.png)
-
-![Vault 列表视图](screenshots/vault_list_view.png)
-
-![Vault 树形视图（深色）](screenshots/treeview-dark.png)
-
-![Vault 树形视图（浅色）](screenshots/treeview-light.png)
-
 <a name="分屏终端"></a>
 ## 分屏终端
 
 分屏适合同时处理多个任务（例如部署 + 日志 + 排障），不用频繁切换窗口。
 
-![分屏窗口](screenshots/split-window.png)
 
----
-
-<a name="支持的发行版"></a>
-# 支持的发行版
-
-ALinLink 会自动识别并在主机列表中展示对应的系统图标：
-
-<p align="center">
-  <img src="public/distro/ubuntu.svg" width="48" alt="Ubuntu" title="Ubuntu">
-  <img src="public/distro/debian.svg" width="48" alt="Debian" title="Debian">
-  <img src="public/distro/centos.svg" width="48" alt="CentOS" title="CentOS">
-  <img src="public/distro/fedora.svg" width="48" alt="Fedora" title="Fedora">
-  <img src="public/distro/arch.svg" width="48" alt="Arch Linux" title="Arch Linux">
-  <img src="public/distro/alpine.svg" width="48" alt="Alpine" title="Alpine">
-  <img src="public/distro/amazon.svg" width="48" alt="Amazon Linux" title="Amazon Linux">
-  <img src="public/distro/redhat.svg" width="48" alt="Red Hat" title="Red Hat">
-  <img src="public/distro/rocky.svg" width="48" alt="Rocky Linux" title="Rocky Linux">
-  <img src="public/distro/opensuse.svg" width="48" alt="openSUSE" title="openSUSE">
-  <img src="public/distro/oracle.svg" width="48" alt="Oracle Linux" title="Oracle Linux">
-  <img src="public/distro/kali.svg" width="48" alt="Kali Linux" title="Kali Linux">
-  <img src="public/distro/almalinux.svg" width="48" alt="AlmaLinux" title="AlmaLinux">
-</p>
-
-<a name="快速开始"></a>
 # 快速开始
 
 ### 下载
 
-从 [GitHub Releases](https://github.com/binaricat/ALinLink/releases/latest) 下载适合您平台的最新版本。
 
 | 操作系统 | 支持情况 |
 | :--- | :--- |
@@ -215,7 +133,6 @@ ALinLink 会自动识别并在主机列表中展示对应的系统图标：
 | **Windows** | x64 / arm64 |
 | **Linux** | x64 / arm64 |
 
-或在 [GitHub Releases](https://github.com/binaricat/ALinLink/releases) 浏览所有版本。
 
 > **macOS 用户注意：** 当前发布版本应已完成代码签名和公证。如果 Gatekeeper 仍然提示风险，请确认您下载的是 GitHub Releases 中的最新官方构建。
 
@@ -223,19 +140,6 @@ ALinLink 会自动识别并在主机列表中展示对应的系统图标：
 - Node.js 18+ 和 npm
 - macOS、Windows 10+ 或 Linux
 
-### 开发
-
-```bash
-# 克隆仓库
-git clone https://github.com/binaricat/ALinLink.git
-cd ALinLink
-
-# 安装依赖
-npm install
-
-# 启动开发模式（Vite + Electron）
-npm run dev
-```
 
 ### 项目结构
 
@@ -305,18 +209,7 @@ npm run pack:linux   # Linux (AppImage, deb, rpm)
 
 查看 [agents.md](agents.md) 了解架构概述和编码规范。
 
----
 
-<a name="贡献者"></a>
-# 贡献者
-
-感谢所有参与贡献的人！
-
-<a href="https://github.com/binaricat/ALinLink/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=binaricat/ALinLink" />
-</a>
-
----
 
 <a name="开源协议"></a>
 # 开源协议
@@ -326,18 +219,5 @@ npm run pack:linux   # Linux (AppImage, deb, rpm)
 ---
 
 <a name="star-历史"></a>
-# Star 历史
-
-<a href="https://star-history.com/#binaricat/ALinLink&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=binaricat/ALinLink&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=binaricat/ALinLink&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=binaricat/ALinLink&type=Date" />
- </picture>
-</a>
-
----
 
 <p align="center">
-  用 ❤️ 制作，作者 <a href="https://ko-fi.com/binaricat">binaricat</a>
-</p>
