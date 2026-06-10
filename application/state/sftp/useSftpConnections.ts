@@ -1,3 +1,8 @@
+/**
+ * SFTP连接管理Hook
+ * 负责管理SFTP连接的建立、断开、文件列表获取等核心功能
+ * 支持本地文件系统和远程SFTP服务器的连接管理
+ */
 import React, { useCallback, useEffect, useRef } from "react";
 import type { MutableRefObject } from "react";
 import { ALinLinkBridge } from "../../../infrastructure/services/ALinLinkBridge";
@@ -7,6 +12,9 @@ import { useSftpDirectoryListing } from "./useSftpDirectoryListing";
 import { useSftpHostCredentials } from "./useSftpHostCredentials";
 import { buildCacheKey, getSharedRemoteHostCache, setSharedRemoteHostCache } from "./sharedRemoteHostCache";
 
+/**
+ * SFTP连接Hook的参数接口
+ */
 interface UseSftpConnectionsParams {
   hosts: Host[];
   keys: SSHKey[];
@@ -34,13 +42,46 @@ interface UseSftpConnectionsParams {
   autoConnectLocalOnMount?: boolean;
 }
 
+/**
+ * SFTP连接Hook的返回结果接口
+ */
 interface UseSftpConnectionsResult {
+  /**
+   * 建立SFTP连接
+   * @param side - 面板位置（左侧或右侧）
+   * @param host - 主机对象或"local"表示本地文件系统
+   * @param options - 连接选项
+   * @param options.forceNewTab - 是否强制在新标签页打开
+   * @param options.onTabCreated - 标签页创建后的回调函数
+   */
   connect: (side: "left" | "right", host: Host | "local", options?: { forceNewTab?: boolean; onTabCreated?: (tabId: string) => void }) => Promise<void>;
+  /**
+   * 断开SFTP连接
+   * @param side - 面板位置（左侧或右侧）
+   */
   disconnect: (side: "left" | "right") => Promise<void>;
+  /**
+   * 获取本地文件列表
+   * @param path - 文件路径
+   * @returns 文件条目数组
+   */
   listLocalFiles: (path: string) => Promise<SftpFileEntry[]>;
+  /**
+   * 获取远程SFTP文件列表
+   * @param sftpId - SFTP会话ID
+   * @param path - 文件路径
+   * @param encoding - 文件名编码
+   * @returns 文件条目数组
+   */
   listRemoteFiles: (sftpId: string, path: string, encoding?: SftpFilenameEncoding) => Promise<SftpFileEntry[]>;
 }
 
+/**
+ * SFTP连接管理Hook
+ * 提供SFTP连接的建立、断开、文件列表获取等功能
+ * @param params - 连接参数
+ * @returns 连接操作函数
+ */
 export const useSftpConnections = ({
   hosts,
   keys,
@@ -70,13 +111,21 @@ export const useSftpConnections = ({
   const getHostCredentials = useSftpHostCredentials({ hosts, keys, identities, terminalSettings });
   const { listLocalFiles, listRemoteFiles } = useSftpDirectoryListing();
 
-  const connect = useCallback(
+  /**
+     * 建立SFTP连接的核心函数
+     * 支持本地文件系统和远程SFTP服务器连接
+     * @param side - 面板位置
+     * @param host - 主机对象或"local"
+     * @param options - 连接选项
+     */
+    const connect = useCallback(
     async (side: "left" | "right", host: Host | "local", options?: { forceNewTab?: boolean; onTabCreated?: (tabId: string) => void }) => {
       const setTabs = side === "left" ? setLeftTabs : setRightTabs;
 
       let activeTabId: string | null = null;
       const sideTabs = side === "left" ? leftTabsRef.current : rightTabsRef.current;
 
+      // 如果当前没有活动标签页或强制新建标签页，则创建新的面板
       if (!sideTabs.activeTabId || options?.forceNewTab) {
         const newPane = createEmptyPane();
         activeTabId = newPane.id;
@@ -92,9 +141,9 @@ export const useSftpConnections = ({
 
       const isReconnectAttempt = reconnectingRef.current[side];
 
-      // Notify caller of the tab ID synchronously, before any async work.
-      // This allows callers to map metadata (e.g. connection keys) to the tab
-      // immediately, avoiding race conditions with deferred effects.
+      // 在异步操作之前同步通知调用者标签页ID
+      // 这允许调用者立即将元数据（如连接密钥）映射到标签页
+      // 避免与延迟效果的竞争条件
       options?.onTabCreated?.(activeTabId);
 
       const connectionId = `${side}-${Date.now()}`;
@@ -103,8 +152,8 @@ export const useSftpConnections = ({
       const connectRequestId = navSeqRef.current[side];
 
       lastConnectedHostRef.current[side] = host;
-      // Store the cache key for this connection so pane actions can look it up
-      // by connectionId instead of relying on the per-side lastConnectedHostRef.
+      // 存储此连接的缓存键，以便面板操作可以通过connectionId查找
+      // 而不是依赖每个面板的lastConnectedHostRef
       if (host !== "local") {
         connectionCacheKeyMapRef.current.set(
           connectionId,
@@ -113,13 +162,13 @@ export const useSftpConnections = ({
       }
 
       const currentPane = getActivePane(side);
-      // Reset encoding to host's configured encoding or "auto" when connecting to a new host
-      // This ensures proper auto-detection works and respects host-level encoding settings
+      // 连接到新主机时，将编码重置为主机配置的编码或"auto"
+      // 这确保正确的自动检测工作并遵守主机级编码设置
       const filenameEncoding: SftpFilenameEncoding =
         host === "local" ? "auto" : (host.sftpEncoding ?? "auto");
 
-      // When forceNewTab is set, we're preserving the old tab for instant switching —
-      // don't close its SFTP session or clear its cache.
+      // 当forceNewTab设置时，我们保留旧标签页以便即时切换
+      // 不要关闭其SFTP会话或清除其缓存
       if (!options?.forceNewTab) {
         if (currentPane?.connection) {
           clearCacheForConnection(currentPane.connection.id);
@@ -127,26 +176,30 @@ export const useSftpConnections = ({
         if (currentPane?.connection && !currentPane.connection.isLocal) {
           const oldSftpId = sftpSessionsRef.current.get(currentPane.connection.id);
           if (oldSftpId) {
-            // Delete the mapping BEFORE the async closeSftp call to prevent
-            // concurrent code from using a stale sftpId that the backend may
-            // have already removed during the await.
+            // 在异步closeSftp调用之前删除映射，以防止
+            // 并发代码使用后端可能在await期间已删除的过期sftpId
             sftpSessionsRef.current.delete(currentPane.connection.id);
             try {
               await ALinLinkBridge.get()?.closeSftp(oldSftpId);
             } catch {
-              // Ignore errors when closing stale SFTP sessions
+              // 关闭过期SFTP会话时忽略错误
             }
           }
         }
       }
 
+      /**
+       * 连接到本地文件系统
+       */
       if (host === "local") {
+        // 获取用户主目录，如果无法获取则使用默认路径
         let homeDir = await ALinLinkBridge.get()?.getHomeDir?.();
         if (!homeDir) {
           const isWindows = navigator.platform.toLowerCase().includes("win");
           homeDir = isWindows ? "C:\\Users\\damao" : "/Users/damao";
         }
 
+        // 创建本地连接对象
         const connection: SftpConnection = {
           id: connectionId,
           hostId: "local",
@@ -157,6 +210,7 @@ export const useSftpConnections = ({
           homeDir,
         };
 
+        // 更新标签页状态为连接中
         updateTab(side, activeTabId, (prev) => ({
           ...prev,
           connection,
@@ -164,17 +218,21 @@ export const useSftpConnections = ({
           reconnecting: false,
           error: null,
           connectionLogs: [],
-          filenameEncoding, // Reset encoding for new connection
+          filenameEncoding, // 为新连接重置编码
         }));
 
+        // 获取本地文件列表
         try {
           const files = await listLocalFiles(homeDir);
+          // 检查是否是最新的连接请求，防止处理过期请求
           if (navSeqRef.current[side] !== connectRequestId) return;
+          // 缓存文件列表
           dirCacheRef.current.set(makeCacheKey(connectionId, homeDir, filenameEncoding), {
             files,
             timestamp: Date.now(),
           });
           reconnectingRef.current[side] = false;
+          // 更新标签页状态为连接成功
           updateTab(side, activeTabId, (prev) => ({
             ...prev,
             files,
@@ -184,6 +242,7 @@ export const useSftpConnections = ({
         } catch (err) {
           if (navSeqRef.current[side] !== connectRequestId) return;
           reconnectingRef.current[side] = false;
+          // 更新标签页状态为连接失败
           updateTab(side, activeTabId, (prev) => ({
             ...prev,
             error: err instanceof Error ? err.message : "Failed to list directory",
@@ -191,15 +250,21 @@ export const useSftpConnections = ({
             reconnecting: false,
           }));
         }
+      /**
+       * 连接到远程SFTP服务器
+       */
       } else {
+        // 构建主机缓存键，用于共享缓存查找
         const hostCacheKey = buildCacheKey(host.id, host.hostname, host.port, host.protocol, host.sftpSudo, host.username);
         const sharedHostCacheCandidate = getSharedRemoteHostCache(hostCacheKey);
+        // 只有当编码匹配时才使用共享缓存
         const sharedHostCache =
           sharedHostCacheCandidate?.filenameEncoding === filenameEncoding
             ? sharedHostCacheCandidate
             : null;
         const cachedStartPath = sharedHostCache?.path ?? "/";
 
+        // 创建远程连接对象
         const connection: SftpConnection = {
           id: connectionId,
           hostId: host.id,
@@ -209,21 +274,21 @@ export const useSftpConnections = ({
           currentPath: cachedStartPath,
         };
 
+        // 更新标签页状态为连接中
         updateTab(side, activeTabId, (prev) => ({
           ...prev,
           connection,
-          // Always show loading while connecting — even with cached files.
-          // The cached file list is shown as a preview, but the pane stays
-          // non-interactive until the SFTP session is actually established.
+          // 连接时始终显示加载状态 — 即使有缓存文件
+          // 缓存的文件列表显示为预览，但面板在SFTP会话实际建立之前保持非交互状态
           loading: true,
           reconnecting: prev.reconnecting,
           error: null,
           connectionLogs: [],
           files: prev.reconnecting ? prev.files : (sharedHostCache?.files ?? []),
-          filenameEncoding, // Reset encoding for new connection
+          filenameEncoding, // 为新连接重置编码
         }));
 
-        // Subscribe to SFTP connection progress events for auth logging
+        // 订阅SFTP连接进度事件用于认证日志
         const sftpSessionId = `sftp-${connectionId}`;
         let unsubSftpProgress: (() => void) | undefined;
         const bridge = ALinLinkBridge.get();
@@ -258,7 +323,7 @@ export const useSftpConnections = ({
               default:
                 logLine = `${label} - ${status}${detail ? `: ${detail}` : ''}`;
             }
-            // Only update if this is still the active request (avoids stale logs leaking)
+            // 只有当这仍然是活动请求时才更新（避免过期日志泄露）
             if (navSeqRef.current[side] !== connectRequestId) return;
             updateTab(side, activeTabId, (prev) => ({
               ...prev,
@@ -268,10 +333,12 @@ export const useSftpConnections = ({
         }
 
         try {
+          // 获取主机凭据
           const credentials = getHostCredentials(host);
           const openSftp = bridge?.openSftp;
           if (!openSftp) throw new Error("SFTP bridge unavailable");
 
+          // 判断是否为认证错误
           const isAuthError = (err: unknown): boolean => {
             if (!(err instanceof Error)) return false;
             const msg = err.message.toLowerCase();
@@ -283,9 +350,14 @@ export const useSftpConnections = ({
             );
           };
 
+          // 检查是否有密钥和密码
           const hasKey = !!credentials.privateKey || !!credentials.identityFilePaths?.length;
           const hasPassword = !!credentials.password;
 
+          /**
+           * 尝试建立SFTP连接
+           * 优先使用密钥认证，如果失败且有密码则回退到密码认证
+           */
           let sftpId: string | undefined;
           if (hasKey) {
             try {
@@ -293,11 +365,13 @@ export const useSftpConnections = ({
                 sessionId: `sftp-${connectionId}`,
                 ...credentials,
               };
+              // 如果不是sudo模式，不需要密码
               if (!credentials.sudo) {
                 keyFirstCredentials.password = undefined;
               }
               sftpId = await openSftp(keyFirstCredentials);
             } catch (err) {
+              // 如果是认证错误且有密码，尝试密码认证
               if (hasPassword && isAuthError(err)) {
                 sftpId = await openSftp({
                   sessionId: `sftp-${connectionId}`,
@@ -314,6 +388,7 @@ export const useSftpConnections = ({
               }
             }
           } else {
+            // 没有密钥，直接使用密码认证
             sftpId = await openSftp({
               sessionId: `sftp-${connectionId}`,
               ...credentials,
@@ -322,16 +397,22 @@ export const useSftpConnections = ({
 
           if (!sftpId) throw new Error("Failed to open SFTP session");
 
+          // 保存SFTP会话ID映射
           sftpSessionsRef.current.set(connectionId, sftpId);
 
+          // 使用缓存的路径或默认路径
           let startPath = sharedHostCache?.path ?? "/";
           let homeDir = sharedHostCache?.homeDir ?? startPath;
 
+          /**
+           * 如果没有共享缓存，检测用户主目录
+           * 检测策略：SSH执行 `echo ~` → SFTP realpath('.') → 硬编码候选路径
+           */
           if (!sharedHostCache) {
-            // Detect home directory: SSH exec `echo ~` → SFTP realpath('.') → hardcoded fallback
             const bridge = ALinLinkBridge.get();
             let detected = false;
 
+            // 首先尝试通过SFTP桥获取主目录
             if (bridge?.getSftpHomeDir) {
               try {
                 const result = await bridge.getSftpHomeDir(sftpId);
@@ -341,10 +422,11 @@ export const useSftpConnections = ({
                   detected = true;
                 }
               } catch {
-                // Fall through to hardcoded candidates
+                // 失败则回退到硬编码候选路径
               }
             }
 
+            // 如果自动检测失败，尝试硬编码的候选路径
             if (!detected) {
               const candidates: string[] = [];
               if (credentials.username === "root") {
@@ -366,11 +448,11 @@ export const useSftpConnections = ({
                       break;
                     }
                   } catch {
-                    // Ignore missing/permission errors
+                    // 忽略不存在或权限错误
                   }
                 }
               } else {
-                // Fallback: probe candidates via listSftp when statSftp is unavailable
+                // 当statSftp不可用时，通过listSftp探测候选路径
                 for (const candidate of candidates) {
                   try {
                     const files = await bridge?.listSftp(sftpId, candidate, filenameEncoding);
@@ -380,13 +462,14 @@ export const useSftpConnections = ({
                       break;
                     }
                   } catch {
-                    // Ignore missing/permission errors
+                    // 忽略不存在或权限错误
                   }
                 }
               }
             }
           }
 
+          // 如果有共享缓存，创建临时缓存键
           const provisionalCacheKey = sharedHostCache
             ? makeCacheKey(connectionId, startPath, filenameEncoding)
             : null;
@@ -397,16 +480,20 @@ export const useSftpConnections = ({
             });
           }
 
+          /**
+           * 获取远程文件列表
+           * 如果缓存路径失效，尝试回退路径
+           */
           let files: SftpFileEntry[] = [];
           try {
             files = await listRemoteFiles(sftpId, startPath, filenameEncoding);
           } catch {
-            // Cached path may be stale (deleted, permissions changed).
-            // Remove the provisional cache entry so phantom files don't resurface.
+            // 缓存路径可能已失效（已删除、权限变更）
+            // 删除临时缓存条目，防止幽灵文件重新出现
             if (provisionalCacheKey) {
               dirCacheRef.current.delete(provisionalCacheKey);
             }
-            // Fall back to homeDir, then "/", chaining attempts.
+            // 依次尝试回退路径：homeDir -> "/"
             let fallbackSucceeded = false;
             if (sharedHostCache && startPath !== homeDir) {
               try {
@@ -414,7 +501,7 @@ export const useSftpConnections = ({
                 files = await listRemoteFiles(sftpId, startPath, filenameEncoding);
                 fallbackSucceeded = true;
               } catch {
-                // homeDir also failed, try root
+                // homeDir也失败，尝试根目录
               }
             }
             if (!fallbackSucceeded && startPath !== "/") {
@@ -423,18 +510,24 @@ export const useSftpConnections = ({
                 files = await listRemoteFiles(sftpId, startPath, filenameEncoding);
                 fallbackSucceeded = true;
               } catch {
-                // root also failed
+                // 根目录也失败
               }
             }
             if (!fallbackSucceeded) {
               throw new Error("Cannot list any remote directory");
             }
           }
+
+          // 检查是否是最新的连接请求
           if (navSeqRef.current[side] !== connectRequestId) return;
+
+          // 更新缓存
           dirCacheRef.current.set(makeCacheKey(connectionId, startPath, filenameEncoding), {
             files,
             timestamp: Date.now(),
           });
+
+          // 更新共享主机缓存
           setSharedRemoteHostCache(hostCacheKey, {
             path: startPath,
             homeDir,
@@ -444,6 +537,7 @@ export const useSftpConnections = ({
 
           reconnectingRef.current[side] = false;
 
+          // 更新标签页状态为连接成功
           updateTab(side, activeTabId, (prev) => ({
             ...prev,
             connection: prev.connection
@@ -457,9 +551,10 @@ export const useSftpConnections = ({
             files,
             loading: false,
             reconnecting: false,
-            connectionLogs: [], // Clear after successful connect to avoid replay during navigation
+            connectionLogs: [], // 连接成功后清除日志，避免导航时重播
           }));
         } catch (err) {
+          // 连接失败处理
           if (navSeqRef.current[side] !== connectRequestId) return;
           reconnectingRef.current[side] = false;
           updateTab(side, activeTabId, (prev) => ({
@@ -480,6 +575,7 @@ export const useSftpConnections = ({
             reconnecting: false,
           }));
         } finally {
+          // 清理进度监听器
           unsubSftpProgress?.();
         }
       }
@@ -497,14 +593,22 @@ export const useSftpConnections = ({
     ],
   );
 
+  /**
+   * 标记初始连接是否已完成
+   */
   const initialConnectDoneRef = useRef(false);
 
+  /**
+   * 组件挂载时自动连接本地文件系统
+   * 仅在首次挂载且左侧标签页为空时执行
+   */
   useEffect(() => {
     if (
       autoConnectLocalOnMount &&
       !initialConnectDoneRef.current &&
       leftTabs.tabs.length === 0
     ) {
+      // 使用 setTimeout 确保在 React 渲染完成后执行
       const timer = window.setTimeout(() => {
         initialConnectDoneRef.current = true;
         connect("left", "local");
@@ -513,6 +617,10 @@ export const useSftpConnections = ({
     }
   }, [autoConnectLocalOnMount, connect, leftTabs.tabs.length]);
 
+  /**
+   * 自动重连逻辑
+   * 当面板标记为重连状态时，延迟1秒后尝试重新连接
+   */
   useEffect(() => {
     const reconnectTimers: number[] = [];
 
@@ -521,6 +629,7 @@ export const useSftpConnections = ({
       if (!lastHost || !reconnectingRef.current[side]) return;
 
       const timer = window.setTimeout(() => {
+        // 再次检查重连标志，防止重复连接
         if (!reconnectingRef.current[side]) return;
         void connect(side, lastHost);
       }, 1000);
@@ -534,11 +643,16 @@ export const useSftpConnections = ({
       scheduleReconnect("right");
     }
 
+    // 清理定时器
     return () => {
       reconnectTimers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [leftPane.reconnecting, rightPane.reconnecting, connect, lastConnectedHostRef, reconnectingRef]);
 
+  /**
+   * 断开SFTP连接
+   * @param side - 面板位置
+   */
   const disconnect = useCallback(
     async (side: "left" | "right") => {
       const pane = getActivePane(side);
@@ -547,27 +661,32 @@ export const useSftpConnections = ({
 
       if (!pane || !activeTabId) return;
 
+      // 增加导航序列号，使任何待处理的连接请求失效
       navSeqRef.current[side] += 1;
 
+      // 清除连接缓存
       if (pane.connection) {
         clearCacheForConnection(pane.connection.id);
       }
 
+      // 重置重连状态和最后连接的主机
       reconnectingRef.current[side] = false;
       lastConnectedHostRef.current[side] = null;
 
+      // 如果是远程连接，关闭SFTP会话
       if (pane.connection && !pane.connection.isLocal) {
         const sftpId = sftpSessionsRef.current.get(pane.connection.id);
         if (sftpId) {
           try {
             await ALinLinkBridge.get()?.closeSftp(sftpId);
           } catch {
-            // Ignore errors when closing SFTP session during disconnect
+            // 断开连接时忽略关闭SFTP会话的错误
           }
           sftpSessionsRef.current.delete(pane.connection.id);
         }
       }
 
+      // 将标签页重置为空面板
       updateTab(side, activeTabId, () => createEmptyPane(activeTabId, pane.showHiddenFiles));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

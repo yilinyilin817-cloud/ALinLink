@@ -1,3 +1,8 @@
+/**
+ * 终端会话启动器工厂
+ * 负责创建SSH、Telnet、Mosh、本地Shell和串口等多种类型的终端会话
+ * 处理认证、连接、错误处理等核心逻辑
+ */
 import type { Terminal as XTerm } from "@xterm/xterm";
 import { logger } from "../../../lib/logger";
 import type { Host, SSHKey } from "../../../types";
@@ -19,6 +24,12 @@ import {
   resolveTelnetUsername,
 } from "../../../domain/host";
 
+/**
+ * 获取缺失的跳转主机ID列表
+ * @param host - 目标主机
+ * @param resolvedChainHosts - 已解析的跳转主机链
+ * @returns 缺失的主机ID数组
+ */
 export const getMissingChainHostIds = (
   host: Host,
   resolvedChainHosts: Host[],
@@ -29,13 +40,28 @@ export const getMissingChainHostIds = (
   return requestedIds.filter((hostId) => !resolvedIds.has(hostId));
 };
 
+/**
+ * 创建终端会话启动器
+ * @param ctx - 终端会话启动器上下文
+ * @returns 包含各种会话启动方法的对象
+ */
 export const createTerminalSessionStarters = (ctx: TerminalSessionStartersContext) => {
+  /**
+   * 翻译辅助函数
+   * @param key - 翻译键
+   * @param fallback - 回退文本
+   * @returns 翻译后的文本或回退文本
+   */
   const tr = (key: string, fallback: string): string => {
     const translated = ctx.t?.(key);
     if (!translated || translated === key) return fallback;
     return translated;
   };
 
+  /**
+   * 启动SSH会话
+   * @param term - XTerm终端实例
+   */
   const startSSH = async (term: XTerm) => {
     if (!ctx.terminalBackend.backendAvailable()) {
       ctx.setError("Native SSH bridge unavailable. Launch via Electron app.");
